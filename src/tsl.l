@@ -11,7 +11,7 @@ CHOICE      [a-zA-Z0-9]([a-zA-Z0-9]+|{WHITESPACE})"."
 %%
 {COMMENTS}
 
-{CATEGORY}  printf("Category: %s", yytext);
+{CATEGORY}  std::string(yytext, yyleng);
 {CHOICE}    printf("Choice: %s", yytext);
 
 %%

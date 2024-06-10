@@ -11,6 +11,16 @@ Feature: The TSLCompiler should generate test frames identical to the TSLgenerat
         And the input is compiled by the TSLgenerator,
         Then the TSLCompiler's test frames should match the TSLgenerator's test frames.
 
+    Scenario: A Category should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with one Category, and one Choice,
+        When the TSLCompiler converts the TSL input into a Parse Tree,
+        Then the Parse Tree from the TSLCompiler should contain one Category named "Sample Category 1:".
+
+    Scenario: A Category should be returned from the Lexer from a valid TSL file.
+        Given a TSL input with one Category, and one Choice,
+        When the TSLCompiler's Lexer consumes the input,
+        Then the Lexer from the TSLCompiler should return the Category contents as a string.
+
 Feature: The TSLCompiler should honor the input flags from the TSLgenerator.
     Scenario: A user wants the results of the TSLCompiler to be in a file using the -o flag.
         Given an input file with one Category, and one Choice,
