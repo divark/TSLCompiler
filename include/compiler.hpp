@@ -1,5 +1,4 @@
-#ifndef __COMPILER_HPP__
-#define __COMPILER_HPP__
+#pragma once
 
 #include <string>
 #include <filesystem>
@@ -11,12 +10,10 @@
 
 struct TSLCompiler {
     std::unique_ptr<FlexLexer> lexer;
-    std::string inputContents;
+    std::istringstream inputContents;
 
     TSLCompiler();
 
-    std::string load(const std::filesystem::path& inputPath);
+    void load(const std::filesystem::path& inputPath);
     std::string getNextToken() const;
 };
-
-#endif

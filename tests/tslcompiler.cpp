@@ -10,7 +10,7 @@ SCENARIO("A Category should be returned from the Lexer from a valid TSL file.") 
         fs::path tslInput = "tests/one_category_one_choice.txt";
         WHEN("the TSLCompiler's Lexer consumes the input,") {
             TSLCompiler compiler;
-            REQUIRE(compiler.load(tslInput) != "");
+            compiler.load(tslInput);
             THEN("the Lexer from the TSLCompiler should return the Category contents as a string.") {
                 REQUIRE(compiler.getNextToken() == "Simple Category 1:");
             }

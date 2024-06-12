@@ -1,15 +1,18 @@
 #include "compiler.hpp"
+#include "lexer_tokens.hpp"
+
+#include <iostream>
 
 TSLCompiler::TSLCompiler() {
     lexer = std::make_unique<yyFlexLexer>();
-    inputContents = "";
+    inputContents = std::istringstream("");
 }
 
 /**
  * Stores all contents of some given input file found at a path.
  * Preconditions: File found at inputPath exists.
  */
-std::string TSLCompiler::load(const std::filesystem::path& inputPath) {
+void TSLCompiler::load(const std::filesystem::path& inputPath) {
     if (!std::filesystem::exists(inputPath)) {
         throw "File does not exist: " + std::filesystem::absolute(inputPath).string();
     }
@@ -19,9 +22,9 @@ std::string TSLCompiler::load(const std::filesystem::path& inputPath) {
     std::string inputBuffer(inputSize, '\0');
 
     inputStream.read(inputBuffer.data(), inputSize);
-    inputContents = inputBuffer;
+    inputContents = std::istringstream(inputBuffer);
 
-    return inputContents;
+    lexer = std::make_unique<yyFlexLexer>(&inputContents);
 }
 
 /**
@@ -31,10 +34,10 @@ std::string TSLCompiler::load(const std::filesystem::path& inputPath) {
  * in the lexer.
  */
 std::string TSLCompiler::getNextToken() const {
-    std::istringstream inputStream(inputContents);
-    while (lexer->yylex(inputStream, std::cout)) {
-        continue;
+    int lexerStatus = lexer->yylex();
+    if (lexerStatus == 0) {
+        return "EOF";
     }
 
-    return std::string(lexer->YYText());
+    return std::string(lexer->YYText(), lexer->YYText() + lexer->YYLeng());
 }
