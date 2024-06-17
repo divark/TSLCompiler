@@ -18,6 +18,21 @@ SCENARIO("A Category should be returned from the Lexer from a valid TSL file.") 
     }
 }
 
+SCENARIO("A Comment should not be returned from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with one Category, and one Choice,") {
+        fs::path tslInput = "tests/one_category_one_choice.txt";
+        WHEN("the TSLCompiler's Lexer consumes the input,") {
+            TSLCompiler compiler;
+            compiler.load(tslInput);
+            THEN("the Lexer from the TSLCompiler should not return the Category's Comment contents as a string.") {
+                auto lexerToken = compiler.getNextToken();
+                REQUIRE(lexerToken != "# Comments are quite helpful as reminders.");
+                REQUIRE(lexerToken == "Simple Category 1:");
+            }
+        }
+    }
+}
+
 SCENARIO("A Category's Choice should be returned from the Lexer from a valid TSL file.") {
     GIVEN("a TSL input with one Category, and one Choice,") {
         fs::path tslInput = "tests/one_category_one_choice.txt";

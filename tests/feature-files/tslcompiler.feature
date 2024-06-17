@@ -21,6 +21,11 @@ Feature: The TSLCompiler should generate test frames identical to the TSLgenerat
         When the TSLCompiler's Lexer consumes the input,
         Then the Lexer from the TSLCompiler should return the Category's Choice contents as a string.
 
+    Scenario: A Comment should not be returned from the Lexer from a valid TSL file.
+        Given a TSL input with one Category, and one Choice,
+        When the TSLCompiler's Lexer consumes the input,
+        Then the Lexer from the TSLCompiler should not return the Category Comment contents as a string.
+
     Scenario: A Category should be returned from the Lexer from a valid TSL file.
         Given a TSL input with one Category, and one Choice,
         When the TSLCompiler's Lexer consumes the input,
