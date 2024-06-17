@@ -14,6 +14,8 @@ Finally, to remain fairly close to the original C implmenetation of the TSLgener
 # Building
 ## Prerequisites
 - A C++ Compiler supporting the C++17 standard.
+- The Lexer library Flex.
+- The Parser library Bison.
 - [The Meson Build System](https://mesonbuild.com/SimpleStart.html).
 - [Catch2](https://github.com/catchorg/Catch2), which can be installed into the project locally using meson via `meson wrap install catch2`
 
