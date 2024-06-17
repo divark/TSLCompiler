@@ -1,4 +1,4 @@
-bison = find_program('bison')
+bison = find_program('bison', version: '>=3.2')
 flex = find_program('flex')
 flex_input = files('tsl.l')
 flex_generated_sources = custom_target('lexer.cpp',
