@@ -1,9 +1,8 @@
-#include "compiler.hpp"
-#include "lexer_tokens.hpp"
+#include "tsl_lexer.hpp"
 
 #include <iostream>
 
-TSLCompiler::TSLCompiler() {
+TSLLexer::TSLLexer() {
     lexer = std::make_unique<yyFlexLexer>();
     inputContents = std::istringstream("");
 }
@@ -12,7 +11,7 @@ TSLCompiler::TSLCompiler() {
  * Stores all contents of some given input file found at a path.
  * Preconditions: File found at inputPath exists.
  */
-void TSLCompiler::load(const std::filesystem::path& inputPath) {
+void TSLLexer::load(const std::filesystem::path& inputPath) {
     if (!std::filesystem::exists(inputPath)) {
         throw "File does not exist: " + std::filesystem::absolute(inputPath).string();
     }
@@ -28,16 +27,23 @@ void TSLCompiler::load(const std::filesystem::path& inputPath) {
 }
 
 /**
- * Returns a Token read from the Lexer.
- * Preconditions: TSLCompiler::load was called.
- * Postconditions: A string containing a token matched from some rule defined
- * in the lexer.
+ * Returns the next Token type read from the Lexer.
+ * Preconditions: TSLLexer::load was called.
+ * Postconditions: A Token represented as a number (enum) is returned for
+ * some rule defined in the lexer found in tsl.l.
  */
-std::string TSLCompiler::getNextToken() const {
+TSLToken TSLLexer::getNextToken() const {
     int lexerStatus = lexer->yylex();
-    if (lexerStatus == 0) {
-        return "EOF";
-    }
 
+    return static_cast<TSLToken>(lexerStatus);
+}
+
+/**
+ * Returns the contents of a Token seen currently by the Lexer.
+ * Preconditions: TSLLexer::getNextToken() was called.
+ * Postconditions: A string containing a token matched from some rule defined
+ * in the lexer found in tsl.l.
+ */
+std::string TSLLexer::getCurrentTokenContents() const {
     return std::string(lexer->YYText(), lexer->YYText() + lexer->YYLeng());
 }

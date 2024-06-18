@@ -1,6 +1,6 @@
 #pragma once
 
-enum Tokens {
+enum TSLToken {
     Category = 1,
     Choice = 2,
 };

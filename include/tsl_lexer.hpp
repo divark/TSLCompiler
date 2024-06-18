@@ -7,13 +7,16 @@
 #include <memory>
 
 #include "FlexLexer.h"
+#include "lexer_tokens.hpp"
 
-struct TSLCompiler {
+struct TSLLexer {
     std::unique_ptr<FlexLexer> lexer;
     std::istringstream inputContents;
 
-    TSLCompiler();
+    TSLLexer();
 
     void load(const std::filesystem::path& inputPath);
-    std::string getNextToken() const;
+
+    TSLToken getNextToken() const;
+    std::string getCurrentTokenContents() const;
 };

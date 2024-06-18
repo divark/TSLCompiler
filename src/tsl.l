@@ -15,8 +15,8 @@ CHOICE      .+"."
 
 {WHITESPACE} /* Go wild with whitespace for formatting, we ignore it by default. */
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
-{CATEGORY}  return Tokens::Category;
-{CHOICE}    return Tokens::Choice;
+{CATEGORY}  return TSLToken::Category;
+{CHOICE}    return TSLToken::Choice;
 
 %%
 /* Extra Code */
