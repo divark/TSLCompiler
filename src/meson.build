@@ -1,6 +1,6 @@
 bison = find_program('bison', version: '>=3.2')
 flex = find_program('flex')
-flex_input = files('tsl.l')
+flex_input = files('lexer.l')
 flex_generated_sources = custom_target('lexer.cpp',
   output: ['lexer.cpp', 'lexer.hpp'],
   input: flex_input,

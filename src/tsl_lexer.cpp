@@ -30,7 +30,7 @@ void TSLLexer::load(const std::filesystem::path& inputPath) {
  * Returns the next Token type read from the Lexer.
  * Preconditions: TSLLexer::load was called.
  * Postconditions: A Token represented as a number (enum) is returned for
- * some rule defined in the lexer found in tsl.l.
+ * some rule defined in the lexer found in lexer.l.
  */
 TSLToken TSLLexer::getNextToken() const {
     int lexerStatus = lexer->yylex();
@@ -42,7 +42,7 @@ TSLToken TSLLexer::getNextToken() const {
  * Returns the contents of a Token seen currently by the Lexer.
  * Preconditions: TSLLexer::getNextToken() was called.
  * Postconditions: A string containing a token matched from some rule defined
- * in the lexer found in tsl.l.
+ * in the lexer found in lexer.l.
  */
 std::string TSLLexer::getCurrentTokenContents() const {
     return std::string(lexer->YYText(), lexer->YYText() + lexer->YYLeng());
