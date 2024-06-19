@@ -7,6 +7,6 @@ flex_generated_sources = custom_target('lexer.cpp',
   command: [flex, '--c++', '--header-file=@OUTPUT1@', '-o@OUTPUT0@', '@INPUT@' ],
 )
 
-app_sources = files('tsl_lexer.cpp') + flex_generated_sources
+app_sources = files('tsl_lexer.cpp', 'parse_tree.cpp') + flex_generated_sources
 
 #executable('tslcompiler', 'main.cpp')
