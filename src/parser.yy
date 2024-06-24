@@ -4,7 +4,6 @@
     #include "tsl_lexer.hpp"
 }
 
-%header
 %code {
     #define yylex lexer.constructNextToken
 }
