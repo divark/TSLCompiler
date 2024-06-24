@@ -6,8 +6,9 @@
 #include <sstream>
 #include <memory>
 
-#include "FlexLexer.h"
-#include "lexer_tokens.hpp"
+#if ! defined(yyFlexLexerOnce)
+#include <FlexLexer.h>
+#endif
 
 struct TSLLexer {
     std::unique_ptr<FlexLexer> lexer;
@@ -17,6 +18,7 @@ struct TSLLexer {
 
     void load(const std::filesystem::path& inputPath);
 
-    TSLToken getNextToken() const;
+    int getNextToken() const;
+    int constructNextToken(std::string*) const;
     std::string getCurrentTokenContents() const;
 };

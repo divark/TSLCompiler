@@ -1,6 +1,6 @@
 /* Includes */
 %{
-    #include "lexer_tokens.hpp"
+    #include "parser.hpp"
 %}
 %option noyywrap
 
@@ -15,8 +15,8 @@ CHOICE      .+"."
 
 {WHITESPACE} /* Go wild with whitespace for formatting, we ignore it by default. */
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
-{CATEGORY}  return TSLToken::Category;
-{CHOICE}    return TSLToken::Choice;
+{CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;
+{CHOICE}    return yy::parser::token::CHOICE_CONTENTS;
 
 %%
 /* Extra Code */

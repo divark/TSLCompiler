@@ -2,6 +2,7 @@
 #include <filesystem>
 
 #include "tsl_lexer.hpp"
+#include "parser.hpp"
 
 namespace fs = std::filesystem;
 
@@ -12,7 +13,7 @@ SCENARIO("A Category should be returned from the Lexer from a valid TSL file.") 
             TSLLexer lexer;
             lexer.load(tslInput);
             THEN("the Lexer should return the Category contents as a string.") {
-                REQUIRE(lexer.getNextToken() == TSLToken::Category);
+                REQUIRE(lexer.getNextToken() == yy::parser::token::CATEGORY_CONTENTS);
                 REQUIRE(lexer.getCurrentTokenContents() == "Simple Category 1:");
             }
         }
@@ -31,7 +32,7 @@ SCENARIO("A Comment should not be returned from the Lexer from a valid TSL file.
 
                 REQUIRE(tokenContents != "# Comments are quite helpful as reminders.");
 
-                REQUIRE(lexerToken == TSLToken::Category);
+                REQUIRE(lexerToken == yy::parser::token::CATEGORY_CONTENTS);
                 REQUIRE(tokenContents == "Simple Category 1:");
             }
         }
@@ -50,8 +51,8 @@ SCENARIO("A Category's Choice should be returned from the Lexer from a valid TSL
                 // Choice.
                 lexer.getNextToken();
 
-		auto lexerToken = lexer.getNextToken();
-                REQUIRE(lexerToken == TSLToken::Choice);
+                auto lexerToken = lexer.getNextToken();
+                REQUIRE(lexerToken == yy::parser::token::CHOICE_CONTENTS);
                 REQUIRE(lexer.getCurrentTokenContents() == "Simple Choice 1.");
             }
         }
