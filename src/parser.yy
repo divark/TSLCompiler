@@ -2,6 +2,7 @@
 %code requires {
     #include <string>
     #include "tsl_lexer.hpp"
+    #include "tsl_collector.hpp"
 }
 
 %code {
@@ -12,9 +13,10 @@
 %require "3.2"
 %language "c++"
 
-%define api.value.type {std::string}
+%define api.value.type {int}
 
 %parse-param {TSLLexer &lexer}
+%parse-param {TSLCollector &collector}
 
 %token CATEGORY_CONTENTS
 %token CHOICE_CONTENTS
@@ -24,8 +26,9 @@
 
 categories: categories category
           | category
+          ;
 
-category:   CATEGORY_CONTENTS 
+category:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
 
 %%
 

@@ -28,7 +28,7 @@ SCENARIO("A Comment should not be returned from the Lexer from a valid TSL file.
             lexer.load(tslInput);
             THEN("the Lexer should not return the Category's Comment contents as a string.") {
                 auto lexerToken = lexer.getNextToken();
-		auto tokenContents = lexer.getCurrentTokenContents();
+                auto tokenContents = lexer.getCurrentTokenContents();
 
                 REQUIRE(tokenContents != "# Comments are quite helpful as reminders.");
 

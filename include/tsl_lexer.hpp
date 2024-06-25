@@ -19,6 +19,6 @@ struct TSLLexer {
     void load(const std::filesystem::path& inputPath);
 
     int getNextToken() const;
-    int constructNextToken(std::string*) const;
+    int constructNextToken(int*) const;
     std::string getCurrentTokenContents() const;
 };

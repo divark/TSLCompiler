@@ -14,6 +14,6 @@ bison_generated_sources = custom_target('parser.cpp',
   command: [bison, '-d', '-o@OUTPUT0@', '@INPUT@' ],
 )
 
-app_sources = files('tsl_lexer.cpp', 'parse_tree.cpp') + bison_generated_sources + flex_generated_sources
+app_sources = files('tsl_lexer.cpp', 'tsl_collector.cpp') + bison_generated_sources + flex_generated_sources
 
 #executable('tslcompiler', 'main.cpp')

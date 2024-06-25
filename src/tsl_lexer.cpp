@@ -39,10 +39,8 @@ int TSLLexer::getNextToken() const {
 /**
  * Populates the contents of the next read Token into the current result.
  */
-int TSLLexer::constructNextToken(std::string* currentResult) const {
+int TSLLexer::constructNextToken(int* currentResult) const {
     auto currentTokenType = getNextToken();
-
-    *currentResult = getCurrentTokenContents();
 
     return currentTokenType;
 }
