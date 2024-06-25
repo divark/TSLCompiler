@@ -25,10 +25,17 @@
 %%
 
 categories: categories category
-          | category
+          | category choices
           ;
 
+choices:    choices choice
+       |    choice
+       ;
+
 category:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
+        ;
+choice:     CHOICE_CONTENTS
+      ;
 
 %%
 
