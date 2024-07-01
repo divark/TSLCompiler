@@ -37,7 +37,6 @@ choice:     choice_label
 
 category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
         ;
-/* $$ as an argument is implied to be the result of an earlier call to collector.recordCategory. */
 choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurrentTokenContents()); }
       ;
 
