@@ -11,10 +11,21 @@ Feature: The TSLCompiler should generate test frames identical to the TSLgenerat
         And the input is compiled by the TSLgenerator,
         Then the TSLCompiler's test frames should match the TSLgenerator's test frames.
 
+    Scenario: Both Categories and Choices should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, and one Choice each,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Parse Tree should contain the contents of both Categories,
+        And the Parse Tree should contain the contents of both Choices.
+
+    Scenario: A Choice should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with one Category, and one Choice,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Parse Tree should contain the contents of the Choice.
+
     Scenario: A Category should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with one Category, and one Choice,
         When the Parser converts the TSL input into a Parse Tree,
-        Then the Parse Tree should contain one Category named "Sample Category 1:".
+        Then the Parse Tree should contain the contents of the Category.
 
     Scenario: A Choice from a Category should be returned from the Lexer from a valid TSL file.
         Given a TSL input with one Category, and one Choice,

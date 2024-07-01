@@ -25,16 +25,20 @@
 %%
 
 categories: categories category
-          | category choices
+          | category 
           ;
-
+category:   category_label choices
+        ;
 choices:    choices choice
        |    choice
        ;
+choice:     choice_label
+      ;
 
-category:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
+category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
         ;
-choice:     CHOICE_CONTENTS
+/* $$ as an argument is implied to be the result of an earlier call to collector.recordCategory. */
+choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurrentTokenContents()); }
       ;
 
 %%
