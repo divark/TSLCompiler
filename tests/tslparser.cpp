@@ -82,3 +82,23 @@ SCENARIO("Both Categories and Choices should be found in the Parse Tree from a v
         }
     }
 }
+
+SCENARIO("A single marking for a Choice should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with a Category, Choice, and one marking constraint,") {
+        fs::path tslInput = "tests/one_category_choice_with_marking.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+
+            TSLCollector collector;
+
+            yy::parser parser(lexer, collector);
+            parser();
+
+            THEN("the Collector should contain the Choice's marking.") {
+                int choiceIdx = 0;
+                REQUIRE(collector.singleMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}

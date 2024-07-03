@@ -11,37 +11,6 @@ Feature: The TSLCompiler should generate test frames identical to the TSLgenerat
         And the input is compiled by the TSLgenerator,
         Then the TSLCompiler's test frames should match the TSLgenerator's test frames.
 
-    Scenario: Both Categories and Choices should be found in the Parse Tree from a valid TSL file.
-        Given a TSL input with two Categories, and one Choice each,
-        When the Parser converts the TSL input into a Parse Tree,
-        Then the Parse Tree should contain the contents of both Categories,
-        And the Parse Tree should contain the contents of both Choices.
-
-    Scenario: A Choice should be found in the Parse Tree from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
-        When the Parser converts the TSL input into a Parse Tree,
-        Then the Parse Tree should contain the contents of the Choice.
-
-    Scenario: A Category should be found in the Parse Tree from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
-        When the Parser converts the TSL input into a Parse Tree,
-        Then the Parse Tree should contain the contents of the Category.
-
-    Scenario: A Choice from a Category should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
-        When the Lexer consumes the input,
-        Then the Lexer should return the Category's Choice contents as a string.
-
-    Scenario: A Comment should not be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
-        When the Lexer consumes the input,
-        Then the Lexer should not return the Category Comment contents as a string.
-
-    Scenario: A Category should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
-        When the Lexer consumes the input,
-        Then the Lexer should return the Category contents as a string.
-
 Feature: The TSLCompiler should honor the input flags from the TSLgenerator.
     Scenario: A user wants the results of the TSLCompiler to be in a file using the -o flag.
         Given an input file with one Category, and one Choice,

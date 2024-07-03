@@ -1,6 +1,7 @@
 /* Prologue (Imports, Macros, etc) */
 %code requires {
     #include <string>
+
     #include "tsl_lexer.hpp"
     #include "tsl_collector.hpp"
 }
@@ -20,6 +21,7 @@
 
 %token CATEGORY_CONTENTS
 %token CHOICE_CONTENTS
+%token MARKING_SINGLE
 
 /* Bison Grammar Rules */
 %%
@@ -32,8 +34,15 @@ category:   category_label choices
 choices:    choices choice
        |    choice
        ;
-choice:     choice_label
+choice:     choice_label constraint
+      |     choice_label
       ;
+constraint: label
+          ;
+label:  marking
+     ;
+marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
+       ;
 
 category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
         ;

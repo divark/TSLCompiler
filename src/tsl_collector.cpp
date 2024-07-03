@@ -15,9 +15,21 @@ int TSLCollector::recordCategory(std::string categoryContents) {
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
     choices.push_back(choiceContents);
+    singleMarkings.push_back(false);
 
     int choiceIdx = choices.size() - 1;
     int currentCategoryIdx = categories.size() - 1;
     categoryChoicesGraph[currentCategoryIdx].push_back(choiceIdx);
+    return choiceIdx;
+}
+
+/**
+ * Returns the Choice used (as an index) to apply a Single Marking.
+ */
+int TSLCollector::markChoiceAsSingle() {
+    int choiceIdx = choices.size() - 1;
+
+    singleMarkings[choiceIdx] = true;
+
     return choiceIdx;
 }

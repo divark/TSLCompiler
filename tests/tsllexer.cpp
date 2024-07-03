@@ -58,3 +58,23 @@ SCENARIO("A Category's Choice should be returned from the Lexer from a valid TSL
         }
     }
 }
+
+SCENARIO("A single marking from a Choice should be returned from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with a Category, Choice, and one marking constraint,") {
+        fs::path tslInput = "tests/one_category_choice_with_marking.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Choice's Marking.") {
+                // To get to the Constraints, we have to ignore the tokens found for the Category
+                // and Choice found first.
+                for (int i = 0; i < 2; i++) {
+                    lexer.getNextToken();
+                }
+
+                auto lexerToken = lexer.getNextToken();
+                REQUIRE(lexerToken == yy::parser::token::MARKING_SINGLE);
+            }
+        }
+    }
+}
