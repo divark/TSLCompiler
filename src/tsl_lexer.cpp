@@ -42,6 +42,8 @@ int TSLLexer::getNextToken() const {
 int TSLLexer::constructNextToken(int* currentResult) const {
     auto currentTokenType = getNextToken();
 
+    *currentResult = currentTokenType;
+
     return currentTokenType;
 }
 
