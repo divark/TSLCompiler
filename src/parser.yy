@@ -22,6 +22,7 @@
 %token CATEGORY_CONTENTS
 %token CHOICE_CONTENTS
 %token MARKING_SINGLE
+%token MARKING_ERROR
 
 /* Bison Grammar Rules */
 %%
@@ -42,6 +43,7 @@ constraint: label
 label:  marking
      ;
 marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
+       |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;
 
 category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 

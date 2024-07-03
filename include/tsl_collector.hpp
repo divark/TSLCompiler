@@ -8,6 +8,7 @@ struct TSLCollector {
     std::vector<std::string> choices;
     // All variables below are Constraints for Choices
     std::vector<bool> singleMarkings;
+    std::vector<bool> errorMarkings;
 
     /// This mimics an Adjacency List approach to a Graph
     /// representation, instead using a vector. This is intentional since
@@ -24,4 +25,5 @@ struct TSLCollector {
     int recordChoice(std::string);
 
     int markChoiceAsSingle();
+    int markChoiceAsError();
 };

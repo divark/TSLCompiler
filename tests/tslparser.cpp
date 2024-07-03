@@ -80,3 +80,38 @@ SCENARIO("A single marking for a Choice should be found in the Parse Tree from a
         }
     }
 }
+
+SCENARIO("A error marking for a Choice should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with a Category, Choice, and one error marking constraint,") {
+        fs::path tslInput = "tests/one_category_choice_with_error_marking.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            parser.run();
+
+            THEN("the Collector should contain the Choice's error marking.") {
+                int choiceIdx = 0;
+                REQUIRE(parser.collector.errorMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}
+
+SCENARIO("A single and error marking for one Choice each should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with a Category, one Choice with a single marking, and one Choice with an error marking,") {
+        fs::path tslInput = "tests/one_category_choices_with_single_and_error_markings.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            parser.run();
+
+            THEN("the Collector should contain the first Choice's single marking.") {
+                int choiceIdx = 0;
+                REQUIRE(parser.collector.singleMarkings[choiceIdx] == true);
+            }
+
+            THEN("the Collector should contain the second Choice's error marking.") {
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.errorMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}

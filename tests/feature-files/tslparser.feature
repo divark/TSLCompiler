@@ -1,8 +1,19 @@
 Feature: The Parser handles valid TSL input.
-    Scenario: A single marking for a Choice should be found in the Parse Tree from a valid TSL file.
-        Given a TSL input with a Category, Choice, and one marking constraint,
+    Scenario: A single and error marking for one Choice each should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with a Category, one Choice with a single marking, and one Choice with an error marking,
         When the Parser converts the TSL input into a Parse Tree,
-        Then the Collector should contain the Choice's marking.
+        Then the Collector should contain the first Choice's single marking.
+        And the Collector should contain the second Choice's error marking.
+
+    Scenario: An error marking for a Choice should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with a Category, Choice, and one error marking constraint,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's error marking.
+
+    Scenario: A single marking for a Choice should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with a Category, Choice, and one single marking constraint,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's single marking.
 
     Scenario: Both Categories and Choices should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with two Categories, and one Choice each,

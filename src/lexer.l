@@ -10,6 +10,7 @@ COMMENT     "#".*
 CATEGORY    .+":"
 CHOICE      .+"."
 MARKING_SINGLE  "[single]"
+MARKING_ERROR   "[error]"
 
 /* Rules */
 %%
@@ -19,6 +20,7 @@ MARKING_SINGLE  "[single]"
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;
 {CHOICE}    return yy::parser::token::CHOICE_CONTENTS;
 {MARKING_SINGLE}    return yy::parser::token::MARKING_SINGLE;
+{MARKING_ERROR}     return yy::parser::token::MARKING_ERROR;
 
 %%
 /* Extra Code */

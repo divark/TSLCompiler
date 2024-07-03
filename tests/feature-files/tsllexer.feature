@@ -1,8 +1,13 @@
 Feature: The Lexer recognizes valid TSL input.
-    Scenario: A single marking from a Choice should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with a Category, Choice, and one marking constraint,
+    Scenario: An error marking from a Choice should be returned from the Lexer from a valid TSL file.
+        Given a TSL input with a Category, Choice, and one error marking constraint,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice's Marking.
+        Then the Lexer should detect the Choice's error Marking.
+
+    Scenario: A single marking from a Choice should be returned from the Lexer from a valid TSL file.
+        Given a TSL input with a Category, Choice, and one single marking constraint,
+        When the Lexer consumes the input,
+        Then the Lexer should detect the Choice's single Marking.
 
     Scenario: A Choice from a Category should be returned from the Lexer from a valid TSL file.
         Given a TSL input with one Category, and one Choice,
