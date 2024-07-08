@@ -72,6 +72,9 @@ SCENARIO("A single marking from a Choice should be returned from the Lexer from 
                     lexer.getNextToken();
                 }
 
+		// We also want to skip the Constraint start and end tokens.
+		lexer.getNextToken();
+
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_SINGLE);
             }
@@ -91,6 +94,9 @@ SCENARIO("An error marking from a Choice should be returned from the Lexer from 
                 for (int i = 0; i < 2; i++) {
                     lexer.getNextToken();
                 }
+
+		// We also want to skip the Constraint start and end tokens.
+		lexer.getNextToken();
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_ERROR);

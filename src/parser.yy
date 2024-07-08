@@ -21,6 +21,10 @@
 
 %token CATEGORY_CONTENTS
 %token CHOICE_CONTENTS
+
+%token CONSTRAINT_START
+%token CONSTRAINT_END
+
 %token MARKING_SINGLE
 %token MARKING_ERROR
 
@@ -38,7 +42,7 @@ choices:    choices choice
 choice:     choice_label constraint
       |     choice_label
       ;
-constraint: label
+constraint: CONSTRAINT_START label CONSTRAINT_END
           ;
 label:  marking
      ;
