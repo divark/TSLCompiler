@@ -95,11 +95,63 @@ SCENARIO("An error marking from a Choice should be returned from the Lexer from 
                     lexer.getNextToken();
                 }
 
-		// We also want to skip the Constraint start and end tokens.
-		lexer.getNextToken();
+                // We also want to skip the Constraint start and end tokens.
+                lexer.getNextToken();
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_ERROR);
+            }
+        }
+    }
+}
+
+SCENARIO("A Property from a Choice should be returned from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with one Category, Choice, and a single Property,") {
+        fs::path tslInput = "tests/choice_with_one_property.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should return the Property's contents as a string.") {
+                // To get to the Constraints, we have to ignore the tokens found for the Category
+                // and Choice found, and ignoring the beginning of the Constraint characters.
+                for (int i = 0; i < 3; i++) {
+                    lexer.getNextToken();
+                }
+
+                auto propertyListToken = lexer.getNextToken();
+                REQUIRE(propertyListToken == yy::parser::token::PROPERTY_LIST);
+
+                auto propertyElementToken = lexer.getNextToken();
+                REQUIRE(propertyElementToken == yy::parser::token::PROPERTY_ELEMENT);
+                REQUIRE(lexer.getCurrentTokenContents() == "ABC");
+            }
+        }
+    }
+}
+
+SCENARIO("Multiple Properties from a Choice should be returned from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with one Category, Choice, and multiple Properties,") {
+        fs::path tslInput = "tests/choice_with_multiple_properties.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should return each Property's contents as a string.") {
+                // To get to the Constraints, we have to ignore the tokens found for the Category
+                // and Choice found, and ignoring the beginning of the Constraint characters.
+                for (int i = 0; i < 3; i++) {
+                    lexer.getNextToken();
+                }
+
+                auto propertyListToken = lexer.getNextToken();
+                REQUIRE(propertyListToken == yy::parser::token::PROPERTY_LIST);
+
+                std::string properties[] = {"A,", "B,", "C"};
+                int numProperties = 3;
+                for (int i = 0; i < numProperties; i++) {
+                    auto propertyElementToken = lexer.getNextToken();
+                    REQUIRE(propertyElementToken == yy::parser::token::PROPERTY_ELEMENT);
+                    REQUIRE(lexer.getCurrentTokenContents() == properties[i]);
+                }
             }
         }
     }

@@ -23,10 +23,15 @@
 %token CHOICE_CONTENTS
 
 %token CONSTRAINT_START
-%token CONSTRAINT_END
+
+%token PROPERTY_LIST
+%token PROPERTY_ELEMENT
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
+
+%token CONSTRAINT_END
+
 
 /* Bison Grammar Rules */
 %%
@@ -45,7 +50,14 @@ choice:     choice_label constraint
 constraint: CONSTRAINT_START label CONSTRAINT_END
           ;
 label:  marking
+     |  property_list
      ;
+property_list:  PROPERTY_LIST property_elements
+             ;
+property_elements: property_element
+                 | property_elements property_element
+                 ;
+property_element:   PROPERTY_ELEMENT { $$ = collector.recordProperty(lexer.getCurrentTokenContents()); }
 marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
        |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;

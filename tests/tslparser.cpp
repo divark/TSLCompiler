@@ -115,3 +115,42 @@ SCENARIO("A single and error marking for one Choice each should be found in the 
         }
     }
 }
+
+SCENARIO("One Property for a Choice should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with one Category, Choice, and a single Property,") {
+        fs::path tslInput = "tests/choice_with_one_property.txt";
+	WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            parser.run();
+
+	    THEN("the Collector should contain the Choice's Property.") {
+		int choiceIdx = 0;
+                int propertyIdx = 0;
+		REQUIRE(parser.collector.properties[propertyIdx] == "ABC");
+		REQUIRE(parser.collector.choiceProperties[choiceIdx][0] == propertyIdx);
+	    }
+	}
+    }
+}
+
+SCENARIO("Multiple Properties for a Choice should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with one Category, Choice, and multiple Properties,") {
+        fs::path tslInput = "tests/choice_with_multiple_properties.txt";
+	WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            parser.run();
+
+	    THEN("the Collector should contain the Choice's Properties.") {
+		int choiceIdx = 0;
+		int property_idx[] = {0, 1, 2};
+		std::string property[] = {"A", "B", "C"};
+
+		REQUIRE(parser.collector.properties.size() == 3);
+		for (int propertyIdx : property_idx) {
+                    REQUIRE(parser.collector.properties[propertyIdx] == property[propertyIdx]);
+		    REQUIRE(parser.collector.choiceProperties[choiceIdx][propertyIdx] == propertyIdx);
+		}
+	    }
+	}
+    }
+}

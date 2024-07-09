@@ -17,11 +17,31 @@ int TSLCollector::recordChoice(std::string choiceContents) {
     choices.push_back(choiceContents);
     singleMarkings.push_back(false);
     errorMarkings.push_back(false);
+    choiceProperties.push_back(std::vector<int>());
 
     int choiceIdx = choices.size() - 1;
     int currentCategoryIdx = categories.size() - 1;
     categoryChoicesGraph[currentCategoryIdx].push_back(choiceIdx);
     return choiceIdx;
+}
+
+/**
+ * Returns an index to the recently stored Property for the most recently recorded Choice.
+ */
+int TSLCollector::recordProperty(std::string propertyContents) {
+    // We could be recording multiple properties, so we want
+    // to remove commas if found, since we don't care about them.
+    if (propertyContents.ends_with(',')) {
+        propertyContents.pop_back();
+    }
+
+    properties.push_back(propertyContents);
+
+    int propertiesIdx = properties.size() - 1;
+    int choiceIdx = choices.size() - 1;
+    choiceProperties[choiceIdx].push_back(propertiesIdx);
+
+    return propertiesIdx;
 }
 
 /**

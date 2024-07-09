@@ -9,8 +9,9 @@ struct TSLCollector {
     // All variables below are Constraints for Choices
     std::vector<bool> singleMarkings;
     std::vector<bool> errorMarkings;
+    std::vector<std::string> properties;
 
-    /// This mimics an Adjacency List approach to a Graph
+    /// These mimic an Adjacency List approach to a Graph
     /// representation, instead using a vector. This is intentional since
     /// the graph will never have nodes or edges deleted during runtime.
     ///
@@ -20,9 +21,12 @@ struct TSLCollector {
     /// where a key is based on its string, and has the potential to
     /// utilize temporal locality if dealing with the graph alone.
     std::vector<std::vector<int>> categoryChoicesGraph;
+    std::vector<std::vector<int>> choiceProperties;
 
     int recordCategory(std::string);
     int recordChoice(std::string);
+
+    int recordProperty(std::string);
 
     int markChoiceAsSingle();
     int markChoiceAsError();
