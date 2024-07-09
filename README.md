@@ -9,7 +9,7 @@ The TSLCompiler is designed to be a drop-in replacement for the TSLgenerator, ho
 
 In addition, the TSLCompiler is developed using the principles behind Test Driven Development/Behavior Driven Development to provide confidence in any proposed changes.
 
-Finally, to remain fairly close to the original C implmenetation of the TSLgenerator, and to reduce memory leaks, this project utilizes C++17.
+Finally, to remain fairly close to the original C implmenetation of the TSLgenerator, and to reduce memory leaks, this project utilizes C++.
 
 # Building
 ## Prerequisites
