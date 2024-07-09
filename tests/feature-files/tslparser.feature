@@ -1,13 +1,13 @@
 Feature: The Parser handles valid TSL input.
     Scenario: One Property for a Choice should be found in the Parse Tree from a valid TSL file.
-	Given a TSL input with one Category, Choice, and a single Property,
-	When the Parser converts the TSL input into a Parse Tree,
-	Then the Collector should contain the Choice's Property.
+	    Given a TSL input with one Category, Choice, and a single Property,
+	    When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Property.
 
     Scenario: Multiple Properties for a Choice should be found in the Parse Tree from a valid TSL file.
-	Given a TSL input with one Category, Choice, and multiple Properties,
-	When the Parser converts the TSL input into a Parse Tree,
-	Then the Collector should contain the Choice's Properties.
+        Given a TSL input with one Category, Choice, and multiple Properties,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Properties.
 
     Scenario: A single and error marking for one Choice each should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with a Category, one Choice with a single marking, and one Choice with an error marking,
