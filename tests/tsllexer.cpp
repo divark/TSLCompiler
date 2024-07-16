@@ -156,3 +156,34 @@ SCENARIO("Multiple Properties from a Choice should be returned from the Lexer fr
         }
     }
 }
+
+SCENARIO("An If Statement should be recognized from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,") {
+        fs::path tslInput = "tests/choices_with_simple_if.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Choice's If Statement.") {
+                // We don't care about the first Category, only the second one.
+                //
+                // NOTE:
+                // However, the first Category is needed since an Expression
+                // refers to a Property already defined earlier, hence why
+                // it is kept for correctness reasons.
+                auto currentTokenFound = lexer.getNextToken();
+                do {
+                    currentTokenFound = lexer.getNextToken();
+                } while (currentTokenFound != yy::parser::token::CATEGORY_CONTENTS);
+
+                // An If Expression comes after a Choice, so we ignore the Choice
+                // as well.
+                lexer.getNextToken();
+                // And when the Constraint starts too, since we only care about
+                // the if statement.
+                lexer.getNextToken();
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::IF);
+            }
+        }
+    }
+}

@@ -13,11 +13,13 @@ CHOICE      .+"."
 
 CONSTRAINT_START "["
 
-PROPERTY_LIST   "property"
-PROPERTY_ELEMENT [a-zA-Z0-9]+","?
+IF              "if"
 
 MARKING_SINGLE  "single"
 MARKING_ERROR   "error"
+
+PROPERTY_LIST   "property"
+PROPERTY_ELEMENT [a-zA-Z0-9]+","?
 
 CONSTRAINT_END   "]"
 
@@ -29,6 +31,7 @@ CONSTRAINT_END   "]"
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;
 {CHOICE}    return yy::parser::token::CHOICE_CONTENTS;
 {CONSTRAINT_START}  return yy::parser::token::CONSTRAINT_START;
+{IF}                return yy::parser::token::IF;
 {MARKING_SINGLE}    return yy::parser::token::MARKING_SINGLE;
 {MARKING_ERROR}     return yy::parser::token::MARKING_ERROR;
 {PROPERTY_LIST}     return yy::parser::token::PROPERTY_LIST;
