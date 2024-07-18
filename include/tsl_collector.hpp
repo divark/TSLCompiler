@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+#include "expressions.hpp"
+
 struct TSLCollector {
     std::vector<std::string> categories;
     std::vector<std::string> choices;
@@ -22,6 +24,14 @@ struct TSLCollector {
     /// utilize temporal locality if dealing with the graph alone.
     std::vector<std::vector<int>> categoryChoicesGraph;
     std::vector<std::vector<int>> choiceProperties;
+
+    /// Normally, a Choice should have just one expression, but because
+    /// we are processing Expressions one at a time, we could have many
+    /// while the Parser is running. The goal is that each Choice consolidates
+    /// into just one Expression, and having more than one indicates an error.
+    std::vector<std::vector<Expression>> choiceExpressions;
+    int recordSimpleExpression(std::string);
+    Expression getChoiceExpression(unsigned int);
 
     int recordCategory(std::string);
     int recordChoice(std::string);

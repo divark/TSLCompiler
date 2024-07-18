@@ -154,3 +154,23 @@ SCENARIO("Multiple Properties for a Choice should be found in the Parse Tree fro
         }
     }
 }
+
+SCENARIO("An Expression from an If Statement should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,") {
+        fs::path tslInput = "tests/choices_with_simple_if.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+
+            THEN("the Collector should contain the Choice's Expression.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                std::string expectedExpression = "simple";
+
+                REQUIRE(parser.collector.choiceExpressions.size() == 2);
+                REQUIRE(parser.collector.getChoiceExpression(choiceIdx).asString() == expectedExpression);
+            }
+        }
+    }
+}

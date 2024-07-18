@@ -15,9 +15,11 @@ int TSLCollector::recordCategory(std::string categoryContents) {
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
     choices.push_back(choiceContents);
+
     singleMarkings.push_back(false);
     errorMarkings.push_back(false);
     choiceProperties.push_back(std::vector<int>());
+    choiceExpressions.push_back(std::vector<Expression>());
 
     int choiceIdx = choices.size() - 1;
     int currentCategoryIdx = categories.size() - 1;
@@ -64,4 +66,24 @@ int TSLCollector::markChoiceAsError() {
     errorMarkings[choiceIdx] = true;
 
     return choiceIdx;
+}
+
+/**
+ * Returns the Expression found for some Choice.
+ */
+Expression TSLCollector::getChoiceExpression(unsigned int choiceIdx) {
+    return choiceExpressions[choiceIdx][0];
+}
+
+/**
+ * Returns the index of the recently created SimpleExpression for the
+ * current choice.
+ */
+int TSLCollector::recordSimpleExpression(std::string propertyContents) {
+    auto simpleExpression = Expression(propertyContents);
+
+    int currentChoiceIdx = choices.size() - 1;
+    choiceExpressions[currentChoiceIdx].push_back(simpleExpression);
+
+    return choiceExpressions[currentChoiceIdx].size() - 1;
 }

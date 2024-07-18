@@ -24,11 +24,13 @@
 
 %token CONSTRAINT_START
 
-%token PROPERTY_LIST
-%token PROPERTY_ELEMENT
+%token IF
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
+
+%token PROPERTY_LIST
+%token PROPERTY_ELEMENT
 
 %token CONSTRAINT_END
 
@@ -48,6 +50,9 @@ choice:     choice_label constraint
       |     choice_label
       ;
 constraint: CONSTRAINT_START label CONSTRAINT_END
+          | CONSTRAINT_START IF expression CONSTRAINT_END
+          ;
+expression: PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking
      |  property_list
