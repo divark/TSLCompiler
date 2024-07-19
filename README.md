@@ -5,7 +5,7 @@ The TSLCompiler is a remake of the original [TSLgenerator](https://github.com/al
 - Even if the code base was consolidated into one, most of the code is hard to test automatically due to the over-reliance of static variables, and functions that do not return their results by default.
 
 # Goals
-The TSLCompiler is designed to be a drop-in replacement for the TSLgenerator, honoring all of the original command-line options. However, this will reject TSL files that containing syntax that would generally be accepted, albeit ignored by the TSLgenerator. This is achieved by implementing the grammar explicitly through a Lexer and Parser library.
+The TSLCompiler is designed to be a drop-in replacement for the TSLgenerator, honoring all of the original command-line options. However, this will reject TSL files containing syntax that would generally be accepted, albeit ignored by the TSLgenerator. This is achieved by implementing the grammar explicitly through a Lexer and Parser library.
 
 In addition, the TSLCompiler is developed using the principles behind Test Driven Development/Behavior Driven Development to provide confidence in any proposed changes.
 
