@@ -6,7 +6,8 @@
 %option noyywrap
 
 /* Lexer Definitions */
-WHITESPACE  [ \r\n]+
+NEWLINES    [\r\n]+
+WHITESPACE  [[:space:]]+
 COMMENT     "#".*
 CATEGORY    .+":"
 CHOICE      .+"."
@@ -14,6 +15,7 @@ CHOICE      .+"."
 CONSTRAINT_START "["
 
 IF              "if"
+LOGICAL_NOT       "!" 
 
 MARKING_SINGLE  "single"
 MARKING_ERROR   "error"
@@ -26,12 +28,14 @@ CONSTRAINT_END   "]"
 /* Rules */
 %%
 
+{NEWLINES}  /* Newlines are nice for formatting, but we don't track them right now. */
 {WHITESPACE} /* Go wild with whitespace for formatting, we ignore it by default. */
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;
 {CHOICE}    return yy::parser::token::CHOICE_CONTENTS;
 {CONSTRAINT_START}  return yy::parser::token::CONSTRAINT_START;
 {IF}                return yy::parser::token::IF;
+{LOGICAL_NOT}       return yy::parser::token::LOGICAL_NOT;
 {MARKING_SINGLE}    return yy::parser::token::MARKING_SINGLE;
 {MARKING_ERROR}     return yy::parser::token::MARKING_ERROR;
 {PROPERTY_LIST}     return yy::parser::token::PROPERTY_LIST;

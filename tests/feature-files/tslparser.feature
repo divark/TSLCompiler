@@ -1,12 +1,17 @@
 Feature: The Parser handles valid TSL input.
-    Scenario: An Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
-	Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,
-	When the Parser converts the TSL input into a Parse Tree,
-	Then the Collector should contain the Choice's Expression.
+    Scenario: An Unary Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing an unary expression,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Negated Expression.
+
+    Scenario: A Simple Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Simple Expression.
 
     Scenario: One Property for a Choice should be found in the Parse Tree from a valid TSL file.
-	Given a TSL input with one Category, Choice, and a single Property,
-	When the Parser converts the TSL input into a Parse Tree,
+        Given a TSL input with one Category, Choice, and a single Property,
+        When the Parser converts the TSL input into a Parse Tree,
         Then the Collector should contain the Choice's Property.
 
     Scenario: Multiple Properties for a Choice should be found in the Parse Tree from a valid TSL file.

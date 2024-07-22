@@ -19,7 +19,7 @@ int TSLCollector::recordChoice(std::string choiceContents) {
     singleMarkings.push_back(false);
     errorMarkings.push_back(false);
     choiceProperties.push_back(std::vector<int>());
-    choiceExpressions.push_back(std::vector<Expression>());
+    choiceExpressions.push_back(std::vector<std::shared_ptr<Expression>>());
 
     int choiceIdx = choices.size() - 1;
     int currentCategoryIdx = categories.size() - 1;
@@ -71,7 +71,7 @@ int TSLCollector::markChoiceAsError() {
 /**
  * Returns the Expression found for some Choice.
  */
-Expression TSLCollector::getChoiceExpression(unsigned int choiceIdx) {
+std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choiceIdx) {
     return choiceExpressions[choiceIdx][0];
 }
 
@@ -80,10 +80,25 @@ Expression TSLCollector::getChoiceExpression(unsigned int choiceIdx) {
  * current choice.
  */
 int TSLCollector::recordSimpleExpression(std::string propertyContents) {
-    auto simpleExpression = Expression(propertyContents);
+    auto simpleExpression = std::make_shared<Expression>(propertyContents);
 
     int currentChoiceIdx = choices.size() - 1;
     choiceExpressions[currentChoiceIdx].push_back(simpleExpression);
+
+    return choiceExpressions[currentChoiceIdx].size() - 1;
+}
+
+/**
+ * Returns the index of the recently created Negated Expression for the
+ * current choice.
+ */
+int TSLCollector::recordNegatedExpression() {
+    auto lastExpression = choiceExpressions.back()[0];
+    choiceExpressions.back().pop_back();
+    auto negatedExpression = std::make_shared<Expression>(ExpType::Negated, lastExpression);
+
+    int currentChoiceIdx = choices.size() - 1;
+    choiceExpressions[currentChoiceIdx].push_back(negatedExpression);
 
     return choiceExpressions[currentChoiceIdx].size() - 1;
 }

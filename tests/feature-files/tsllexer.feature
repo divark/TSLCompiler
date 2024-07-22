@@ -1,4 +1,9 @@
 Feature: The Lexer recognizes valid TSL input.
+    Scenario: A Negated Logical Operator should be recognized from the Lexer from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing an unary expression,
+	When the Lexer consumes the input,
+	Then the Lexer should detect the Choice Expression's Negated Operator.
+
     Scenario: An If Statement should be recognized from the Lexer from a valid TSL file.
         Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,
         When the Lexer consumes the input,

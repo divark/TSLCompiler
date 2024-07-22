@@ -25,6 +25,7 @@
 %token CONSTRAINT_START
 
 %token IF
+%token LOGICAL_NOT
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
@@ -52,7 +53,8 @@ choice:     choice_label constraint
 constraint: CONSTRAINT_START label CONSTRAINT_END
           | CONSTRAINT_START IF expression CONSTRAINT_END
           ;
-expression: PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
+expression: LOGICAL_NOT expression { $$ = collector.recordNegatedExpression(); }
+          | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking
      |  property_list

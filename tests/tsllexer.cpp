@@ -187,3 +187,37 @@ SCENARIO("An If Statement should be recognized from the Lexer from a valid TSL f
         }
     }
 }
+
+SCENARIO("A Negation Logical Operator should be recognized from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing a negated expression,") {
+        fs::path tslInput = "tests/choice_with_unary_expression.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Choice Expression's Negated Operator.") {
+                // We don't care about the first Category, only the second one.
+                //
+                // NOTE:
+                // However, the first Category is needed since an Expression
+                // refers to a Property already defined earlier, hence why
+                // it is kept for correctness reasons.
+                auto currentTokenFound = lexer.getNextToken();
+                do {
+                    currentTokenFound = lexer.getNextToken();
+                } while (currentTokenFound != yy::parser::token::CATEGORY_CONTENTS);
+
+                // An If Expression comes after a Choice, so we ignore the Choice
+                // as well.
+                lexer.getNextToken();
+                // And when the Constraint starts too, since we only care about
+                // what's in the if statement.
+                lexer.getNextToken();
+                // Finally, we ignore the start of the IF expression to get to
+                // the negated operator.
+                lexer.getNextToken();
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::LOGICAL_NOT);
+            }
+        }
+    }
+}

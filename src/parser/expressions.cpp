@@ -5,7 +5,16 @@
  * the value of some property.
  */
 Expression::Expression(std::string foundProperty) {
+    expressionType = ExpType::Simple;
     property = foundProperty;
+}
+
+/**
+ * Constructs a Negated Expression holding an existing Expression.
+ */
+Expression::Expression(ExpType expType, std::shared_ptr<Expression> expression) {
+    expressionType = expType;
+    leftExpression = expression;
 }
 
 /**
@@ -13,5 +22,10 @@ Expression::Expression(std::string foundProperty) {
  * Property.
  */
 std::string Expression::asString() {
-    return property;
+    switch (expressionType) {
+        case ExpType::Negated:
+            return "!" + leftExpression->asString();
+        default:
+            return property;
+    }
 }

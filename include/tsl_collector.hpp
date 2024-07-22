@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "expressions.hpp"
 
@@ -29,9 +30,10 @@ struct TSLCollector {
     /// we are processing Expressions one at a time, we could have many
     /// while the Parser is running. The goal is that each Choice consolidates
     /// into just one Expression, and having more than one indicates an error.
-    std::vector<std::vector<Expression>> choiceExpressions;
+    std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
     int recordSimpleExpression(std::string);
-    Expression getChoiceExpression(unsigned int);
+    int recordNegatedExpression();
+    std::shared_ptr<Expression> getChoiceExpression(unsigned int);
 
     int recordCategory(std::string);
     int recordChoice(std::string);
