@@ -89,18 +89,19 @@ int TSLCollector::recordSimpleExpression(std::string propertyContents) {
 }
 
 /**
- * Returns the index of the recently created Negated Expression for the
+ * Returns the index of the recently created Unary Expression for the
  * current choice.
  */
-int TSLCollector::recordNegatedExpression() {
+int TSLCollector::recordUnaryExpression(ExpType unaryType) {
     // We want the most recent Expression recorded (2nd call to back()), meaning we have to
     // get the most recent Choice's Expression (1st call to back()).
     auto lastExpression = choiceExpressions.back().back();
     choiceExpressions.back().pop_back();
-    auto negatedExpression = std::make_shared<Expression>(ExpType::Negated, lastExpression);
+    auto unaryExpression = std::make_shared<Expression>(unaryType, lastExpression);
 
     int currentChoiceIdx = choices.size() - 1;
-    choiceExpressions[currentChoiceIdx].push_back(negatedExpression);
+    choiceExpressions[currentChoiceIdx].push_back(unaryExpression);
 
     return choiceExpressions[currentChoiceIdx].size() - 1;
 }
+

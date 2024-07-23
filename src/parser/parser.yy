@@ -26,6 +26,8 @@
 
 %token IF
 %token LOGICAL_NOT
+%token LOGICAL_GROUP_START
+%token LOGICAL_GROUP_END
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
@@ -53,7 +55,8 @@ choice:     choice_label constraint
 constraint: CONSTRAINT_START label CONSTRAINT_END
           | CONSTRAINT_START IF expression CONSTRAINT_END
           ;
-expression: LOGICAL_NOT expression { $$ = collector.recordNegatedExpression(); }
+expression: LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
+          | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking

@@ -194,3 +194,23 @@ SCENARIO("An Negation Expression from an If Statement should be found in the Par
         }
     }
 }
+
+SCENARIO("A Grouped Expression from an If Statement should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing a grouped expression,") {
+        fs::path tslInput = "tests/choice_with_grouped_expression.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+
+            THEN("the Collector should contain the Choice's Negated Expression.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                std::string expectedExpression = "(simple)";
+
+                REQUIRE(parser.collector.choiceExpressions.size() == 2);
+                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+            }
+        }
+    }
+}

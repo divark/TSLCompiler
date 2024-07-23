@@ -192,3 +192,22 @@ SCENARIO("A Negation Logical Operator should be recognized from the Lexer from a
         }
     }
 }
+
+SCENARIO("A Grouped Expression should be recognized from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing a grouped expression,") {
+        fs::path tslInput = "tests/choice_with_grouped_expression.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Grouped Expression's beginning and end.") {
+                waitUntil(lexer, yy::parser::token::IF, 1);
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::LOGICAL_GROUP_START);
+                // We don't mind what's in the middle, so we skip it.
+                lexer.getNextToken();
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::LOGICAL_GROUP_END);
+            }
+        }
+    }
+}

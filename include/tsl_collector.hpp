@@ -32,7 +32,7 @@ struct TSLCollector {
     /// into just one Expression, and having more than one indicates an error.
     std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
     int recordSimpleExpression(std::string);
-    int recordNegatedExpression();
+    int recordUnaryExpression(ExpType);
     std::shared_ptr<Expression> getChoiceExpression(unsigned int);
 
     int recordCategory(std::string);

@@ -25,6 +25,8 @@ std::string Expression::asString() {
     switch (expressionType) {
         case ExpType::Negated:
             return "!" + leftExpression->asString();
+        case ExpType::Grouped:
+            return "(" + leftExpression->asString() + ")";
         default:
             return property;
     }

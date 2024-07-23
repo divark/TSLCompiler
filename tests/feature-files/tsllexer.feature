@@ -1,4 +1,9 @@
 Feature: The Lexer recognizes valid TSL input.
+    Scenario: A Grouped Expression should be recognized from the Lexer from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing a grouped expression,
+	When the Lexer consumes the input,
+	Then the Lexer should detect the Grouped Expression's beginning and end.
+
     Scenario: A Negated Logical Operator should be recognized from the Lexer from a valid TSL file.
         Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing an unary expression,
 	When the Lexer consumes the input,

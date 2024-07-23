@@ -6,6 +6,7 @@
 enum ExpType {
     Simple,
     Negated,
+    Grouped,
 };
 
 /**
