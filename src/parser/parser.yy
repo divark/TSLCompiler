@@ -49,11 +49,13 @@ category:   category_label choices
 choices:    choices choice
        |    choice
        ;
-choice:     choice_label constraint
+choice:     choice_label constraints
       |     choice_label
       ;
-constraint: CONSTRAINT_START label CONSTRAINT_END
-          | CONSTRAINT_START IF expression CONSTRAINT_END
+constraints: CONSTRAINT_START constraint CONSTRAINT_END
+           ;
+constraint: label
+          | IF expression
           ;
 expression: LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
