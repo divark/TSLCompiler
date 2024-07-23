@@ -93,7 +93,9 @@ int TSLCollector::recordSimpleExpression(std::string propertyContents) {
  * current choice.
  */
 int TSLCollector::recordNegatedExpression() {
-    auto lastExpression = choiceExpressions.back()[0];
+    // We want the most recent Expression recorded (2nd call to back()), meaning we have to
+    // get the most recent Choice's Expression (1st call to back()).
+    auto lastExpression = choiceExpressions.back().back();
     choiceExpressions.back().pop_back();
     auto negatedExpression = std::make_shared<Expression>(ExpType::Negated, lastExpression);
 
