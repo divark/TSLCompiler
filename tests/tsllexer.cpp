@@ -6,6 +6,25 @@
 
 namespace fs = std::filesystem;
 
+/**
+ * Skips all Tokens until finding the nth Desired Token.
+ */
+void waitUntil(TSLLexer &lexer, yy::parser::token::token_kind_type desiredToken, unsigned int nthToken) {
+    unsigned int tokenFoundCount = 0;
+
+    while (true) {
+        auto currentTokenFound = lexer.getNextToken();
+        if (currentTokenFound != desiredToken) {
+            continue;
+        }
+
+        tokenFoundCount++;
+        if (tokenFoundCount == nthToken) {
+            break;
+        }
+    }
+}
+
 SCENARIO("A Category should be returned from the Lexer from a valid TSL file.") {
     GIVEN("a TSL input with one Category, and one Choice,") {
         fs::path tslInput = "tests/one_category_one_choice.txt";
@@ -67,13 +86,8 @@ SCENARIO("A single marking from a Choice should be returned from the Lexer from 
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice's single Marking.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
-                // and Choice found first.
-                for (int i = 0; i < 2; i++) {
-                    lexer.getNextToken();
-                }
-
-		// We also want to skip the Constraint start and end tokens.
-		lexer.getNextToken();
+                // and Choice found first, and we also want to skip the Constraint start and end tokens.
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_SINGLE);
@@ -90,13 +104,8 @@ SCENARIO("An error marking from a Choice should be returned from the Lexer from 
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice's error Marking.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
-                // and Choice found first.
-                for (int i = 0; i < 2; i++) {
-                    lexer.getNextToken();
-                }
-
-                // We also want to skip the Constraint start and end tokens.
-                lexer.getNextToken();
+                // and Choice found first, and we also want to skip the Constraint start and end tokens.
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_ERROR);
@@ -114,9 +123,7 @@ SCENARIO("A Property from a Choice should be returned from the Lexer from a vali
             THEN("the Lexer should return the Property's contents as a string.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
                 // and Choice found, and ignoring the beginning of the Constraint characters.
-                for (int i = 0; i < 3; i++) {
-                    lexer.getNextToken();
-                }
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
 
                 auto propertyListToken = lexer.getNextToken();
                 REQUIRE(propertyListToken == yy::parser::token::PROPERTY_LIST);
@@ -138,10 +145,7 @@ SCENARIO("Multiple Properties from a Choice should be returned from the Lexer fr
             THEN("the Lexer should return each Property's contents as a string.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
                 // and Choice found, and ignoring the beginning of the Constraint characters.
-                for (int i = 0; i < 3; i++) {
-                    lexer.getNextToken();
-                }
-
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
                 auto propertyListToken = lexer.getNextToken();
                 REQUIRE(propertyListToken == yy::parser::token::PROPERTY_LIST);
 
@@ -164,23 +168,9 @@ SCENARIO("An If Statement should be recognized from the Lexer from a valid TSL f
             TSLLexer lexer;
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice's If Statement.") {
-                // We don't care about the first Category, only the second one.
-                //
-                // NOTE:
-                // However, the first Category is needed since an Expression
-                // refers to a Property already defined earlier, hence why
-                // it is kept for correctness reasons.
-                auto currentTokenFound = lexer.getNextToken();
-                do {
-                    currentTokenFound = lexer.getNextToken();
-                } while (currentTokenFound != yy::parser::token::CATEGORY_CONTENTS);
-
-                // An If Expression comes after a Choice, so we ignore the Choice
-                // as well.
-                lexer.getNextToken();
-                // And when the Constraint starts too, since we only care about
-                // the if statement.
-                lexer.getNextToken();
+                // A Property and an If Statement both share a Constraint Start,
+                // so we want to wait until the 2nd one.
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 2);
 
                 REQUIRE(lexer.getNextToken() == yy::parser::token::IF);
             }
@@ -195,26 +185,7 @@ SCENARIO("A Negation Logical Operator should be recognized from the Lexer from a
             TSLLexer lexer;
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice Expression's Negated Operator.") {
-                // We don't care about the first Category, only the second one.
-                //
-                // NOTE:
-                // However, the first Category is needed since an Expression
-                // refers to a Property already defined earlier, hence why
-                // it is kept for correctness reasons.
-                auto currentTokenFound = lexer.getNextToken();
-                do {
-                    currentTokenFound = lexer.getNextToken();
-                } while (currentTokenFound != yy::parser::token::CATEGORY_CONTENTS);
-
-                // An If Expression comes after a Choice, so we ignore the Choice
-                // as well.
-                lexer.getNextToken();
-                // And when the Constraint starts too, since we only care about
-                // what's in the if statement.
-                lexer.getNextToken();
-                // Finally, we ignore the start of the IF expression to get to
-                // the negated operator.
-                lexer.getNextToken();
+                waitUntil(lexer, yy::parser::token::IF, 1);
 
                 REQUIRE(lexer.getNextToken() == yy::parser::token::LOGICAL_NOT);
             }
