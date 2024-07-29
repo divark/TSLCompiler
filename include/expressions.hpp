@@ -7,6 +7,7 @@ enum ExpType {
     Simple,
     Negated,
     Grouped,
+    And,
 };
 
 /**
@@ -20,10 +21,11 @@ class Expression {
         std::string property;
 
         std::shared_ptr<Expression> leftExpression;
+        std::shared_ptr<Expression> rightExpression;
     public:
         std::string asString();
 
         Expression(std::string);
         Expression(ExpType, std::shared_ptr<Expression>);
+        Expression(ExpType, std::shared_ptr<Expression>, std::shared_ptr<Expression>);
 };
-

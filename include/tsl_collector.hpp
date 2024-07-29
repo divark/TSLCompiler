@@ -33,6 +33,7 @@ struct TSLCollector {
     std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
     int recordSimpleExpression(std::string);
     int recordUnaryExpression(ExpType);
+    int recordBinaryExpression(ExpType);
     std::shared_ptr<Expression> getChoiceExpression(unsigned int);
 
     int recordCategory(std::string);

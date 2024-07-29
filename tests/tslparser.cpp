@@ -202,13 +202,33 @@ SCENARIO("A Grouped Expression from an If Statement should be found in the Parse
             TSLParser parser(tslInput);
             auto parserStatus = parser.run();
 
-            THEN("the Collector should contain the Choice's Negated Expression.") {
+            THEN("the Collector should contain the Choice's Grouped Expression.") {
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
                 std::string expectedExpression = "(simple)";
 
                 REQUIRE(parser.collector.choiceExpressions.size() == 2);
+                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+            }
+        }
+    }
+}
+
+SCENARIO("An AND Expression from an If Statement should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an AND Expression,") {
+        fs::path tslInput = "tests/choice_with_and_expression.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+
+            THEN("the Collector should contain the Choice's AND Expression.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 2;
+                std::string expectedExpression = "choice1 && choice2";
+
+                REQUIRE(parser.collector.choiceExpressions.size() == 3);
                 REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }

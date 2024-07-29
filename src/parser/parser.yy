@@ -25,9 +25,12 @@
 %token CONSTRAINT_START
 
 %token IF
-%token LOGICAL_NOT
+%precedence LOGICAL_NOT
 %token LOGICAL_GROUP_START
 %token LOGICAL_GROUP_END
+/* Since all Grammar rules are written in a left-associative style,
+all Binary-based operations should have left-precedence. */
+%left LOGICAL_AND
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
@@ -42,7 +45,7 @@
 %%
 
 categories: categories category
-          | category 
+          | category
           ;
 category:   category_label choices
         ;
@@ -57,8 +60,9 @@ constraints: CONSTRAINT_START constraint CONSTRAINT_END
 constraint: label
           | IF expression
           ;
-expression: LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
+expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
+          | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking
@@ -74,7 +78,7 @@ marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
        |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;
 
-category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); } 
+category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); }
         ;
 choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurrentTokenContents()); }
       ;
