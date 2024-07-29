@@ -1,0 +1,8 @@
+Simple Category 1:
+    Simple Choice 1.    [property choice1]
+
+Simple Category 2:
+    Simple Choice 2.    [property choice2]
+
+Simple Category 3:
+    Simple Choice 3.    [if choice1 || choice2]

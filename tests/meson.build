@@ -19,8 +19,9 @@ choices_with_simple_if_test_file = fs.copyfile('test-files/choices_with_simple_i
 choice_with_unary_expression_test_file = fs.copyfile('test-files/choice_with_unary_expression.txt', 'choice_with_unary_expression.txt')
 choice_with_grouped_expression_test_file = fs.copyfile('test-files/choice_with_grouped_expression.txt', 'choice_with_grouped_expression.txt')
 choice_with_and_expression_test_file = fs.copyfile('test-files/choice_with_and_expression.txt', 'choice_with_and_expression.txt')
+choice_with_or_expression_test_file = fs.copyfile('test-files/choice_with_or_expression.txt', 'choice_with_or_expression.txt')
 
-properties_test_files = [choice_with_one_property_test_file, choice_with_multiple_properties_test_file, choices_with_simple_if_test_file, choice_with_unary_expression_test_file, choice_with_grouped_expression_test_file, choice_with_and_expression_test_file]
+properties_test_files = [choice_with_one_property_test_file, choice_with_multiple_properties_test_file, choices_with_simple_if_test_file, choice_with_unary_expression_test_file, choice_with_grouped_expression_test_file, choice_with_and_expression_test_file, choice_with_or_expression_test_file]
 
 test_files = simple_test_files + marking_test_files + properties_test_files
 

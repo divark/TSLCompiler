@@ -8,6 +8,7 @@ enum ExpType {
     Negated,
     Grouped,
     And,
+    Or,
 };
 
 /**

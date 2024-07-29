@@ -19,6 +19,7 @@ LOGICAL_NOT       "!"
 LOGICAL_GROUP_START "("
 LOGICAL_GROUP_END   ")"
 LOGICAL_AND         "&&"
+LOGICAL_OR          "||"
 
 MARKING_SINGLE  "single"
 MARKING_ERROR   "error"
@@ -42,6 +43,7 @@ CONSTRAINT_END   "]"
 {LOGICAL_GROUP_START}   return yy::parser::token::LOGICAL_GROUP_START;
 {LOGICAL_GROUP_END}     return yy::parser::token::LOGICAL_GROUP_END;
 {LOGICAL_AND}       return yy::parser::token::LOGICAL_AND;
+{LOGICAL_OR}        return yy::parser::token::LOGICAL_OR;
 {MARKING_SINGLE}    return yy::parser::token::MARKING_SINGLE;
 {MARKING_ERROR}     return yy::parser::token::MARKING_ERROR;
 {PROPERTY_LIST}     return yy::parser::token::PROPERTY_LIST;

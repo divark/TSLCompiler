@@ -1,4 +1,9 @@
 Feature: The Lexer recognizes valid TSL input.
+    Scenario: An Or Expression should be recognized from the Lexer from a valid TSL file.
+        Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,
+        When the Lexer consumes the input,
+        Then the Lexer should detect the Choice Expression's OR Operator.
+
     Scenario: An And Expression should be recognized from the Lexer from a valid TSL file.
         Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an AND Expression,
         When the Lexer consumes the input,

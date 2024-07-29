@@ -227,3 +227,19 @@ SCENARIO("An And Expression should be recognized from the Lexer from a valid TSL
         }
     }
 }
+
+SCENARIO("An Or Expression should be recognized from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,") {
+        fs::path tslInput = "tests/choice_with_or_expression.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Choice Expression's OR Operator.") {
+                waitUntil(lexer, yy::parser::token::IF, 1);
+                waitUntil(lexer, yy::parser::token::PROPERTY_ELEMENT, 1);
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::LOGICAL_OR);
+            }
+        }
+    }
+}

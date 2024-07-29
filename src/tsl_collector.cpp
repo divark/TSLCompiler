@@ -108,7 +108,7 @@ int TSLCollector::recordUnaryExpression(ExpType unaryType) {
 /**
 * Returns the index of the recently created Binary Expression for the
 * current choice.
-* Preconditions: The most recent Choice has two Expressions.
+* Preconditions: The most recent Choice has exactly two Expressions.
 */
 int TSLCollector::recordBinaryExpression(ExpType binaryType) {
     auto firstExpression = choiceExpressions.back().front();

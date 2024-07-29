@@ -234,3 +234,23 @@ SCENARIO("An AND Expression from an If Statement should be found in the Parse Tr
         }
     }
 }
+
+SCENARIO("An OR Expression from an If Statement should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,") {
+        fs::path tslInput = "tests/choice_with_or_expression.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+
+            THEN("the Collector should contain the Choice's OR Expression.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 2;
+                std::string expectedExpression = "choice1 || choice2";
+
+                REQUIRE(parser.collector.choiceExpressions.size() == 3);
+                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+            }
+        }
+    }
+}

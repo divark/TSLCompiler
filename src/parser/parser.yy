@@ -31,6 +31,7 @@
 /* Since all Grammar rules are written in a left-associative style,
 all Binary-based operations should have left-precedence. */
 %left LOGICAL_AND
+%left LOGICAL_OR
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
@@ -61,6 +62,7 @@ constraint: label
           | IF expression
           ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
+          | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }

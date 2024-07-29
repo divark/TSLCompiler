@@ -1,4 +1,9 @@
 Feature: The Parser handles valid TSL input.
+    Scenario: An OR Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's OR Expression.
+
     Scenario: An AND Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an AND Expression,
         When the Parser converts the TSL input into a Parse Tree,

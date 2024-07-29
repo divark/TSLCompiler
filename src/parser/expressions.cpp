@@ -42,6 +42,8 @@ std::string Expression::asString() {
             return "(" + leftExpression->asString() + ")";
         case ExpType::And:
             return leftExpression->asString() + " && " + rightExpression->asString();
+        case ExpType::Or:
+            return leftExpression->asString() + " || " + rightExpression->asString();
         default:
             return property;
     }
