@@ -91,6 +91,7 @@ int TSLCollector::recordSimpleExpression(std::string propertyContents) {
 /**
  * Returns the index of the recently created Unary Expression for the
  * current choice.
+ * Preconditions: The most recent Choice has at least one Expression.
  */
 int TSLCollector::recordUnaryExpression(ExpType unaryType) {
     // We want the most recent Expression recorded (2nd call to back()), meaning we have to
