@@ -19,6 +19,7 @@ int TSLCollector::recordChoice(std::string choiceContents) {
     singleMarkings.push_back(false);
     errorMarkings.push_back(false);
     choiceProperties.push_back(std::vector<int>());
+    choiceIfProperties.push_back(std::vector<int>());
     choiceExpressions.push_back(std::vector<std::shared_ptr<Expression>>());
 
     int choiceIdx = choices.size() - 1;
@@ -124,4 +125,15 @@ int TSLCollector::recordBinaryExpression(ExpType binaryType) {
     choiceExpressions[currentChoiceIdx].push_back(binaryExpression);
 
     return choiceExpressions[currentChoiceIdx].size() - 1;
+}
+
+/**
+ * Returns the index of the Choice whose Properties were labeled as those
+ * defined from an If Statement.
+ */
+int TSLCollector::convertPropertiesToIfProperties() {
+    auto currentChoiceIdx = choices.size() - 1;
+
+    choiceIfProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
+    choiceProperties[currentChoiceIdx].clear();
 }

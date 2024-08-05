@@ -56,19 +56,20 @@ choices:    choices choice
 choice:     choice_label constraints
       |     choice_label
       ;
-constraints: CONSTRAINT_START constraint CONSTRAINT_END
-           ;
-constraint: label
-          | IF expression
+constraints: label
+          | if_statement label { $$ = collector.convertPropertiesToIfProperties(); }
+          | if_statement
           ;
+if_statement: CONSTRAINT_START IF expression CONSTRAINT_END
+            ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
-label:  marking
-     |  property_list
+label:  CONSTRAINT_START marking CONSTRAINT_END
+     |  CONSTRAINT_START property_list CONSTRAINT_END
      ;
 property_list:  PROPERTY_LIST property_elements
              ;

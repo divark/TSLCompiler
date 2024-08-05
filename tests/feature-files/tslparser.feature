@@ -1,4 +1,9 @@
 Feature: The Parser handles valid TSL input.
+    Scenario: Properties from an If Expression are found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Property in the If Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's If Properties.
+
     Scenario: An OR Expression from an If Statement should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,
         When the Parser converts the TSL input into a Parse Tree,

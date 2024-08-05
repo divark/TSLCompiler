@@ -254,3 +254,20 @@ SCENARIO("An OR Expression from an If Statement should be found in the Parse Tre
         }
     }
 }
+
+SCENARIO("Properties from an If Expression are found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Property in the If Statement,") {
+        fs::path tslInput = "tests/choice_with_property_in_if.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's If Properties.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.choiceIfProperties[choiceIdx].size() == 1);
+                REQUIRE(parser.collector.choiceProperties[choiceIdx].size() == 0);
+            }
+        }
+    }
+}

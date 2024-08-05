@@ -26,11 +26,17 @@ struct TSLCollector {
     std::vector<std::vector<int>> categoryChoicesGraph;
     std::vector<std::vector<int>> choiceProperties;
 
+    /// Properties and Markings can be defined from an if-else statement,
+    /// so we have to differentiate between this and when a property or marking
+    /// is defined without an if statement.
+    std::vector<std::vector<int>> choiceIfProperties;
+
     /// Normally, a Choice should have just one expression, but because
     /// we are processing Expressions one at a time, we could have many
     /// while the Parser is running. The goal is that each Choice consolidates
     /// into just one Expression, and having more than one indicates an error.
     std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
+
     int recordSimpleExpression(std::string);
     int recordUnaryExpression(ExpType);
     int recordBinaryExpression(ExpType);
@@ -40,6 +46,7 @@ struct TSLCollector {
     int recordChoice(std::string);
 
     int recordProperty(std::string);
+    int convertPropertiesToIfProperties();
 
     int markChoiceAsSingle();
     int markChoiceAsError();
