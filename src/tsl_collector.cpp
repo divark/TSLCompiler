@@ -136,4 +136,6 @@ int TSLCollector::convertPropertiesToIfProperties() {
 
     choiceIfProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
     choiceProperties[currentChoiceIdx].clear();
+
+    return currentChoiceIdx;
 }
