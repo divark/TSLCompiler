@@ -1,4 +1,14 @@
 Feature: The Parser handles valid TSL input.
+    Scenario: An Error Marking from an If Expression is found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the If Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Error If Marking.
+ 
+    Scenario: A Single Marking from an If Expression is found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the If Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Single If Marking.
+
     Scenario: Properties from an If Expression are found in the Parse Tree from a valid TSL file.
         Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Property in the If Statement,
         When the Parser converts the TSL input into a Parse Tree,

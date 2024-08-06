@@ -271,3 +271,37 @@ SCENARIO("Properties from an If Expression are found in the Parse Tree from a va
         }
     }
 }
+
+SCENARIO("A Single Marking from an If Expression is found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the If Statement,") {
+        fs::path tslInput = "tests/choice_with_single_in_if.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's Single If Marking.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.singleMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.singleIfMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}
+
+SCENARIO("An Error Marking from an If Expression is found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the If Statement,") {
+        fs::path tslInput = "tests/choice_with_error_in_if.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's Error If Marking.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.errorMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.errorIfMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}

@@ -30,6 +30,8 @@ struct TSLCollector {
     /// so we have to differentiate between this and when a property or marking
     /// is defined without an if statement.
     std::vector<std::vector<int>> choiceIfProperties;
+    std::vector<bool> singleIfMarkings;
+    std::vector<bool> errorIfMarkings;
 
     /// Normally, a Choice should have just one expression, but because
     /// we are processing Expressions one at a time, we could have many
