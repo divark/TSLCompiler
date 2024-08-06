@@ -15,6 +15,13 @@
 %language "c++"
 
 %define api.value.type {int}
+/* 
+* The following options help make descriptive error messages
+* relating to syntax, according to the following resource:
+* https://www.gnu.org/software/bison/manual/html_node/Error-Reporting-Function.html 
+*/
+%define parse.error detailed
+%define parse.lac full
 
 %parse-param {TSLLexer &lexer}
 %parse-param {TSLCollector &collector}
