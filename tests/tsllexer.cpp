@@ -243,3 +243,21 @@ SCENARIO("An Or Expression should be recognized from the Lexer from a valid TSL 
         }
     }
 }
+
+SCENARIO("An Else Statement should be recongized from the Lexer from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an Else Statement,") {
+        fs::path tslInput = "tests/choice_with_else_alone.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            THEN("the Lexer should detect the Choice's Else Statement.") {
+                // An Else Statement is considered a Constraint, which follows
+                // an If Statement, which is also a Constraint, hence we want
+                // to wait for the 3rd Constraint we see.
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 3);
+
+                REQUIRE(lexer.getNextToken() == yy::parser::token::ELSE);
+            }
+        }
+    }
+}

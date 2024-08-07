@@ -305,3 +305,21 @@ SCENARIO("An Error Marking from an If Expression is found in the Parse Tree from
         }
     }
 }
+
+SCENARIO("An Else Statement should be found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an Else Statement,") {
+        fs::path tslInput = "tests/choice_with_else_alone.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+
+            THEN("the Collector should have the Choice flagged as having an Else Statement.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+
+                REQUIRE(parser.collector.hasElseExpression(choiceIdx) == true);
+            }
+        }
+    }
+}

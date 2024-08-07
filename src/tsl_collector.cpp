@@ -21,6 +21,8 @@ int TSLCollector::recordChoice(std::string choiceContents) {
     errorMarkings.push_back(false);
     errorIfMarkings.push_back(false);
 
+    choiceHasElseStatement.push_back(false);
+
     choiceProperties.push_back(std::vector<int>());
     choiceIfProperties.push_back(std::vector<int>());
 
@@ -145,6 +147,26 @@ int TSLCollector::convertPropertiesToIfProperties() {
 
     choiceIfProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
     choiceProperties[currentChoiceIdx] = std::vector<int>();
+
+    return currentChoiceIdx;
+}
+
+/** 
+ * Returns whether a Choice has been flagged having an Else
+ * statement.
+ */
+bool TSLCollector::hasElseExpression(unsigned int choiceIdx) {
+    return choiceHasElseStatement[choiceIdx];
+}
+
+/**
+ * Returns the most recent Choice index that has
+ * now been flagged to have an Else Statement.
+ */
+int TSLCollector::markChoiceHasElse() {
+    auto currentChoiceIdx = choices.size() - 1;
+
+    choiceHasElseStatement[currentChoiceIdx] = true;
 
     return currentChoiceIdx;
 }

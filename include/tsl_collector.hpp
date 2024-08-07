@@ -33,6 +33,8 @@ struct TSLCollector {
     std::vector<bool> singleIfMarkings;
     std::vector<bool> errorIfMarkings;
 
+    std::vector<bool> choiceHasElseStatement;
+
     /// Normally, a Choice should have just one expression, but because
     /// we are processing Expressions one at a time, we could have many
     /// while the Parser is running. The goal is that each Choice consolidates
@@ -52,4 +54,7 @@ struct TSLCollector {
 
     int markChoiceAsSingle();
     int markChoiceAsError();
+
+    int markChoiceHasElse();
+    bool hasElseExpression(unsigned int);
 };

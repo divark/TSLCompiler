@@ -32,6 +32,7 @@
 %token CONSTRAINT_START
 
 %token IF
+%token ELSE
 %precedence LOGICAL_NOT
 %token LOGICAL_GROUP_START
 %token LOGICAL_GROUP_END
@@ -65,10 +66,13 @@ choice:     choice_label constraints
       ;
 constraints: label
           | if_statement label { $$ = collector.convertPropertiesToIfProperties(); }
+          | if_statement else_statement { $$ = collector.markChoiceHasElse(); }
           | if_statement
           ;
 if_statement: CONSTRAINT_START IF expression CONSTRAINT_END
             ;
+else_statement: CONSTRAINT_START ELSE CONSTRAINT_END
+              ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }

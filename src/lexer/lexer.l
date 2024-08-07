@@ -15,6 +15,7 @@ CHOICE      .+"."
 CONSTRAINT_START "["
 
 IF              "if"
+ELSE            "else"
 LOGICAL_NOT       "!"
 LOGICAL_GROUP_START "("
 LOGICAL_GROUP_END   ")"
@@ -39,6 +40,7 @@ CONSTRAINT_END   "]"
 {CHOICE}    return yy::parser::token::CHOICE_CONTENTS;
 {CONSTRAINT_START}  return yy::parser::token::CONSTRAINT_START;
 {IF}                return yy::parser::token::IF;
+{ELSE}              return yy::parser::token::ELSE;
 {LOGICAL_NOT}       return yy::parser::token::LOGICAL_NOT;
 {LOGICAL_GROUP_START}   return yy::parser::token::LOGICAL_GROUP_START;
 {LOGICAL_GROUP_END}     return yy::parser::token::LOGICAL_GROUP_END;

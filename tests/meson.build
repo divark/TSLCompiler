@@ -24,7 +24,8 @@ choice_with_or_expression_test_file = fs.copyfile('test-files/choice_with_or_exp
 choice_with_property_in_if_test_file = fs.copyfile('test-files/choice_with_property_in_if.txt', 'choice_with_property_in_if.txt')
 choice_with_single_in_if_test_file = fs.copyfile('test-files/choice_with_single_in_if.txt', 'choice_with_single_in_if.txt')
 choice_with_error_in_if_test_file = fs.copyfile('test-files/choice_with_error_in_if.txt', 'choice_with_error_in_if.txt')
-expression_test_files = [choices_with_simple_if_test_file, choice_with_unary_expression_test_file, choice_with_grouped_expression_test_file, choice_with_and_expression_test_file, choice_with_or_expression_test_file, choice_with_property_in_if_test_file, choice_with_single_in_if_test_file, choice_with_error_in_if_test_file]
+choice_with_else_alone_test_file = fs.copyfile('test-files/choice_with_else_alone.txt', 'choice_with_else_alone.txt')
+expression_test_files = [choices_with_simple_if_test_file, choice_with_unary_expression_test_file, choice_with_grouped_expression_test_file, choice_with_and_expression_test_file, choice_with_or_expression_test_file, choice_with_property_in_if_test_file, choice_with_single_in_if_test_file, choice_with_error_in_if_test_file, choice_with_else_alone_test_file]
 
 test_files = simple_test_files + marking_test_files + properties_test_files + expression_test_files
 
