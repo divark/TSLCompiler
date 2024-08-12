@@ -15,15 +15,15 @@ CHOICE      .+"."
 CONSTRAINT_START "["
 
 IF              "if"
-ELSE            "else"
+ELSE            "[else]"
 LOGICAL_NOT       "!"
 LOGICAL_GROUP_START "("
 LOGICAL_GROUP_END   ")"
 LOGICAL_AND         "&&"
 LOGICAL_OR          "||"
 
-MARKING_SINGLE  "single"
-MARKING_ERROR   "error"
+MARKING_SINGLE  "[single]"
+MARKING_ERROR   "[error]"
 
 PROPERTY_LIST   "property"
 PROPERTY_ELEMENT [a-zA-Z0-9]+","?

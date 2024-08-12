@@ -65,13 +65,13 @@ choice:     choice_label constraints
       |     choice_label
       ;
 constraints: label
-          | if_statement label { $$ = collector.convertPropertiesToIfProperties(); }
           | if_statement else_statement { $$ = collector.markChoiceHasElse(); }
           | if_statement
           ;
-if_statement: CONSTRAINT_START IF expression CONSTRAINT_END
+if_statement: CONSTRAINT_START IF expression CONSTRAINT_END label { $$ = collector.convertPropertiesToIfProperties(); }
+	    | CONSTRAINT_START IF expression CONSTRAINT_END
             ;
-else_statement: CONSTRAINT_START ELSE CONSTRAINT_END
+else_statement: ELSE
               ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
@@ -79,7 +79,7 @@ expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpre
           | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
-label:  CONSTRAINT_START marking CONSTRAINT_END
+label:  marking
      |  CONSTRAINT_START property_list CONSTRAINT_END
      ;
 property_list:  PROPERTY_LIST property_elements

@@ -86,8 +86,8 @@ SCENARIO("A single marking from a Choice should be returned from the Lexer from 
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice's single Marking.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
-                // and Choice found first, and we also want to skip the Constraint start and end tokens.
-                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
+                // and Choice found first.
+                waitUntil(lexer, yy::parser::token::CHOICE_CONTENTS, 1);
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_SINGLE);
@@ -104,8 +104,8 @@ SCENARIO("An error marking from a Choice should be returned from the Lexer from 
             lexer.load(tslInput);
             THEN("the Lexer should detect the Choice's error Marking.") {
                 // To get to the Constraints, we have to ignore the tokens found for the Category
-                // and Choice found first, and we also want to skip the Constraint start and end tokens.
-                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 1);
+                // and Choice found first.
+                waitUntil(lexer, yy::parser::token::CHOICE_CONTENTS, 1);
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::MARKING_ERROR);
@@ -254,7 +254,7 @@ SCENARIO("An Else Statement should be recongized from the Lexer from a valid TSL
                 // An Else Statement is considered a Constraint, which follows
                 // an If Statement, which is also a Constraint, hence we want
                 // to wait for the 3rd Constraint we see.
-                waitUntil(lexer, yy::parser::token::CONSTRAINT_START, 3);
+                waitUntil(lexer, yy::parser::token::CONSTRAINT_END, 2);
 
                 REQUIRE(lexer.getNextToken() == yy::parser::token::ELSE);
             }
