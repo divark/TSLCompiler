@@ -347,3 +347,57 @@ SCENARIO("An Else Statement following an If Statement with a Label should be fou
         }
     }
 }
+
+SCENARIO("An Error Marking from an Else Expression is found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the Else Statement,") {
+        fs::path tslInput = "tests/choice_with_error_in_else.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's Error Else Marking.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.errorMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.errorIfMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.errorElseMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}
+
+SCENARIO("A Single Marking from an Else Expression is found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the Else Statement,") {
+        fs::path tslInput = "tests/choice_with_single_in_else.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's Error Else Marking.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.singleMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.singleIfMarkings[choiceIdx] == false);
+                REQUIRE(parser.collector.singleElseMarkings[choiceIdx] == true);
+            }
+        }
+    }
+}
+
+SCENARIO("Properties from an Else Expression are found in the Parse Tree from a valid TSL file.") {
+    GIVEN("a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Property in the Else Statement,") {
+        fs::path tslInput = "tests/choice_with_property_in_else.txt";
+        WHEN("the Parser converts the TSL input into a Parse Tree,") {
+            TSLParser parser(tslInput);
+            auto parserStatus = parser.run();
+            THEN("the Collector should contain the Choice's Else Properties.") {
+                REQUIRE(parserStatus == 0);
+
+                int choiceIdx = 1;
+                REQUIRE(parser.collector.choiceElseProperties[choiceIdx].size() == 1);
+                REQUIRE(parser.collector.choiceIfProperties[choiceIdx].size() == 0);
+                REQUIRE(parser.collector.choiceProperties[choiceIdx].size() == 0);
+            }
+        }
+    }
+}

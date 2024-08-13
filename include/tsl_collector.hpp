@@ -30,8 +30,11 @@ struct TSLCollector {
     /// so we have to differentiate between this and when a property or marking
     /// is defined without an if statement.
     std::vector<std::vector<int>> choiceIfProperties;
+    std::vector<std::vector<int>> choiceElseProperties;
     std::vector<bool> singleIfMarkings;
+    std::vector<bool> singleElseMarkings;
     std::vector<bool> errorIfMarkings;
+    std::vector<bool> errorElseMarkings;
 
     std::vector<bool> choiceHasElseStatement;
 
@@ -51,6 +54,7 @@ struct TSLCollector {
 
     int recordProperty(std::string);
     int convertPropertiesToIfProperties();
+    int convertPropertiesToElseProperties();
 
     int markChoiceAsSingle();
     int markChoiceAsError();

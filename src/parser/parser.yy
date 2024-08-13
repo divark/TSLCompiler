@@ -69,9 +69,10 @@ constraints: label
           | if_statement
           ;
 if_statement: CONSTRAINT_START IF expression CONSTRAINT_END label { $$ = collector.convertPropertiesToIfProperties(); }
-	    | CONSTRAINT_START IF expression CONSTRAINT_END
+            | CONSTRAINT_START IF expression CONSTRAINT_END
             ;
-else_statement: ELSE
+else_statement: ELSE label { $$ = collector.convertPropertiesToElseProperties(); }
+              | ELSE
               ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }

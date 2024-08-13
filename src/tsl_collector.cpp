@@ -18,13 +18,16 @@ int TSLCollector::recordChoice(std::string choiceContents) {
 
     singleMarkings.push_back(false);
     singleIfMarkings.push_back(false);
+    singleElseMarkings.push_back(false);
     errorMarkings.push_back(false);
     errorIfMarkings.push_back(false);
+    errorElseMarkings.push_back(false);
 
     choiceHasElseStatement.push_back(false);
 
     choiceProperties.push_back(std::vector<int>());
     choiceIfProperties.push_back(std::vector<int>());
+    choiceElseProperties.push_back(std::vector<int>());
 
     choiceExpressions.push_back(std::vector<std::shared_ptr<Expression>>());
 
@@ -146,6 +149,24 @@ int TSLCollector::convertPropertiesToIfProperties() {
     errorMarkings[currentChoiceIdx] = false;
 
     choiceIfProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
+    choiceProperties[currentChoiceIdx] = std::vector<int>();
+
+    return currentChoiceIdx;
+}
+
+/**
+ * Returns the index of the Choice whose Properties and Markings were
+ * defined from an Else Statement.
+ */
+int TSLCollector::convertPropertiesToElseProperties() {
+    auto currentChoiceIdx = choices.size() - 1;
+
+    singleElseMarkings[currentChoiceIdx] = singleMarkings[currentChoiceIdx];
+    singleMarkings[currentChoiceIdx] = false;
+    errorElseMarkings[currentChoiceIdx] = errorMarkings[currentChoiceIdx];
+    errorMarkings[currentChoiceIdx] = false;
+
+    choiceElseProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
     choiceProperties[currentChoiceIdx] = std::vector<int>();
 
     return currentChoiceIdx;

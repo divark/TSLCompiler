@@ -1,4 +1,19 @@
 Feature: The Parser handles valid TSL input.
+    Scenario: An Error Marking from an Else Expression is found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the Else Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Error Else Marking.
+ 
+    Scenario: A Single Marking from an Else Expression is found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the Else Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Single Else Marking.
+
+    Scenario: Properties from an Else Expression are found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice defining a Property in the Else Statement,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should contain the Choice's Else Properties.
+
     Scenario: An Else Statement following an If Statement with a Label should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice containing an If Label Else,
         When the Parser converts the TSL input into a Parse Tree,
