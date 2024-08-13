@@ -1,4 +1,10 @@
 Feature: The Parser handles valid TSL input.
+    Scenario: An Else Statement following an If Statement with a Label should be found in the Parse Tree from a valid TSL file.
+        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice containing an If Label Else,
+        When the Parser converts the TSL input into a Parse Tree,
+        Then the Collector should have the second Choice flagged as having an Else Statement.
+        And the Collector should have the second Choice flagged as having an Error marking defined from the If Statement.
+
     Scenario: An Else Statement should be found in the Parse Tree from a valid TSL file.
         Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an Else Statement,
         When the Parser converts the TSL input into a Parse Tree,
