@@ -26,7 +26,7 @@ MARKING_SINGLE  "[single]"
 MARKING_ERROR   "[error]"
 
 PROPERTY_LIST   "property"
-PROPERTY_ELEMENT [a-zA-Z0-9]+","?
+PROPERTY_ELEMENT [a-zA-Z0-9_\-]+","?
 
 CONSTRAINT_END   "]"
 
