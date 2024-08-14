@@ -8,3 +8,4 @@ inc = include_directories('include')
 subdir('src')
 subdir('tests')
 
+executable('tslchecker', tslchecker_sources + app_sources, include_directories: inc)
