@@ -4,6 +4,7 @@
 %}
 %option warn nodefault
 %option noyywrap
+%option yylineno
 
 /* Lexer Definitions */
 NEWLINES    [\r\n]+
