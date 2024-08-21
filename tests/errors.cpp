@@ -58,6 +58,8 @@ SCENARIO("The Parser reports a malformed Category.") {
                 TSLParser parser(tslInput);
                 parser.run();
                 THEN("the error message should be \"Parser failed at invalid_symbol.txt:1:4: Expected Category does not end with a ':'.\"") {
+                    REQUIRE(parser.lexer.contentErrorTracker->getLineNumber() == 1);
+                    REQUIRE(parser.lexer.contentErrorTracker->getLineColumn() == 4);
                     REQUIRE("Parser failed at invalid_symbol.txt:1:4: Expected Category does not end with a ':'." == stderrListener.getCurrentErrorMsg());
                 }
             }

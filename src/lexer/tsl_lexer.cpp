@@ -24,6 +24,7 @@ void TSLLexer::load(const std::filesystem::path& inputPath) {
     inputContents = std::istringstream(inputBuffer);
 
     lexer = std::make_unique<yyFlexLexer>(&inputContents);
+    contentErrorTracker = std::make_unique<FileTracker>(inputPath);
 }
 
 /**
@@ -41,8 +42,10 @@ int TSLLexer::getNextToken() const {
  */
 int TSLLexer::constructNextToken(int* currentResult) const {
     auto currentTokenType = getNextToken();
-
+    contentErrorTracker->shiftToNewline(lexer->lineno());
+    
     *currentResult = currentTokenType;
+    contentErrorTracker->shiftLineColumn(lexer->YYLeng());
 
     return currentTokenType;
 }
@@ -56,3 +59,4 @@ int TSLLexer::constructNextToken(int* currentResult) const {
 std::string TSLLexer::getCurrentTokenContents() const {
     return std::string(lexer->YYText(), lexer->YYText() + lexer->YYLeng());
 }
+
