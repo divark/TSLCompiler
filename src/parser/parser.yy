@@ -20,8 +20,10 @@
 * relating to syntax, according to the following resource:
 * https://www.gnu.org/software/bison/manual/html_node/Error-Reporting-Function.html 
 */
+%define parse.trace
 %define parse.error detailed
 %define parse.lac full
+%locations
 
 %parse-param {TSLLexer &lexer}
 %parse-param {TSLCollector &collector}
@@ -102,6 +104,6 @@ choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurre
 
 /* Bison Epilogue (Function declarations) */
 
-void yy::parser::error(const std::string &message) {
-    std::cerr << "Parser Error: " << message << std::endl;
+void yy::parser::error(const location_type& l, const std::string &message) {
+    std::cerr << "Parser failed at " << l << ": " << message << std::endl;
 }

@@ -13,8 +13,8 @@ SCENARIO("A Category should be found in the Parse Tree from a valid TSL file.") 
             parser.run();
 
             THEN("the Parse Tree should contain the contents of the Category.") {
-                REQUIRE(parser.collector.categories.size() == 1);
-                REQUIRE(parser.collector.categories[0] == "Simple Category 1:");
+                REQUIRE(parser.getCollector().categories.size() == 1);
+                REQUIRE(parser.getCollector().categories[0] == "Simple Category 1:");
             }
         }
     }
@@ -28,9 +28,9 @@ SCENARIO("A Choice should be found in the Parse Tree from a valid TSL file.") {
             parser.run();
 
             THEN("the Parse Tree should contain the contents of the Choice.") {
-                REQUIRE(parser.collector.choices.size() == 1);
-                REQUIRE(parser.collector.choices[0] == "Simple Choice 1.");
-		REQUIRE(parser.collector.categoryChoicesGraph[0][0] == 0);
+                REQUIRE(parser.getCollector().choices.size() == 1);
+                REQUIRE(parser.getCollector().choices[0] == "Simple Choice 1.");
+		REQUIRE(parser.getCollector().categoryChoicesGraph[0][0] == 0);
             }
         }
     }
@@ -44,23 +44,23 @@ SCENARIO("Both Categories and Choices should be found in the Parse Tree from a v
             parser.run();
 
             THEN("the Parse Tree should contain the contents of both Categories,") {
-		REQUIRE(parser.collector.categories.size() == 2);
-		REQUIRE(parser.collector.categories[0] == "Simple Category 1:");
-		REQUIRE(parser.collector.categories[1] == "Simple Category 2:");
+		REQUIRE(parser.getCollector().categories.size() == 2);
+		REQUIRE(parser.getCollector().categories[0] == "Simple Category 1:");
+		REQUIRE(parser.getCollector().categories[1] == "Simple Category 2:");
             }
 
 	    THEN("the Parse Tree should contain the contents of both Choices.") {
-		REQUIRE(parser.collector.choices.size() == 2);
-		REQUIRE(parser.collector.choices[0] == "Simple Choice 1.");
-		REQUIRE(parser.collector.choices[1] == "Simple Choice 2.");
+		REQUIRE(parser.getCollector().choices.size() == 2);
+		REQUIRE(parser.getCollector().choices[0] == "Simple Choice 1.");
+		REQUIRE(parser.getCollector().choices[1] == "Simple Choice 2.");
 
-		REQUIRE(parser.collector.categoryChoicesGraph.size() == 2);
+		REQUIRE(parser.getCollector().categoryChoicesGraph.size() == 2);
 
-		REQUIRE(parser.collector.categoryChoicesGraph[0].size() == 1);
-		REQUIRE(parser.collector.categoryChoicesGraph[0][0] == 0);
+		REQUIRE(parser.getCollector().categoryChoicesGraph[0].size() == 1);
+		REQUIRE(parser.getCollector().categoryChoicesGraph[0][0] == 0);
 
-		REQUIRE(parser.collector.categoryChoicesGraph[1].size() == 1);
-		REQUIRE(parser.collector.categoryChoicesGraph[1][0] == 1);
+		REQUIRE(parser.getCollector().categoryChoicesGraph[1].size() == 1);
+		REQUIRE(parser.getCollector().categoryChoicesGraph[1][0] == 1);
 	    }
         }
     }
@@ -75,7 +75,7 @@ SCENARIO("A single marking for a Choice should be found in the Parse Tree from a
 
             THEN("the Collector should contain the Choice's single marking.") {
                 int choiceIdx = 0;
-                REQUIRE(parser.collector.singleMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().singleMarkings[choiceIdx] == true);
             }
         }
     }
@@ -90,7 +90,7 @@ SCENARIO("A error marking for a Choice should be found in the Parse Tree from a 
 
             THEN("the Collector should contain the Choice's error marking.") {
                 int choiceIdx = 0;
-                REQUIRE(parser.collector.errorMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().errorMarkings[choiceIdx] == true);
             }
         }
     }
@@ -105,12 +105,12 @@ SCENARIO("A single and error marking for one Choice each should be found in the 
 
             THEN("the Collector should contain the first Choice's single marking.") {
                 int choiceIdx = 0;
-                REQUIRE(parser.collector.singleMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().singleMarkings[choiceIdx] == true);
             }
 
             THEN("the Collector should contain the second Choice's error marking.") {
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.errorMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().errorMarkings[choiceIdx] == true);
             }
         }
     }
@@ -126,8 +126,8 @@ SCENARIO("One Property for a Choice should be found in the Parse Tree from a val
             THEN("the Collector should contain the Choice's Property.") {
                 int choiceIdx = 0;
                 int propertyIdx = 0;
-                REQUIRE(parser.collector.properties[propertyIdx] == "ABC");
-                REQUIRE(parser.collector.choiceProperties[choiceIdx][0] == propertyIdx);
+                REQUIRE(parser.getCollector().properties[propertyIdx] == "ABC");
+                REQUIRE(parser.getCollector().choiceProperties[choiceIdx][0] == propertyIdx);
             }
         }
     }
@@ -145,10 +145,10 @@ SCENARIO("Multiple Properties for a Choice should be found in the Parse Tree fro
                 int property_idx[] = {0, 1, 2};
                 std::string property[] = {"A", "B", "C"};
 
-                REQUIRE(parser.collector.properties.size() == 3);
+                REQUIRE(parser.getCollector().properties.size() == 3);
                 for (int propertyIdx : property_idx) {
-                    REQUIRE(parser.collector.properties[propertyIdx] == property[propertyIdx]);
-                    REQUIRE(parser.collector.choiceProperties[choiceIdx][propertyIdx] == propertyIdx);
+                    REQUIRE(parser.getCollector().properties[propertyIdx] == property[propertyIdx]);
+                    REQUIRE(parser.getCollector().choiceProperties[choiceIdx][propertyIdx] == propertyIdx);
                 }
             }
         }
@@ -168,8 +168,8 @@ SCENARIO("A Simple Expression from an If Statement should be found in the Parse 
                 int choiceIdx = 1;
                 std::string expectedExpression = "simple";
 
-                REQUIRE(parser.collector.choiceExpressions.size() == 2);
-                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+                REQUIRE(parser.getCollector().choiceExpressions.size() == 2);
+                REQUIRE(parser.getCollector().getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }
     }
@@ -188,8 +188,8 @@ SCENARIO("An Negation Expression from an If Statement should be found in the Par
                 int choiceIdx = 1;
                 std::string expectedExpression = "!simple";
 
-                REQUIRE(parser.collector.choiceExpressions.size() == 2);
-                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+                REQUIRE(parser.getCollector().choiceExpressions.size() == 2);
+                REQUIRE(parser.getCollector().getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }
     }
@@ -208,8 +208,8 @@ SCENARIO("A Grouped Expression from an If Statement should be found in the Parse
                 int choiceIdx = 1;
                 std::string expectedExpression = "(simple)";
 
-                REQUIRE(parser.collector.choiceExpressions.size() == 2);
-                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+                REQUIRE(parser.getCollector().choiceExpressions.size() == 2);
+                REQUIRE(parser.getCollector().getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }
     }
@@ -228,8 +228,8 @@ SCENARIO("An AND Expression from an If Statement should be found in the Parse Tr
                 int choiceIdx = 2;
                 std::string expectedExpression = "choice1 && choice2";
 
-                REQUIRE(parser.collector.choiceExpressions.size() == 3);
-                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+                REQUIRE(parser.getCollector().choiceExpressions.size() == 3);
+                REQUIRE(parser.getCollector().getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }
     }
@@ -248,8 +248,8 @@ SCENARIO("An OR Expression from an If Statement should be found in the Parse Tre
                 int choiceIdx = 2;
                 std::string expectedExpression = "choice1 || choice2";
 
-                REQUIRE(parser.collector.choiceExpressions.size() == 3);
-                REQUIRE(parser.collector.getChoiceExpression(choiceIdx)->asString() == expectedExpression);
+                REQUIRE(parser.getCollector().choiceExpressions.size() == 3);
+                REQUIRE(parser.getCollector().getChoiceExpression(choiceIdx)->asString() == expectedExpression);
             }
         }
     }
@@ -265,8 +265,8 @@ SCENARIO("Properties from an If Expression are found in the Parse Tree from a va
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.choiceIfProperties[choiceIdx].size() == 1);
-                REQUIRE(parser.collector.choiceProperties[choiceIdx].size() == 0);
+                REQUIRE(parser.getCollector().choiceIfProperties[choiceIdx].size() == 1);
+                REQUIRE(parser.getCollector().choiceProperties[choiceIdx].size() == 0);
             }
         }
     }
@@ -282,8 +282,8 @@ SCENARIO("A Single Marking from an If Expression is found in the Parse Tree from
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.singleMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.singleIfMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().singleMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().singleIfMarkings[choiceIdx] == true);
             }
         }
     }
@@ -299,8 +299,8 @@ SCENARIO("An Error Marking from an If Expression is found in the Parse Tree from
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.errorMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.errorIfMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().errorMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().errorIfMarkings[choiceIdx] == true);
             }
         }
     }
@@ -318,7 +318,7 @@ SCENARIO("An Else Statement should be found in the Parse Tree from a valid TSL f
 
                 int choiceIdx = 1;
 
-                REQUIRE(parser.collector.hasElseExpression(choiceIdx) == true);
+                REQUIRE(parser.getCollector().hasElseExpression(choiceIdx) == true);
             }
         }
     }
@@ -336,13 +336,13 @@ SCENARIO("An Else Statement following an If Statement with a Label should be fou
 
                 int choiceIdx = 1;
 
-                REQUIRE(parser.collector.hasElseExpression(choiceIdx) == true);
+                REQUIRE(parser.getCollector().hasElseExpression(choiceIdx) == true);
             }
 
             THEN("the Collector should have the second Choice flagged as having an Error marking defined from the If Statement.") {
                 int choiceIdx = 1;
 
-                REQUIRE(parser.collector.errorIfMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().errorIfMarkings[choiceIdx] == true);
             }
         }
     }
@@ -358,9 +358,9 @@ SCENARIO("An Error Marking from an Else Expression is found in the Parse Tree fr
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.errorMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.errorIfMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.errorElseMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().errorMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().errorIfMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().errorElseMarkings[choiceIdx] == true);
             }
         }
     }
@@ -376,9 +376,9 @@ SCENARIO("A Single Marking from an Else Expression is found in the Parse Tree fr
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.singleMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.singleIfMarkings[choiceIdx] == false);
-                REQUIRE(parser.collector.singleElseMarkings[choiceIdx] == true);
+                REQUIRE(parser.getCollector().singleMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().singleIfMarkings[choiceIdx] == false);
+                REQUIRE(parser.getCollector().singleElseMarkings[choiceIdx] == true);
             }
         }
     }
@@ -394,9 +394,9 @@ SCENARIO("Properties from an Else Expression are found in the Parse Tree from a 
                 REQUIRE(parserStatus == 0);
 
                 int choiceIdx = 1;
-                REQUIRE(parser.collector.choiceElseProperties[choiceIdx].size() == 1);
-                REQUIRE(parser.collector.choiceIfProperties[choiceIdx].size() == 0);
-                REQUIRE(parser.collector.choiceProperties[choiceIdx].size() == 0);
+                REQUIRE(parser.getCollector().choiceElseProperties[choiceIdx].size() == 1);
+                REQUIRE(parser.getCollector().choiceIfProperties[choiceIdx].size() == 0);
+                REQUIRE(parser.getCollector().choiceProperties[choiceIdx].size() == 0);
             }
         }
     }

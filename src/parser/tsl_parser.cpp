@@ -10,9 +10,16 @@ TSLParser::TSLParser(const std::filesystem::path& inputPath) {
 }
 
 /**
- * Runs the Parser, returning the status code 
+ * Runs the Parser, returning the status code
  * when it has read the whole file, or it has encountered an error.
  */
 int TSLParser::run() {
     return parser->parse();
+}
+
+/**
+ * Returns a reference to the TSLCollector.
+*/
+TSLCollector& TSLParser::getCollector() {
+    return collector;
 }

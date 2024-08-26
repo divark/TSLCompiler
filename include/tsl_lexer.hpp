@@ -10,18 +10,22 @@
 #include <FlexLexer.h>
 #endif
 
-#include "filetracker.hpp"
+#include "location.hh"
 
-struct TSLLexer {
-    std::unique_ptr<FlexLexer> lexer;
-    std::istringstream inputContents;
-    std::unique_ptr<FileTracker> contentErrorTracker;
+class TSLLexer {
+    private:
+        std::unique_ptr<FlexLexer> lexer;
+        std::istringstream inputContents;
+        std::string filePath;
 
-    TSLLexer();
+        bool hasLoadedErrorTracking;
 
-    void load(const std::filesystem::path& inputPath);
+    public:
+        TSLLexer();
 
-    int getNextToken() const;
-    int constructNextToken(int*) const;
-    std::string getCurrentTokenContents() const;
+        void load(const std::filesystem::path& inputPath);
+
+        int getNextToken() const;
+        int constructNextToken(int*, yy::location*);
+        std::string getCurrentTokenContents() const;
 };
