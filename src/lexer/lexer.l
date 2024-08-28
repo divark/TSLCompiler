@@ -5,6 +5,7 @@
 %option warn nodefault
 %option noyywrap
 %option yylineno
+%option yyclass="TSLLexer"
 
 /* Lexer Definitions */
 NEWLINES    [\r\n]+

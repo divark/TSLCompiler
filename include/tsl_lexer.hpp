@@ -12,9 +12,10 @@
 
 #include "location.hh"
 
-class TSLLexer {
+// yyFlexLexer is derived in order for us to have more control
+// over what gets passed to the lexer via the yylex function.
+class TSLLexer : yyFlexLexer {
     private:
-        std::unique_ptr<FlexLexer> lexer;
         std::istringstream inputContents;
         std::string filePath;
 
@@ -24,8 +25,9 @@ class TSLLexer {
         TSLLexer();
 
         void load(const std::filesystem::path& inputPath);
+        int yylex();
 
-        int getNextToken() const;
+        int getNextToken();
         int constructNextToken(int*, yy::location*);
         std::string getCurrentTokenContents() const;
 };

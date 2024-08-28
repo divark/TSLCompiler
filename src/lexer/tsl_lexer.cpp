@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-TSLLexer::TSLLexer() {
-    lexer = std::make_unique<yyFlexLexer>();
+TSLLexer::TSLLexer() : yyFlexLexer() {
     inputContents = std::istringstream("");
+    switch_streams(&inputContents, &std::cout);
 
     hasLoadedErrorTracking = false;
 }
@@ -25,7 +25,7 @@ void TSLLexer::load(const std::filesystem::path& inputPath) {
     inputStream.read(inputBuffer.data(), inputSize);
     inputContents = std::istringstream(inputBuffer);
 
-    lexer = std::make_unique<yyFlexLexer>(&inputContents);
+    switch_streams(&inputContents, &std::cout);
     filePath = inputPath.string();
 }
 
@@ -35,8 +35,8 @@ void TSLLexer::load(const std::filesystem::path& inputPath) {
  * Postconditions: A Token represented as a number (enum) is returned for
  * some rule defined in the lexer found in lexer.l.
  */
-int TSLLexer::getNextToken() const {
-    return lexer->yylex();
+int TSLLexer::getNextToken() {
+    return yylex();
 }
 
 /**
@@ -52,7 +52,7 @@ int TSLLexer::constructNextToken(int* currentResult, yy::location* currentLocati
     currentLocation->step();
 
     *currentResult = currentTokenType;
-    currentLocation->columns(lexer->YYLeng());
+    currentLocation->columns(YYLeng());
 
     return currentTokenType;
 }
@@ -64,5 +64,5 @@ int TSLLexer::constructNextToken(int* currentResult, yy::location* currentLocati
  * in the lexer found in lexer.l.
  */
 std::string TSLLexer::getCurrentTokenContents() const {
-    return std::string(lexer->YYText(), lexer->YYText() + lexer->YYLeng());
+    return std::string(YYText(), YYText() + YYLeng());
 }
