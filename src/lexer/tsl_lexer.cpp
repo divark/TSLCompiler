@@ -51,6 +51,7 @@ int TSLLexer::constructNextToken(int* currentResult, yy::location* currentLocati
 
     auto currentTokenType = getNextToken();
     currentLocation->step();
+    currentLocation->lines(lineNumber);
 
     *currentResult = currentTokenType;
     currentLocation->columns(YYLeng());
