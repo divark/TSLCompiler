@@ -6,6 +6,7 @@ TSLLexer::TSLLexer() : yyFlexLexer() {
     inputContents = std::istringstream("");
     switch_streams(&inputContents, &std::cout);
 
+    lineNumber = 1;
     hasLoadedErrorTracking = false;
 }
 
@@ -65,4 +66,12 @@ int TSLLexer::constructNextToken(int* currentResult, yy::location* currentLocati
  */
 std::string TSLLexer::getCurrentTokenContents() const {
     return std::string(YYText(), YYText() + YYLeng());
+}
+
+/**
+ * Returns the currently recorded Line Number based on where
+ * the Lexer is in the input file.
+ */
+size_t TSLLexer::getLineNumber() {
+    return lineNumber;
 }

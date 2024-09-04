@@ -4,15 +4,14 @@
 %}
 %option warn nodefault
 %option noyywrap
-%option yylineno
 %option yyclass="TSLLexer"
 
 /* Lexer Definitions */
-NEWLINES    [\r\n]+
-WHITESPACE  [[:space:]]+
-COMMENT     "#".*
-CATEGORY    .+":"
-CHOICE      .+"."
+NEWLINES    \n
+WHITESPACE  [[:blank:]]+
+COMMENT     #.*
+CATEGORY    [a-zA-Z0-9].+:
+CHOICE      [a-zA-Z0-9].+\.
 
 CONSTRAINT_START "["
 
@@ -35,7 +34,7 @@ CONSTRAINT_END   "]"
 /* Rules */
 %%
 
-{NEWLINES}  /* Newlines are nice for formatting, but we don't track them right now. */
+{NEWLINES}  lineNumber++;
 {WHITESPACE} /* Go wild with whitespace for formatting, we ignore it by default. */
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;

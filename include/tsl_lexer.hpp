@@ -19,6 +19,7 @@ class TSLLexer : yyFlexLexer {
         std::istringstream inputContents;
         std::string filePath;
 
+        size_t lineNumber;
         bool hasLoadedErrorTracking;
 
     public:
@@ -30,4 +31,6 @@ class TSLLexer : yyFlexLexer {
         int getNextToken();
         int constructNextToken(int*, yy::location*);
         std::string getCurrentTokenContents() const;
+
+        size_t getLineNumber();
 };

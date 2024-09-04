@@ -39,6 +39,41 @@ SCENARIO("A Category should be returned from the Lexer from a valid TSL file.") 
     }
 }
 
+SCENARIO("The Line Number should be tracking the whereabouts of a single Category.") {
+    GIVEN("a TSL input with one Category, and one Choice,") {
+        fs::path tslInput = "tests/one_category_one_choice.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            WHEN("the Lexer reads the first Category,") {
+                REQUIRE(lexer.getNextToken() == yy::parser::token::CATEGORY_CONTENTS);
+                THEN("the Lexer should be on Line Number 2.") {
+                    // There's a comment in this file, so technically, the
+                    // Category is first found on Line Number 2.
+                    REQUIRE(lexer.getLineNumber() == 2);
+                }
+            }
+        }
+    }
+}
+
+SCENARIO("The Line Number should be tracking the whereabouts of a single Choice.") {
+    GIVEN("a TSL input with one Category, and one Choice,") {
+        fs::path tslInput = "tests/one_category_one_choice.txt";
+        WHEN("the Lexer consumes the input,") {
+            TSLLexer lexer;
+            lexer.load(tslInput);
+            WHEN("the Lexer reads the first Choice,") {
+                waitUntil(lexer, yy::parser::token::CATEGORY_CONTENTS, 1);
+                REQUIRE(lexer.getNextToken() == yy::parser::token::CHOICE_CONTENTS);
+                THEN("the Lexer should be on Line Number 3.") {
+                    REQUIRE(lexer.getLineNumber() == 3);
+                }
+            }
+        }
+    }
+}
+
 SCENARIO("A Comment should not be returned from the Lexer from a valid TSL file.") {
     GIVEN("a TSL input with one Category, and one Choice,") {
         fs::path tslInput = "tests/one_category_one_choice.txt";
