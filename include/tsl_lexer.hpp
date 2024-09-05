@@ -20,7 +20,7 @@ class TSLLexer : yyFlexLexer {
         std::string filePath;
 
         size_t lineNumber;
-        bool hasLoadedErrorTracking;
+        size_t lineColumn;
 
     public:
         TSLLexer();
@@ -33,4 +33,5 @@ class TSLLexer : yyFlexLexer {
         std::string getCurrentTokenContents() const;
 
         size_t getLineNumber();
+        size_t getLineColumn();
 };

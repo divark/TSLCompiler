@@ -8,7 +8,7 @@
 
 /* Lexer Definitions */
 NEWLINES    \n
-WHITESPACE  [[:blank:]]+
+WHITESPACE  [[:blank:]]
 COMMENT     #.*
 CATEGORY    [a-zA-Z0-9].+:
 CHOICE      [a-zA-Z0-9].+\.
@@ -34,8 +34,8 @@ CONSTRAINT_END   "]"
 /* Rules */
 %%
 
-{NEWLINES}  lineNumber++;
-{WHITESPACE} /* Go wild with whitespace for formatting, we ignore it by default. */
+{NEWLINES}  { lineNumber++; lineColumn = 1; }
+{WHITESPACE} { lineColumn += 1; }
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;
 {CHOICE}    return yy::parser::token::CHOICE_CONTENTS;

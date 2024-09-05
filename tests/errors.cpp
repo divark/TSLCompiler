@@ -48,7 +48,7 @@ std::string ErrorMessageListener::getCurrentErrorMsg() {
     return currentErrorMsg;
 }
 
-SCENARIO("The Parser reports a malformed Category.") {
+SCENARIO("The Parser reports an invalid Category.") {
     GIVEN("a TSL input with a Category that ends with a '?' instead of a ':',") {
         fs::path tslInput = "tests/invalid_category.txt";
         WHEN("error messages are redirected to be read by us,") {
@@ -58,7 +58,13 @@ SCENARIO("The Parser reports a malformed Category.") {
                 TSLParser parser(tslInput);
                 parser.run();
                 THEN("the error message should point to line 1.") {
+                    INFO(stderrListener.getCurrentErrorMsg());
                     REQUIRE(stderrListener.getCurrentErrorMsg().find("tests/invalid_category.txt:1") != std::string::npos);
+                }
+
+                THEN("error message should point to line column 4.") {
+                    INFO(stderrListener.getCurrentErrorMsg());
+                    REQUIRE(stderrListener.getCurrentErrorMsg().find("tests/invalid_category.txt:1.4") != std::string::npos);
                 }
 
                 THEN("the error message should mention expecting a Category.") {
@@ -81,6 +87,11 @@ SCENARIO("The Parser reports an invalid Choice.") {
                 THEN("the error message should point to line 2.") {
                     INFO(stderrListener.getCurrentErrorMsg());
                     REQUIRE(stderrListener.getCurrentErrorMsg().find("tests/invalid_choice.txt:2") != std::string::npos);
+                }
+
+                THEN("error message should point to line column 8.") {
+                    INFO(stderrListener.getCurrentErrorMsg());
+                    REQUIRE(stderrListener.getCurrentErrorMsg().find("tests/invalid_choice.txt:2.8") != std::string::npos);
                 }
 
                 THEN("the error message should mention expecting a Choice.") {

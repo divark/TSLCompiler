@@ -7,7 +7,7 @@ TSLLexer::TSLLexer() : yyFlexLexer() {
     switch_streams(&inputContents, &std::cout);
 
     lineNumber = 1;
-    hasLoadedErrorTracking = false;
+    lineColumn = 1;
 }
 
 /**
@@ -44,17 +44,14 @@ int TSLLexer::getNextToken() {
  * Populates the contents of the next read Token into the current result.
  */
 int TSLLexer::constructNextToken(int* currentResult, yy::location* currentLocation) {
-    if (!hasLoadedErrorTracking) {
-        currentLocation->initialize(&filePath);
-        hasLoadedErrorTracking = true;
-    }
-
     auto currentTokenType = getNextToken();
-    currentLocation->step();
-    currentLocation->lines(lineNumber);
+
+    lineColumn += YYLeng();
+    // This is being treated as a setter to the current Line Number
+    // and Line Column in the input file.
+    currentLocation->initialize(&filePath, lineNumber, lineColumn);
 
     *currentResult = currentTokenType;
-    currentLocation->columns(YYLeng());
 
     return currentTokenType;
 }
@@ -75,4 +72,12 @@ std::string TSLLexer::getCurrentTokenContents() const {
  */
 size_t TSLLexer::getLineNumber() {
     return lineNumber;
+}
+
+/**
+ * Returns the currently recorded Line Column based on where
+ * the Lexer is in the input file.
+ */
+size_t TSLLexer::getLineColumn() {
+    return lineColumn;
 }
