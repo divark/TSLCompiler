@@ -46,7 +46,9 @@ test('tsl_parser', parser_test_executable, verbose: true, depends: test_files)
 # Testing error messages generated from the TSL Lexer or TSL Parser.
 invalid_symbol_test_file = fs.copyfile('test-files/invalid_category.txt', 'invalid_category.txt')
 invalid_choice_test_file = fs.copyfile('test-files/invalid_choice.txt', 'invalid_choice.txt')
-error_test_files = [invalid_symbol_test_file, invalid_choice_test_file]
+invalid_property_then_if_test_file = fs.copyfile('test-files/invalid_property_then_if.txt', 'invalid_property_then_if.txt')
+invalid_double_marking_test_file = fs.copyfile('test-files/invalid_double_marking.txt', 'invalid_double_marking.txt')
+error_test_files = [invalid_symbol_test_file, invalid_choice_test_file, invalid_property_then_if_test_file, invalid_double_marking_test_file]
 
 error_test_sources = files('errors.cpp')
 error_test_executable = executable('errors-test', sources: error_test_sources + app_sources, dependencies: test_dep, include_directories: inc)

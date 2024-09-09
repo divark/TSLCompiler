@@ -34,7 +34,7 @@ CONSTRAINT_END   "]"
 /* Rules */
 %%
 
-{NEWLINES}  { lineNumber++; lineColumn = 1; }
+{NEWLINES}  { lineNumber++; lineColumn = 0; }
 {WHITESPACE} { lineColumn += 1; }
 {COMMENT}   /* Comments are nice for documentation, but we don't look at these either. */
 {CATEGORY}  return yy::parser::token::CATEGORY_CONTENTS;

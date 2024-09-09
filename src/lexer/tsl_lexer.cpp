@@ -7,7 +7,7 @@ TSLLexer::TSLLexer() : yyFlexLexer() {
     switch_streams(&inputContents, &std::cout);
 
     lineNumber = 1;
-    lineColumn = 1;
+    lineColumn = 0;
 }
 
 /**
