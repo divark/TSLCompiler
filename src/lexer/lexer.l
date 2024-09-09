@@ -52,6 +52,7 @@ CONSTRAINT_END   "]"
 {PROPERTY_LIST}     return yy::parser::token::PROPERTY_LIST;
 {PROPERTY_ELEMENT}  return yy::parser::token::PROPERTY_ELEMENT;
 {CONSTRAINT_END}    return yy::parser::token::CONSTRAINT_END;
+.                   return yy::parser::token::YYUNDEF;
 
 %%
 /* Extra Code */
