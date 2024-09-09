@@ -22,11 +22,17 @@ class TSLLexer : yyFlexLexer {
         size_t lineNumber;
         size_t lineColumn;
 
+        // This is required by yyFlexLexer to identify
+        // which token has been found. However, since
+        // we have our own explicit methods of
+        // getNextToken and getCurrentTokenContents,
+        // this serves as a helper function to those instead.
+        int yylex();
+
     public:
         TSLLexer();
 
         void load(const std::filesystem::path& inputPath);
-        int yylex();
 
         int getNextToken();
         int constructNextToken(int*, yy::location*);
