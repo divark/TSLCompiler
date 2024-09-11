@@ -1,8 +1,8 @@
-Feature: The TSLCompiler should emit an error for whatever the TSLgenerator ignores.
-    Scenario: A user provides a file containing only Categories.
-        Given an input with only Categories,
-        When the input is compiled by the TSLCompiler,
-        Then the TSLCompiler should return an error.
+Feature: The TSLCompiler should generate test frames.
+    Scenario: A user provides a file containing a Category and a Choice.
+        Given a TSL file containing one Category and one Choice,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain one test frame mentioning the Category and Choice.
 
 Feature: The TSLCompiler should generate test frames identical to the TSLgenerator.
     Scenario: A user provides a file containing a Category and a Choice.

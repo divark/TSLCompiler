@@ -43,6 +43,11 @@ parser_test_sources = files('tslparser.cpp')
 parser_test_executable = executable('tslparser-test', sources: parser_test_sources + app_sources, dependencies: test_dep, include_directories: inc)
 test('tsl_parser', parser_test_executable, verbose: true, depends: test_files)
 
+# Testing the TSL Compiler overall.
+compiler_test_sources = files('tslcompiler.cpp')
+compiler_test_executable = executable('tslcompiler-test', sources: compiler_test_sources + app_sources, dependencies: test_dep, include_directories: inc)
+test('tsl_compiler', compiler_test_executable, verbose: true, depends: test_files)
+
 # Testing error messages generated from the TSL Lexer or TSL Parser.
 invalid_symbol_test_file = fs.copyfile('test-files/invalid_category.txt', 'invalid_category.txt')
 invalid_choice_test_file = fs.copyfile('test-files/invalid_choice.txt', 'invalid_choice.txt')
