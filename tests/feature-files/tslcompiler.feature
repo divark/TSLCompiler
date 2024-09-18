@@ -4,6 +4,14 @@ Feature: The TSLCompiler should generate test frames.
         When the input is consumed by the TSLCompiler,
         Then the TSLCompiler's result should contain one test frame mentioning the Category and Choice.
 
+    Scenario: A single Node should be made from a file containing one Category, and one Choice.
+        Given a TSL file containing one Category, and one Choice,
+        When the input is compiled by the TSLCompiler,
+        And the nodes are created from the TSLCollector,
+        Then the number of Nodes should match the number of Choices,
+        And Node 1 should contain the first Category,
+        And Node 1 should contain the first Choice.
+
 Feature: The TSLCompiler should generate test frames identical to the TSLgenerator.
     Scenario: A user provides a file containing a Category and a Choice.
         Given an input with one Category, and one Choice,

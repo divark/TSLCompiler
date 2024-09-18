@@ -15,6 +15,13 @@ std::vector<TSLTestCase>& TSLCompiler::getTestCases() {
 }
 
 /**
+ * Returns the collection of variables found after compiling.
+ */
+TSLCollector& TSLCompiler::getCollector() {
+    return parser->getCollector();
+}
+
+/**
  * Runs the Compiler to generate test cases.
  */
 int TSLCompiler::compile() {

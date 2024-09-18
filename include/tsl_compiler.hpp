@@ -11,5 +11,6 @@ class TSLCompiler {
         TSLCompiler(const std::filesystem::path&);
         int compile();
 
+        TSLCollector& getCollector();
         std::vector<TSLTestCase>& getTestCases();
 };
