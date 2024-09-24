@@ -43,16 +43,57 @@ SCENARIO("A single Node should be made from a file containing one Category, and 
                 THEN("Node 1 should contain the first Category,") {
                     auto firstNode = nodes[0];
                     auto firstNodeData = firstNode.getData();
+                    auto categoryIdx = firstNodeData.getCategoryIdx();
 
-                    REQUIRE(firstNodeData.getCategory() == "Simple Category 1");
+                    REQUIRE(collected_tsl_variables.categories[categoryIdx] == "Simple Category 1:");
                 }
 
                 THEN("Node 1 should contain the first Choice.") {
                     auto firstNode = nodes[0];
                     auto firstNodeData = firstNode.getData();
+                    auto choiceIdx = firstNodeData.getChoiceIdx();
 
-                    REQUIRE(firstNodeData.getChoice() == "Simple Choice 1");
+                    REQUIRE(collected_tsl_variables.choices[choiceIdx] == "Simple Choice 1.");
                 }
+            }
+        }
+    }
+}
+
+SCENARIO("Edges should be made from a file containing two Categories, and two Choices.") {
+    GIVEN("a TSL file containing two Categories, and two Choices each,") {
+        fs::path tslInput = "tests/two_categories_two_choices_each.txt";
+        WHEN("the input is compiled by the TSLCompiler,") {
+            TSLCompiler compiler(tslInput);
+            REQUIRE(compiler.compile() == 0);
+            WHEN("the nodes are created from the TSLCollector,") {
+                auto collected_tsl_variables = compiler.getCollector();
+                std::vector<Node> nodes = getNodesFromCollector(collected_tsl_variables);
+
+                WHEN("the edges are created from the nodes,") {
+                    auto edges = getEdgesFromTSLNodes(nodes, collected_tsl_variables);
+
+                    THEN("the number of Nodes should match the number of Choices,") {
+                        REQUIRE(nodes.size() == collected_tsl_variables.choices.size());
+                    }
+
+                    THEN("Node 1 should have an edge to Nodes 3 and 4.") {
+                        std::vector<size_t> expectedEdges = {2, 3};
+
+                        auto node = nodes[0];
+                        auto actualEdges = edges.getNodeEdges(node);
+                        REQUIRE(expectedEdges == actualEdges);
+                    }
+
+                    THEN("Node 2 should have an edge to Nodes 3 and 4.") {
+                        std::vector<size_t> expectedEdges = {2, 3};
+
+                        auto node = nodes[1];
+                        auto actualEdges = edges.getNodeEdges(node);
+                        REQUIRE(expectedEdges == actualEdges);
+                    }
+                }
+
             }
         }
     }

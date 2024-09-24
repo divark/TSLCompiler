@@ -5,7 +5,8 @@ test_dep = dependency('catch2-with-main')
 # paths are relative, and the test-files directory by default is not brought over.
 one_category_test_file = fs.copyfile('test-files/one_category_one_choice.txt', 'one_category_one_choice.txt')
 multiple_categories_test_file = fs.copyfile('test-files/two_categories_one_choice_each.txt', 'two_categories_one_choice_each.txt')
-simple_test_files = [one_category_test_file, multiple_categories_test_file]
+two_categories_two_choices_test_file = fs.copyfile('test-files/two_categories_two_choices_each.txt', 'two_categories_two_choices_each.txt')
+simple_test_files = [one_category_test_file, multiple_categories_test_file, two_categories_two_choices_test_file]
 
 single_marking_test_file = fs.copyfile('test-files/one_category_choice_with_marking.txt', 'one_category_choice_with_marking.txt')
 error_marking_test_file = fs.copyfile('test-files/one_category_choice_with_error_marking.txt', 'one_category_choice_with_error_marking.txt')
