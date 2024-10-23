@@ -107,7 +107,7 @@ SCENARIO("A Category's Choice should be returned from the Lexer from a valid TSL
 
                 auto lexerToken = lexer.getNextToken();
                 REQUIRE(lexerToken == yy::parser::token::CHOICE_CONTENTS);
-                REQUIRE(lexer.getCurrentTokenContents() == "    Simple Choice 1.");
+                REQUIRE(lexer.getCurrentTokenContents() == "Simple Choice 1.");
             }
         }
     }
