@@ -10,8 +10,8 @@
 NEWLINES    \n
 WHITESPACE  [[:blank:]]
 COMMENT     #.*
-CATEGORY    [[[:alnum:][:graph:][:punct:]][[:alnum:][:graph:][:punct:][:blank:]]+:
-CHOICE      [[[:alnum:][:graph:][:punct:]][[:alnum:][:graph:][:punct:][:blank:]]+\.
+CATEGORY    [[:alnum:][:graph:][:punct:]][[:alnum:][:graph:][:punct:][:blank:]]*:
+CHOICE      [[:alnum:][:graph:][:punct:]][[:alnum:][:graph:][:punct:][:blank:]]*\.
 
 CONSTRAINT_START "["
 
