@@ -11,10 +11,24 @@ int TSLCollector::recordCategory(std::string categoryContents) {
 }
 
 /**
+ * Returns the original String whose whitespace has been trimmed starting from the left.
+ */
+std::string left_trim(const std::string& originalString) {
+    const std::string whitespace = " \n\r\t\f\v";
+
+    auto startingIdx = originalString.find_first_not_of(whitespace);
+    if (startingIdx == std::string::npos) {
+        return originalString;
+    }
+
+    return originalString.substr(startingIdx);
+}
+
+/**
  * Returns an index to the recently stored Choice for the most recently recorded Category.
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
-    choices.push_back(choiceContents);
+    choices.push_back(left_trim(choiceContents));
 
     singleMarkings.push_back(false);
     singleIfMarkings.push_back(false);

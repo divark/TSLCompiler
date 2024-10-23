@@ -10,8 +10,8 @@
 NEWLINES    \n
 WHITESPACE  [[:blank:]]
 COMMENT     #.*
-CATEGORY    [a-zA-Z0-9].*:
-CHOICE      [a-zA-Z0-9].*\.
+CATEGORY    .+:
+CHOICE      .+\.
 
 CONSTRAINT_START "["
 
