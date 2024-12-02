@@ -3,7 +3,7 @@
 #include <iostream>
 
 TSLLexer::TSLLexer() : yyFlexLexer() {
-    inputContents = std::istringstream("");
+    inputContents = std::ifstream("");
     switch_streams(&inputContents, &std::cout);
 
     lineNumber = 1;
@@ -19,12 +19,7 @@ void TSLLexer::load(const std::filesystem::path& inputPath) {
         throw "File does not exist: " + std::filesystem::absolute(inputPath).string();
     }
 
-    const auto inputSize = std::filesystem::file_size(inputPath);
-    std::ifstream inputStream(inputPath);
-    std::string inputBuffer(inputSize, '\0');
-
-    inputStream.read(inputBuffer.data(), inputSize);
-    inputContents = std::istringstream(inputBuffer);
+    inputContents = std::ifstream(inputPath);
 
     switch_streams(&inputContents, &std::cout);
     filePath = inputPath.string();

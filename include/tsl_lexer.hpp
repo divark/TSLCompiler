@@ -16,7 +16,7 @@
 // over what gets passed to the lexer via the yylex function.
 class TSLLexer : yyFlexLexer {
     private:
-        std::istringstream inputContents;
+        std::ifstream inputContents;
         std::string filePath;
 
         size_t lineNumber;
