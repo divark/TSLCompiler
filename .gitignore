@@ -1,5 +1,9 @@
 /build
 /builddir
-/subprojects
+
+/subprojects/*
+!/subprojects/ut.wrap
+
 .vscode
 .cache
+
