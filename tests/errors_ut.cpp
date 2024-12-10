@@ -84,8 +84,8 @@ int main(int argc, const char** argv) {
                       TSLParser parser(tslInput);
                       parser.run();
 
-                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} unexpectedly.") = [&](uint lineNumber, std::string errorFound) {
-                          auto expectedErrorSummary = std::format("Error: Unexpected {} found", errorFound);
+                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](uint lineNumber, std::string errorFound) {
+                          auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
                           auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
@@ -107,41 +107,6 @@ int main(int argc, const char** argv) {
                           auto errorTokenFoundInInput = actualErrorPointedOut.find(errorToken) != std::string::npos;
                           expect(errorTokenFoundInInput) << std::format("Could not find error token {} in error message {}", errorToken, actualErrorPointedOut);
                       };
-
-                      steps.then("line {lineNumber} of the error message should display a help message with {expectedNumBulletPoints} bullet points.") = [&](uint lineNumber, uint expectedNumBulletPoints) {
-                          std::string helpMsg = "";
-                          auto expectedNumHelpLines = 1 + expectedNumBulletPoints;
-                          for (auto i = 0; i < expectedNumHelpLines; i++) {
-                              helpMsg += std::format("{}\n", stderrListener.getLine(lineNumber + i));
-                          }
-
-                          auto expectedNumHelpMsgs = expectedNumBulletPoints;
-                          auto actualNumHelpMsgs = std::ranges::count(helpMsg, '-');
-
-                          expect_eq(expectedNumHelpMsgs, actualNumHelpMsgs);
-                      };
-                      //steps.then("the error message should point to line {line_number}.") = [&](uint line_number) {
-                      //    auto currentErrorMsg = stderrListener.getCurrentErrorMsg();
-                      //    auto expectedLineNumber = std::format(":{}", line_number);
-                      //    auto expectedErrorMsgContent = tslInput.string() + expectedLineNumber;
-                      //    expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-
-                      //    steps.then("the error message should point to line column {column_number}.") = [&](uint column_number) {
-                      //      auto expectedLineColumn = std::format(".{}", column_number);
-                      //      expectedErrorMsgContent = expectedErrorMsgContent + expectedLineColumn;
-                      //      expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-
-                      //      steps.then("the error message should mention expecting a Category.") = [&] {
-                      //          expectedErrorMsgContent = "CATEGORY_CONTENTS";
-                      //          expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-                      //      };
-
-                      //      steps.then("the error message should mention expecting a Choice.") = [&] {
-                      //          expectedErrorMsgContent = "CHOICE_CONTENTS";
-                      //          expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-                      //      };
-                      //  };
-                      //};
                   };
               };
           };

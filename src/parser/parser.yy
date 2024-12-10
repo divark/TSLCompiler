@@ -129,13 +129,17 @@ FileReader::FileReader(std::string fileName) {
 
 bool FileReader::hasLine(int lineNumber) {
     auto adjustedLineNumber = lineNumber - 1;
-    return adjustedLineNumber > 0 && adjustedLineNumber < inputLines.size();
+    return adjustedLineNumber >= 0 && adjustedLineNumber < inputLines.size();
 }
 
 std::string FileReader::getLine(uint lineNumber) {
     return inputLines[lineNumber - 1];
 }
 
+/**
+ * Returns a table-like representation showing where the error took
+ * place in the input file, line-by-line.
+*/
 std::string getPointingMsg(const yy::parser::location_type& location) {
     std::string pointingMsg = "";
 
@@ -167,96 +171,15 @@ std::string getPointingMsg(const yy::parser::location_type& location) {
     return pointingMsg;
 }
 
-std::string getTokenFixDescription(yy::parser::symbol_kind_type currentToken) {
-    std::string tokenFixDescription = "";
-
-    switch (currentToken) {
-        case yy::parser::symbol_kind_type::S_CATEGORY_CONTENTS:
-            tokenFixDescription = "Add a ':' at the end.";
-            break;
-        case yy::parser::symbol_kind_type::S_CHOICE_CONTENTS:
-            tokenFixDescription = "Add a '.' at the end.";
-            break;
-        case yy::parser::symbol_kind_type::S_CONSTRAINT_START:
-            tokenFixDescription = "Start this with a '['";
-            break;
-        case yy::parser::symbol_kind_type::S_IF:
-            tokenFixDescription = "This should be replaced with 'if'";
-            break;
-        case yy::parser::symbol_kind_type::S_ELSE:
-            tokenFixDescription = "This should be replaced with '[else]'";
-            break;
-        case yy::parser::symbol_kind_type::S_LOGICAL_NOT:
-            tokenFixDescription = "Add a '!' at the start.";
-            break;
-        case yy::parser::symbol_kind_type::S_LOGICAL_GROUP_START:
-            tokenFixDescription = "Add a '(' at the start.";
-            break;
-        case yy::parser::symbol_kind_type::S_LOGICAL_GROUP_END:
-            tokenFixDescription = "Add a ')' at the end.";
-            break;
-        case yy::parser::symbol_kind_type::S_LOGICAL_AND:
-            tokenFixDescription = "This should be replaced with '&&'";
-            break;
-        case yy::parser::symbol_kind_type::S_LOGICAL_OR:
-            tokenFixDescription = "This should be replaced with '||'";
-            break;
-        case yy::parser::symbol_kind_type::S_MARKING_SINGLE:
-            tokenFixDescription = "This should be replaced with '[single]'";
-            break;
-        case yy::parser::symbol_kind_type::S_MARKING_ERROR:
-            tokenFixDescription = "This should be replaced with '[error]'";
-            break;
-        case yy::parser::symbol_kind_type::S_PROPERTY_LIST:
-            tokenFixDescription = "This should be replaced with 'property'";
-            break;
-        case yy::parser::symbol_kind_type::S_PROPERTY_ELEMENT:
-            tokenFixDescription = "A property element is any one word (following the pattern [a-zA-Z0-9_-]) separated by a comma.";
-            break;
-        case yy::parser::symbol_kind_type::S_CONSTRAINT_END:
-            tokenFixDescription = "Add a ']' at the end.";
-            break;
-        case yy::parser::symbol_kind_type::S_YYEOF:
-            tokenFixDescription = "The last line of the file should be empty.";
-            break;
-        default:
-            tokenFixDescription = "No fix suggestions available.";
-    }
-
-
-    return tokenFixDescription;
-}
-
-std::string getHelpMsg(const yy::parser::context& yyctx) {
-    std::string helpMsg = "Help: Was this supposed to be\n";
-
-    auto numTokens = 3;
-    yy::parser::symbol_kind_type expectedTokens[numTokens];
-    auto numTokensRead = yyctx.expected_tokens(expectedTokens, numTokens);
-
-    for (auto i = 0; i < numTokensRead; i++) {
-        auto currentToken = expectedTokens[i];
-
-        std::string tokenName = yy::parser::symbol_name(currentToken);
-        std::string tokenFixDescription = getTokenFixDescription(currentToken);
-        helpMsg += std::format("- {}: {}\n", tokenName, tokenFixDescription);
-    }
-
-    return helpMsg;
-}
-
 /**
  * Prints a detailed error message when a problem occurs in the parser.
 */
 void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
-    std::string errorSummaryMsg = std::format("Error: Unexpected {} found", symbol_name(yyctx.token()));
+    std::string errorSummaryMsg = std::format("Error: A {} is not allowed in its current spot.", symbol_name(yyctx.token()));
     std::cerr << errorSummaryMsg << std::endl;
 
     std::cerr << " --> " << yyctx.location() << std::endl;
 
     std::string errorPointingToMsg = getPointingMsg(yyctx.location());
     std::cerr << errorPointingToMsg;
-
-    std::string helpMsg = getHelpMsg(yyctx);
-    std::cerr << helpMsg << std::endl;
 }
