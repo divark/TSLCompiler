@@ -1,6 +1,7 @@
 /* Prologue (Imports, Macros, etc) */
 %code requires {
     #include <string>
+    #include <format>
 
     #include "tsl_lexer.hpp"
     #include "tsl_collector.hpp"
@@ -15,13 +16,13 @@
 %language "c++"
 
 %define api.value.type {int}
-/* 
+/*
 * The following options help make descriptive error messages
 * relating to syntax, according to the following resource:
-* https://www.gnu.org/software/bison/manual/html_node/Error-Reporting-Function.html 
+* https://www.gnu.org/software/bison/manual/html_node/Error-Reporting-Function.html
 */
 %define parse.trace
-%define parse.error detailed
+%define parse.error custom
 %define parse.lac full
 %locations
 
@@ -106,4 +107,83 @@ choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurre
 
 void yy::parser::error(const location_type& l, const std::string &message) {
     std::cerr << "Parser failed at " << l << ": " << message << std::endl;
+}
+
+class FileReader {
+    private:
+        std::vector<std::string> inputLines;
+    public:
+        FileReader(std::string);
+
+        bool hasLine(int);
+        std::string getLine(uint);
+};
+
+FileReader::FileReader(std::string fileName) {
+    std::ifstream inputContents(fileName);
+
+    for (std::string line; std::getline(inputContents, line);) {
+        inputLines.push_back(line);
+    }
+}
+
+bool FileReader::hasLine(int lineNumber) {
+    auto adjustedLineNumber = lineNumber - 1;
+    return adjustedLineNumber > 0 && adjustedLineNumber < inputLines.size();
+}
+
+std::string FileReader::getLine(uint lineNumber) {
+    return inputLines[lineNumber - 1];
+}
+
+std::string getPointingMsg(const yy::parser::location_type& location) {
+    std::string pointingMsg = "";
+
+    auto filePath = std::string(*location.end.filename);
+    auto fileReader = FileReader(filePath);
+
+    auto lineNumber = location.end.line;
+    auto columnNumber = location.end.column;
+    if (fileReader.hasLine(lineNumber - 1)) {
+        pointingMsg += std::format("{} | {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
+    }
+
+    pointingMsg += std::format("{} | {}\n", lineNumber, fileReader.getLine(lineNumber));
+    pointingMsg += std::format("{} | {}", "", "");
+    for (auto i = 0; i < columnNumber; i++) {
+        if (i + 1 == columnNumber) {
+            pointingMsg += "^";
+            break;
+        }
+
+        pointingMsg += "-";
+    }
+
+    pointingMsg += "\n";
+
+    if (fileReader.hasLine(lineNumber + 1)) {
+        pointingMsg += std::format("{} | {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
+    }
+
+    return pointingMsg;
+}
+
+std::string getHelpMsg(const yy::parser::context& yyctx) {
+    return "";
+}
+
+/**
+ * Prints a detailed error message when a problem occurs in the parser.
+*/
+void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
+    std::string errorSummaryMsg = std::format("Error: Unexpected {} found", symbol_name(yyctx.token()));
+    std::cerr << errorSummaryMsg << std::endl;
+
+    std::cerr << " --> " << yyctx.location() << std::endl;
+
+    std::string errorPointingToMsg = getPointingMsg(yyctx.location());
+    std::cerr << errorPointingToMsg << std::endl;
+
+    std::string helpMsg = getHelpMsg(yyctx);
+    std::cerr << helpMsg << std::endl;
 }

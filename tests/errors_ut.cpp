@@ -19,6 +19,7 @@ class ErrorMessageListener {
         ~ErrorMessageListener();
 
         std::string getCurrentErrorMsg();
+        std::string getLine(uint);
 };
 
 /**
@@ -47,6 +48,25 @@ std::string ErrorMessageListener::getCurrentErrorMsg() {
     return currentErrorMsg;
 }
 
+/**
+* Returns a line from the currently read stderr message.
+*/
+std::string ErrorMessageListener::getLine(uint lineNumber) {
+    auto errorMessage = std::istringstream(this->getCurrentErrorMsg());
+    std::string errorLine = "";
+    for (auto i = 0; i < lineNumber; i++) {
+        if (!std::getline(errorMessage, errorLine)) {
+            return "";
+        }
+    }
+    return errorLine;
+}
+
+void expect_eq(auto expected, auto actual) {
+    auto assertErrorMsg = std::format("Expected {},\n Found {}", expected, actual);
+    boost::ut::expect(expected == actual) << assertErrorMsg;
+}
+
 int main(int argc, const char** argv) {
   using namespace boost::ut;
 
@@ -63,28 +83,54 @@ int main(int argc, const char** argv) {
                       TSLParser parser(tslInput);
                       parser.run();
 
-                      steps.then("the error message should point to line {line_number}.") = [&](uint line_number) {
-                          auto currentErrorMsg = stderrListener.getCurrentErrorMsg();
-                          auto expectedLineNumber = std::format(":{}", line_number);
-                          auto expectedErrorMsgContent = tslInput.string() + expectedLineNumber;
-                          expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
+                      steps.then("line 1 of the error message should mention finding an unexpected property element.") = [&] {
+                          auto expectedErrorSummary = "Error: Unexpected property element found";
+                          auto actualErrorSummary = stderrListener.getLine(1);
 
-                          steps.then("the error message should point to line column {column_number}.") = [&](uint column_number) {
-                            auto expectedLineColumn = std::format(".{}", column_number);
-                            expectedErrorMsgContent = expectedErrorMsgContent + expectedLineColumn;
-                            expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-
-                            steps.then("the error message should mention expecting a Category.") = [&] {
-                                expectedErrorMsgContent = "CATEGORY_CONTENTS";
-                                expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-                            };
-
-                            steps.then("the error message should mention expecting a Choice.") = [&] {
-                                expectedErrorMsgContent = "CHOICE_CONTENTS";
-                                expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
-                            };
-                        };
+                          expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
+
+                      steps.then("line 2 of the error message should mention the given TSL input file at line 1, column 3.") = [&] {
+                          auto expectedFileLine = " --> tests/invalid_category.txt:1.3";
+                          auto actualFileLine = stderrListener.getLine(2);
+
+                          expect_eq(expectedFileLine, actualFileLine);
+                      };
+
+                      steps.then("line 3 of the error message should point to the \"Huh\" in line 1 with line 2 below it.") = [&] {
+                          auto expectedErrorPointedOut =
+                            "1 | Huh?\n"
+                            "  | --^\n"
+                            "2 |\n";
+
+                          auto actualErrorPointedOut = stderrListener.getLine(3) + "\n"
+                            + stderrListener.getLine(4) + "\n"
+                            + stderrListener.getLine(5) + "\n";
+
+                          expect_eq(expectedErrorPointedOut, actualErrorPointedOut);
+                      };
+                      //steps.then("the error message should point to line {line_number}.") = [&](uint line_number) {
+                      //    auto currentErrorMsg = stderrListener.getCurrentErrorMsg();
+                      //    auto expectedLineNumber = std::format(":{}", line_number);
+                      //    auto expectedErrorMsgContent = tslInput.string() + expectedLineNumber;
+                      //    expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
+
+                      //    steps.then("the error message should point to line column {column_number}.") = [&](uint column_number) {
+                      //      auto expectedLineColumn = std::format(".{}", column_number);
+                      //      expectedErrorMsgContent = expectedErrorMsgContent + expectedLineColumn;
+                      //      expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
+
+                      //      steps.then("the error message should mention expecting a Category.") = [&] {
+                      //          expectedErrorMsgContent = "CATEGORY_CONTENTS";
+                      //          expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
+                      //      };
+
+                      //      steps.then("the error message should mention expecting a Choice.") = [&] {
+                      //          expectedErrorMsgContent = "CHOICE_CONTENTS";
+                      //          expect(currentErrorMsg.find(expectedErrorMsgContent) != std::string::npos) << std::format("Could not find {} in {}", expectedErrorMsgContent, currentErrorMsg);
+                      //      };
+                      //  };
+                      //};
                   };
               };
           };

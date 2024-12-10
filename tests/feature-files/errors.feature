@@ -3,9 +3,10 @@ Feature: An error message should be provided when an issue comes up with the Lex
         Given a TSL input file called invalid_category.txt,
         When the error messages are redirected to be read by us,
         When the Parser consumes the input,
-        Then the error message should point to line 1.
-        Then the error message should point to line column 3.
-        Then the error message should mention expecting a Category.
+        Then line 1 of the error message should mention finding an unexpected property element.
+        Then line 2 of the error message should mention the given TSL input file at line 1, column 3.
+        Then line 3 of the error message should point to the "Huh" in line 1 with line 2 below it.
+        Then line 5 of the error message should display a help message with three bullet points.
 
     Scenario: The Parser reports an invalid Choice.
         Given a TSL input file called invalid_choice.txt,
