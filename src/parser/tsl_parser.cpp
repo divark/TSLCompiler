@@ -23,3 +23,10 @@ int TSLParser::run() {
 TSLCollector& TSLParser::getCollector() {
     return collector;
 }
+
+/**
+ * Returns a reference to the TSLLexer.
+*/
+TSLLexer& TSLParser::getLexer() {
+    return lexer;
+}

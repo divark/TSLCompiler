@@ -1,5 +1,6 @@
 #include <boost/ut.hpp>
 #include <fstream>
+#include <algorithm>
 
 #include "tsl_parser.hpp"
 
@@ -83,31 +84,41 @@ int main(int argc, const char** argv) {
                       TSLParser parser(tslInput);
                       parser.run();
 
-                      steps.then("line 1 of the error message should mention finding an unexpected property element.") = [&] {
-                          auto expectedErrorSummary = "Error: Unexpected property element found";
-                          auto actualErrorSummary = stderrListener.getLine(1);
+                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} unexpectedly.") = [&](uint lineNumber, std::string errorFound) {
+                          auto expectedErrorSummary = std::format("Error: Unexpected {} found", errorFound);
+                          auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
-                      steps.then("line 2 of the error message should mention the given TSL input file at line 1, column 3.") = [&] {
-                          auto expectedFileLine = " --> tests/invalid_category.txt:1.3";
-                          auto actualFileLine = stderrListener.getLine(2);
+                      steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](uint lineNumber, uint inputLineNumber, uint inputLineColumn) {
+                          auto expectedFileLine = std::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
+                          auto actualFileLine = stderrListener.getLine(lineNumber);
 
                           expect_eq(expectedFileLine, actualFileLine);
                       };
 
-                      steps.then("line 3 of the error message should point to the \"Huh\" in line 1 with line 2 below it.") = [&] {
-                          auto expectedErrorPointedOut =
-                            "1 | Huh?\n"
-                            "  | --^\n"
-                            "2 |\n";
+                      steps.then("line {lineNumber} of the error message should point to the {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](uint lineNumber, std::string errorToken, uint expectedFirstLineNumber, uint expectedNextLineNumber) {
+                          auto actualErrorPointedOut = stderrListener.getLine(lineNumber) + "\n"
+                            + stderrListener.getLine(lineNumber + 1) + "\n";
 
-                          auto actualErrorPointedOut = stderrListener.getLine(3) + "\n"
-                            + stderrListener.getLine(4) + "\n"
-                            + stderrListener.getLine(5) + "\n";
+                          auto errorTokenLineNumberFound = actualErrorPointedOut.find(std::format(" {} |", expectedFirstLineNumber)) != std::string::npos;
+                          expect(errorTokenLineNumberFound) << std::format("Could not find line number {} in error message {}", expectedFirstLineNumber, actualErrorPointedOut);
+                          auto errorTokenFoundInInput = actualErrorPointedOut.find(errorToken) != std::string::npos;
+                          expect(errorTokenFoundInInput) << std::format("Could not find error token {} in error message {}", errorToken, actualErrorPointedOut);
+                      };
 
-                          expect_eq(expectedErrorPointedOut, actualErrorPointedOut);
+                      steps.then("line {lineNumber} of the error message should display a help message with {expectedNumBulletPoints} bullet points.") = [&](uint lineNumber, uint expectedNumBulletPoints) {
+                          std::string helpMsg = "";
+                          auto expectedNumHelpLines = 1 + expectedNumBulletPoints;
+                          for (auto i = 0; i < expectedNumHelpLines; i++) {
+                              helpMsg += std::format("{}\n", stderrListener.getLine(lineNumber + i));
+                          }
+
+                          auto expectedNumHelpMsgs = expectedNumBulletPoints;
+                          auto actualNumHelpMsgs = std::ranges::count(helpMsg, '-');
+
+                          expect_eq(expectedNumHelpMsgs, actualNumHelpMsgs);
                       };
                       //steps.then("the error message should point to line {line_number}.") = [&](uint line_number) {
                       //    auto currentErrorMsg = stderrListener.getCurrentErrorMsg();

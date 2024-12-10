@@ -36,6 +36,7 @@ class TSLLexer : yyFlexLexer {
         int constructNextToken(int*, yy::location*);
         std::string getCurrentTokenContents() const;
 
+        std::string getFileName() const;
         size_t getLineNumber();
         size_t getLineColumn();
 };

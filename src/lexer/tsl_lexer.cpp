@@ -62,6 +62,14 @@ std::string TSLLexer::getCurrentTokenContents() const {
 }
 
 /**
+ * Returns the path of the input file fed into the Lexer.
+ * Preconditions: TSLLexer::load was called.
+*/
+std::string TSLLexer::getFileName() const {
+    return filePath;
+}
+
+/**
  * Returns the currently recorded Line Number based on where
  * the Lexer is in the input file.
  */

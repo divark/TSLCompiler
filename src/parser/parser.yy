@@ -145,31 +145,104 @@ std::string getPointingMsg(const yy::parser::location_type& location) {
     auto lineNumber = location.end.line;
     auto columnNumber = location.end.column;
     if (fileReader.hasLine(lineNumber - 1)) {
-        pointingMsg += std::format("{} | {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
+        pointingMsg += std::format("{:^3}| {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
     }
 
-    pointingMsg += std::format("{} | {}\n", lineNumber, fileReader.getLine(lineNumber));
-    pointingMsg += std::format("{} | {}", "", "");
+    pointingMsg += std::format("{:^3}| {}\n", lineNumber, fileReader.getLine(lineNumber));
+    std::string errorPointer = "";
     for (auto i = 0; i < columnNumber; i++) {
         if (i + 1 == columnNumber) {
-            pointingMsg += "^";
+            errorPointer += "^";
             break;
         }
 
-        pointingMsg += "-";
+        errorPointer += "-";
     }
-
-    pointingMsg += "\n";
+    pointingMsg += std::format("{:^3}| {}\n", "", errorPointer);
 
     if (fileReader.hasLine(lineNumber + 1)) {
-        pointingMsg += std::format("{} | {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
+        pointingMsg += std::format("{:^3}| {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
     }
 
     return pointingMsg;
 }
 
+std::string getTokenFixDescription(yy::parser::symbol_kind_type currentToken) {
+    std::string tokenFixDescription = "";
+
+    switch (currentToken) {
+        case yy::parser::symbol_kind_type::S_CATEGORY_CONTENTS:
+            tokenFixDescription = "Add a ':' at the end.";
+            break;
+        case yy::parser::symbol_kind_type::S_CHOICE_CONTENTS:
+            tokenFixDescription = "Add a '.' at the end.";
+            break;
+        case yy::parser::symbol_kind_type::S_CONSTRAINT_START:
+            tokenFixDescription = "Start this with a '['";
+            break;
+        case yy::parser::symbol_kind_type::S_IF:
+            tokenFixDescription = "This should be replaced with 'if'";
+            break;
+        case yy::parser::symbol_kind_type::S_ELSE:
+            tokenFixDescription = "This should be replaced with '[else]'";
+            break;
+        case yy::parser::symbol_kind_type::S_LOGICAL_NOT:
+            tokenFixDescription = "Add a '!' at the start.";
+            break;
+        case yy::parser::symbol_kind_type::S_LOGICAL_GROUP_START:
+            tokenFixDescription = "Add a '(' at the start.";
+            break;
+        case yy::parser::symbol_kind_type::S_LOGICAL_GROUP_END:
+            tokenFixDescription = "Add a ')' at the end.";
+            break;
+        case yy::parser::symbol_kind_type::S_LOGICAL_AND:
+            tokenFixDescription = "This should be replaced with '&&'";
+            break;
+        case yy::parser::symbol_kind_type::S_LOGICAL_OR:
+            tokenFixDescription = "This should be replaced with '||'";
+            break;
+        case yy::parser::symbol_kind_type::S_MARKING_SINGLE:
+            tokenFixDescription = "This should be replaced with '[single]'";
+            break;
+        case yy::parser::symbol_kind_type::S_MARKING_ERROR:
+            tokenFixDescription = "This should be replaced with '[error]'";
+            break;
+        case yy::parser::symbol_kind_type::S_PROPERTY_LIST:
+            tokenFixDescription = "This should be replaced with 'property'";
+            break;
+        case yy::parser::symbol_kind_type::S_PROPERTY_ELEMENT:
+            tokenFixDescription = "A property element is any one word (following the pattern [a-zA-Z0-9_-]) separated by a comma.";
+            break;
+        case yy::parser::symbol_kind_type::S_CONSTRAINT_END:
+            tokenFixDescription = "Add a ']' at the end.";
+            break;
+        case yy::parser::symbol_kind_type::S_YYEOF:
+            tokenFixDescription = "The last line of the file should be empty.";
+            break;
+        default:
+            tokenFixDescription = "No fix suggestions available.";
+    }
+
+
+    return tokenFixDescription;
+}
+
 std::string getHelpMsg(const yy::parser::context& yyctx) {
-    return "";
+    std::string helpMsg = "Help: Was this supposed to be\n";
+
+    auto numTokens = 3;
+    yy::parser::symbol_kind_type expectedTokens[numTokens];
+    auto numTokensRead = yyctx.expected_tokens(expectedTokens, numTokens);
+
+    for (auto i = 0; i < numTokensRead; i++) {
+        auto currentToken = expectedTokens[i];
+
+        std::string tokenName = yy::parser::symbol_name(currentToken);
+        std::string tokenFixDescription = getTokenFixDescription(currentToken);
+        helpMsg += std::format("- {}: {}\n", tokenName, tokenFixDescription);
+    }
+
+    return helpMsg;
 }
 
 /**
@@ -182,7 +255,7 @@ void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
     std::cerr << " --> " << yyctx.location() << std::endl;
 
     std::string errorPointingToMsg = getPointingMsg(yyctx.location());
-    std::cerr << errorPointingToMsg << std::endl;
+    std::cerr << errorPointingToMsg;
 
     std::string helpMsg = getHelpMsg(yyctx);
     std::cerr << helpMsg << std::endl;

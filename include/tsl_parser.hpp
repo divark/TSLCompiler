@@ -14,5 +14,6 @@ class TSLParser {
         TSLParser(const std::filesystem::path&);
 
         TSLCollector& getCollector();
+        TSLLexer& getLexer();
         int run();
 };
