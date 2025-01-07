@@ -1,6 +1,5 @@
 #include <boost/ut.hpp>
 #include <fstream>
-#include <algorithm>
 
 #include "tsl_parser.hpp"
 
@@ -91,6 +90,13 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
+                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](uint lineNumber, std::string errorFound) {
+                          auto expectedErrorSummary = std::format("Error: {}", errorFound);
+                          auto actualErrorSummary = stderrListener.getLine(lineNumber);
+
+                          expect_eq(expectedErrorSummary, actualErrorSummary);
+                      };
+
                       steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](uint lineNumber, uint inputLineNumber, uint inputLineColumn) {
                           auto expectedFileLine = std::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
                           auto actualFileLine = stderrListener.getLine(lineNumber);
@@ -98,7 +104,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedFileLine, actualFileLine);
                       };
 
-                      steps.then("line {lineNumber} of the error message should point to the {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](uint lineNumber, std::string errorToken, uint expectedFirstLineNumber, uint expectedNextLineNumber) {
+                      steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](uint lineNumber, std::string errorToken, uint expectedFirstLineNumber, uint expectedNextLineNumber) {
                           auto actualErrorPointedOut = stderrListener.getLine(lineNumber) + "\n"
                             + stderrListener.getLine(lineNumber + 1) + "\n";
 

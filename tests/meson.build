@@ -131,6 +131,7 @@ invalid_symbol_test_file = fs.copyfile('test-files/invalid_category.txt', 'inval
 invalid_choice_test_file = fs.copyfile('test-files/invalid_choice.txt', 'invalid_choice.txt')
 invalid_property_then_if_test_file = fs.copyfile('test-files/invalid_property_then_if.txt', 'invalid_property_then_if.txt')
 invalid_double_marking_test_file = fs.copyfile('test-files/invalid_double_marking.txt', 'invalid_double_marking.txt')
+undefined_property_test_file = fs.copyfile('test-files/undefined_property.txt', 'undefined_property.txt')
 
 error_feature_file = fs.copyfile('feature-files/errors.feature', 'errors.feature')
 
@@ -140,6 +141,7 @@ error_test_files = [
   invalid_property_then_if_test_file,
   invalid_double_marking_test_file,
   error_feature_file,
+  undefined_property_test_file,
 ]
 
 error_ut_test_sources = files('errors_ut.cpp')
