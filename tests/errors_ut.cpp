@@ -83,15 +83,15 @@ int main(int argc, const char** argv) {
                       TSLParser parser(tslInput);
                       parser.run();
 
-                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](uint lineNumber, std::string errorFound) {
-                          auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
+                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](uint lineNumber, std::string errorFound) {
+                          auto expectedErrorSummary = std::format("Error: {}", errorFound);
                           auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
-                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](uint lineNumber, std::string errorFound) {
-                          auto expectedErrorSummary = std::format("Error: {}", errorFound);
+                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](uint lineNumber, std::string errorFound) {
+                          auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
                           auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);

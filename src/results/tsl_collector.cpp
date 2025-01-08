@@ -52,6 +52,7 @@ int TSLCollector::recordProperty(std::string propertyContents) {
     int propertiesIdx = properties.size() - 1;
     int choiceIdx = choices.size() - 1;
     choiceProperties[choiceIdx].push_back(propertiesIdx);
+    propertyDefinedInCategory[propertyContents] = categories.size() - 1;
 
     return propertiesIdx;
 }
@@ -86,16 +87,30 @@ std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choic
 }
 
 /**
+ * Records a newly formed Expression for some Choice.
+*/
+int TSLCollector::recordExpression(std::shared_ptr<Expression> expression) {
+    int currentChoiceIdx = choices.size() - 1;
+    choiceExpressions[currentChoiceIdx].push_back(expression);
+
+    return choiceExpressions[currentChoiceIdx].size() - 1;
+}
+
+/**
  * Returns the index of the recently created SimpleExpression for the
  * current choice.
  */
-int TSLCollector::recordSimpleExpression(std::string propertyContents) {
+int TSLCollector::recordSimpleExpression(std::string propertyContents, const yy::location& location) {
     auto simpleExpression = std::make_shared<Expression>(propertyContents);
+    auto propertyInExpressionIsUndefined = isExpressionUndefined(simpleExpression);
+    if (propertyInExpressionIsUndefined) {
+        reportUndefinedPropertyError(simpleExpression, location);
+        // NOTE: This function is called from Bison. In order for Bison to know that an error happened,
+        // the value YYerror (the integer 256) must be returned.
+        return 256;
+    }
 
-    int currentChoiceIdx = choices.size() - 1;
-    choiceExpressions[currentChoiceIdx].push_back(simpleExpression);
-
-    return choiceExpressions[currentChoiceIdx].size() - 1;
+    return recordExpression(simpleExpression);
 }
 
 /**
@@ -110,10 +125,7 @@ int TSLCollector::recordUnaryExpression(ExpType unaryType) {
     choiceExpressions.back().pop_back();
     auto unaryExpression = std::make_shared<Expression>(unaryType, lastExpression);
 
-    int currentChoiceIdx = choices.size() - 1;
-    choiceExpressions[currentChoiceIdx].push_back(unaryExpression);
-
-    return choiceExpressions[currentChoiceIdx].size() - 1;
+    return recordExpression(unaryExpression);
 }
 
 /**
@@ -130,10 +142,18 @@ int TSLCollector::recordBinaryExpression(ExpType binaryType) {
     }
     auto binaryExpression = std::make_shared<Expression>(binaryType, firstExpression, lastExpression);
 
-    int currentChoiceIdx = choices.size() - 1;
-    choiceExpressions[currentChoiceIdx].push_back(binaryExpression);
+    return recordExpression(binaryExpression);
+}
 
-    return choiceExpressions[currentChoiceIdx].size() - 1;
+/**
+* Returns whether the property defined in a simple expression is
+* defined in the program or not.
+*/
+bool TSLCollector::isExpressionUndefined(std::shared_ptr<Expression> expression) {
+    auto currentCategoryIdx = categories.size() - 1;
+    auto property = expression->asString();
+
+    return !propertyDefinedInCategory.contains(property) || propertyDefinedInCategory[property] >= currentCategoryIdx;
 }
 
 /**
@@ -172,7 +192,7 @@ int TSLCollector::convertPropertiesToElseProperties() {
     return currentChoiceIdx;
 }
 
-/** 
+/**
  * Returns whether a Choice has been flagged having an Else
  * statement.
  */

@@ -3,8 +3,11 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 #include "expressions.hpp"
+#include "error_reporting.hpp"
+#include "location.hh"
 
 struct TSLCollector {
     std::vector<std::string> categories;
@@ -13,6 +16,8 @@ struct TSLCollector {
     std::vector<bool> singleMarkings;
     std::vector<bool> errorMarkings;
     std::vector<std::string> properties;
+
+    std::unordered_map<std::string, int> propertyDefinedInCategory;
 
     /// These mimic an Adjacency List approach to a Graph
     /// representation, instead using a vector. This is intentional since
@@ -44,10 +49,13 @@ struct TSLCollector {
     /// into just one Expression, and having more than one indicates an error.
     std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
 
-    int recordSimpleExpression(std::string);
+    int recordExpression(std::shared_ptr<Expression>);
+
+    int recordSimpleExpression(std::string, const yy::location& location);
     int recordUnaryExpression(ExpType);
     int recordBinaryExpression(ExpType);
     std::shared_ptr<Expression> getChoiceExpression(unsigned int);
+    bool isExpressionUndefined(std::shared_ptr<Expression>);
 
     int recordCategory(std::string);
     int recordChoice(std::string);

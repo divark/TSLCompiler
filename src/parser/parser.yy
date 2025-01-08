@@ -1,10 +1,10 @@
 /* Prologue (Imports, Macros, etc) */
 %code requires {
     #include <string>
-    #include <format>
 
     #include "tsl_lexer.hpp"
     #include "tsl_collector.hpp"
+    #include "error_reporting.hpp"
 }
 
 %code {
@@ -81,7 +81,7 @@ expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpre
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
-          | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
+          | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents(), @$); }
           ;
 label:  marking
      |  CONSTRAINT_START property_list CONSTRAINT_END
@@ -107,68 +107,6 @@ choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurre
 
 void yy::parser::error(const location_type& l, const std::string &message) {
     std::cerr << "Parser failed at " << l << ": " << message << std::endl;
-}
-
-class FileReader {
-    private:
-        std::vector<std::string> inputLines;
-    public:
-        FileReader(std::string);
-
-        bool hasLine(int);
-        std::string getLine(uint);
-};
-
-FileReader::FileReader(std::string fileName) {
-    std::ifstream inputContents(fileName);
-
-    for (std::string line; std::getline(inputContents, line);) {
-        inputLines.push_back(line);
-    }
-}
-
-bool FileReader::hasLine(int lineNumber) {
-    auto adjustedLineNumber = lineNumber - 1;
-    return adjustedLineNumber >= 0 && adjustedLineNumber < inputLines.size();
-}
-
-std::string FileReader::getLine(uint lineNumber) {
-    return inputLines[lineNumber - 1];
-}
-
-/**
- * Returns a table-like representation showing where the error took
- * place in the input file, line-by-line.
-*/
-std::string getPointingMsg(const yy::parser::location_type& location) {
-    std::string pointingMsg = "";
-
-    auto filePath = std::string(*location.end.filename);
-    auto fileReader = FileReader(filePath);
-
-    auto lineNumber = location.end.line;
-    auto columnNumber = location.end.column;
-    if (fileReader.hasLine(lineNumber - 1)) {
-        pointingMsg += std::format("{:^3}| {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
-    }
-
-    pointingMsg += std::format("{:^3}| {}\n", lineNumber, fileReader.getLine(lineNumber));
-    std::string errorPointer = "";
-    for (auto i = 0; i < columnNumber; i++) {
-        if (i + 1 == columnNumber) {
-            errorPointer += "^";
-            break;
-        }
-
-        errorPointer += "-";
-    }
-    pointingMsg += std::format("{:^3}| {}\n", "", errorPointer);
-
-    if (fileReader.hasLine(lineNumber + 1)) {
-        pointingMsg += std::format("{:^3}| {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
-    }
-
-    return pointingMsg;
 }
 
 /**
