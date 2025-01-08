@@ -1,6 +1,7 @@
 /* Prologue (Imports, Macros, etc) */
 %code requires {
     #include <string>
+    #include <format>
 
     #include "tsl_lexer.hpp"
     #include "tsl_collector.hpp"
