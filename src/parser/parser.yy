@@ -114,10 +114,5 @@ void yy::parser::error(const location_type& l, const std::string &message) {
 */
 void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
     std::string errorSummaryMsg = std::format("Error: A {} is not allowed in its current spot.", symbol_name(yyctx.token()));
-    std::cerr << errorSummaryMsg << std::endl;
-
-    std::cerr << " --> " << yyctx.location() << std::endl;
-
-    std::string errorPointingToMsg = getPointingMsg(yyctx.location());
-    std::cerr << errorPointingToMsg;
+    reportError(errorSummaryMsg, yyctx.location());
 }

@@ -56,15 +56,22 @@ std::string getPointingMsg(const yy::location& location) {
 }
 
 /**
-* Prints an error message pointing to the property in the file that is undefined,
-* then aborts.
+* Prints an error message pointing to some location.
 */
-void reportUndefinedPropertyError(std::shared_ptr<Expression> simpleExpression, const yy::location& location) {
-    std::string errorSummaryMsg = std::format("Error: Property {} not defined in prior Categories.", simpleExpression->asString());
-    std::cerr << errorSummaryMsg << std::endl;
+void reportError(const std::string& errorMessage, const yy::location& location) {
+    std::cerr << errorMessage << std::endl;
 
     std::cerr << " --> " << location << std::endl;
 
     std::string errorPointingToMsg = getPointingMsg(location);
     std::cerr << errorPointingToMsg;
+}
+
+/**
+* Prints an error message pointing to the property in the file that is undefined,
+* then aborts.
+*/
+void reportUndefinedPropertyError(std::shared_ptr<Expression> simpleExpression, const yy::location& location) {
+    std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", simpleExpression->asString());
+    reportError(errorSummaryMsg, location);
 }
