@@ -1,4 +1,6 @@
 #include "tsl_collector.hpp"
+#include "parser.hpp"
+#include <stdexcept>
 
 /**
  * Returns an index to the recently stored Category.
@@ -105,9 +107,7 @@ int TSLCollector::recordSimpleExpression(std::string propertyContents, const yy:
     auto propertyInExpressionIsUndefined = isExpressionUndefined(simpleExpression);
     if (propertyInExpressionIsUndefined) {
         reportUndefinedPropertyError(simpleExpression, location);
-        // NOTE: This function is called from Bison. In order for Bison to know that an error happened,
-        // the value YYerror (the integer 256) must be returned.
-        return 256;
+        throw yy::parser::syntax_error(location, "Please see the error message above for more details.");
     }
 
     return recordExpression(simpleExpression);
