@@ -60,7 +60,7 @@ struct TSLCollector {
     int recordCategory(std::string);
     int recordChoice(std::string);
 
-    int recordProperty(std::string);
+    int recordProperty(std::string, const yy::location& location);
     int convertPropertiesToIfProperties();
     int convertPropertiesToElseProperties();
 

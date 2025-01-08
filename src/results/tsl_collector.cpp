@@ -1,6 +1,6 @@
 #include "tsl_collector.hpp"
+#include "error_reporting.hpp"
 #include "parser.hpp"
-#include <stdexcept>
 
 /**
  * Returns an index to the recently stored Category.
@@ -42,7 +42,7 @@ int TSLCollector::recordChoice(std::string choiceContents) {
 /**
  * Returns an index to the recently stored Property for the most recently recorded Choice.
  */
-int TSLCollector::recordProperty(std::string propertyContents) {
+int TSLCollector::recordProperty(std::string propertyContents, const yy::location& location) {
     // We could be recording multiple properties, so we want
     // to remove commas if found, since we don't care about them.
     if (propertyContents.ends_with(',')) {
@@ -54,6 +54,11 @@ int TSLCollector::recordProperty(std::string propertyContents) {
     int propertiesIdx = properties.size() - 1;
     int choiceIdx = choices.size() - 1;
     choiceProperties[choiceIdx].push_back(propertiesIdx);
+    if (propertyDefinedInCategory.contains(propertyContents)) {
+        auto errorSummaryMsg = std::format("Error: Property {} was already defined elsewhere.", propertyContents);
+        reportError(errorSummaryMsg, location);
+        throw yy::parser::syntax_error(location, "Please see the error message above for more details.");
+    }
     propertyDefinedInCategory[propertyContents] = categories.size() - 1;
 
     return propertiesIdx;

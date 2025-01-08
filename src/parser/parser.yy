@@ -92,7 +92,7 @@ property_list:  PROPERTY_LIST property_elements
 property_elements: property_element
                  | property_elements property_element
                  ;
-property_element:   PROPERTY_ELEMENT { $$ = collector.recordProperty(lexer.getCurrentTokenContents()); }
+property_element:   PROPERTY_ELEMENT { $$ = collector.recordProperty(lexer.getCurrentTokenContents(), @$); }
 marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
        |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;

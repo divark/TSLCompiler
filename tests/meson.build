@@ -139,6 +139,7 @@ defined_property_in_same_category_test_file = fs.copyfile(
   'test-files/defined_property_used_in_same_category.txt',
   'defined_property_used_in_same_category.txt',
 )
+duplicate_property_test_file = fs.copyfile('test-files/duplicate_property.txt', 'duplicate_property.txt')
 
 error_feature_file = fs.copyfile('feature-files/errors.feature', 'errors.feature')
 
@@ -150,6 +151,7 @@ error_test_files = [
   error_feature_file,
   undefined_property_test_file,
   defined_property_in_same_category_test_file,
+  duplicate_property_test_file,
 ]
 
 error_ut_test_sources = files('errors_ut.cpp')
