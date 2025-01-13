@@ -15,6 +15,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    TSLParser parser(inputFilePath);
-    return parser.run();
+    try {
+        TSLParser parser(inputFilePath);
+        return parser.run();
+    } catch (yy::parser::syntax_error exception) {
+        std::cerr << exception.what() << std::endl;
+        return 1;
+    }
 }

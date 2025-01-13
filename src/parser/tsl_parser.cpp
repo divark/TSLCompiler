@@ -12,6 +12,8 @@ TSLParser::TSLParser(const std::filesystem::path& inputPath) {
 /**
  * Runs the Parser, returning the status code
  * when it has read the whole file, or it has encountered an error.
+ *
+ * May throw a yy::parser::syntax_error exception.
  */
 int TSLParser::run() {
     return parser->parse();
