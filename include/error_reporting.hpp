@@ -1,7 +1,6 @@
 #pragma once
 
 #include "location.hh"
-#include "expressions.hpp"
 #include "tsl_collector.hpp"
 
 #include <vector>
@@ -20,7 +19,6 @@ class FileReader {
 std::string getPointingMsg(const yy::location&);
 
 void reportError(const std::string&, const yy::location&);
-void reportUndefinedPropertyError(std::shared_ptr<Expression>, const yy::location&);
 
 void checkIfCurrentPropertyRedefined(const std::string, const TSLCollector&, const yy::location&);
 void checkIfCurrentPropertyUndefined(const std::string, const TSLCollector&, const yy::location&);

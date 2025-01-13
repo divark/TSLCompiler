@@ -107,7 +107,7 @@ choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurre
 /* Bison Epilogue (Function declarations) */
 
 void yy::parser::error(const location_type& l, const std::string &message) {
-    std::cerr << "Parser failed at " << l << ": " << message << std::endl;
+    std::cerr << message << std::endl;
 }
 
 /**

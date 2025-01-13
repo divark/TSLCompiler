@@ -1,5 +1,6 @@
 #include <boost/ut.hpp>
 #include <fstream>
+#include <memory>
 
 #include "tsl_parser.hpp"
 
@@ -16,6 +17,7 @@ class ErrorMessageListener {
         std::stringstream currentErrorContents;
     public:
         ErrorMessageListener();
+        ErrorMessageListener(std::string);
         ~ErrorMessageListener();
 
         std::string getCurrentErrorMsg();
@@ -30,6 +32,14 @@ ErrorMessageListener::ErrorMessageListener() {
     std::cerr.rdbuf(currentErrorContents.rdbuf());
 
     originalCerrStream = oldCerrStream;
+}
+
+/**
+* Populates the error message listener with some string
+* before intercepting the stderr.
+*/
+ErrorMessageListener::ErrorMessageListener(std::string exceptionMsg) : ErrorMessageListener() {
+    currentErrorContents << exceptionMsg;
 }
 
 /**
@@ -77,36 +87,40 @@ int main(int argc, const char** argv) {
               fs::path tslInput = std::format("tests/{}", file_name);
 
               steps.when("the error messages are redirected to be read by us,") = [&] {
-                  auto stderrListener = ErrorMessageListener();
+                  auto stderrListener = std::make_unique<ErrorMessageListener>();
 
                   steps.when("the Parser consumes the input,") = [&] {
                       TSLParser parser(tslInput);
-                      parser.run();
+                      try {
+                          parser.run();
+                      } catch (yy::parser::syntax_error syntaxException) {
+                          stderrListener = std::make_unique<ErrorMessageListener>(std::string(syntaxException.what()));
+                      }
 
                       steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](uint lineNumber, std::string errorFound) {
                           auto expectedErrorSummary = std::format("Error: {}", errorFound);
-                          auto actualErrorSummary = stderrListener.getLine(lineNumber);
+                          auto actualErrorSummary = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
                       steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](uint lineNumber, std::string errorFound) {
                           auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
-                          auto actualErrorSummary = stderrListener.getLine(lineNumber);
+                          auto actualErrorSummary = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
                       steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](uint lineNumber, uint inputLineNumber, uint inputLineColumn) {
                           auto expectedFileLine = std::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
-                          auto actualFileLine = stderrListener.getLine(lineNumber);
+                          auto actualFileLine = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedFileLine, actualFileLine);
                       };
 
                       steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](uint lineNumber, std::string errorToken, uint expectedFirstLineNumber, uint expectedNextLineNumber) {
-                          auto actualErrorPointedOut = stderrListener.getLine(lineNumber) + "\n"
-                            + stderrListener.getLine(lineNumber + 1) + "\n";
+                          auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\n"
+                            + stderrListener->getLine(lineNumber + 1) + "\n";
 
                           auto errorTokenLineNumberFound = actualErrorPointedOut.find(std::format(" {} |", expectedFirstLineNumber)) != std::string::npos;
                           expect(errorTokenLineNumberFound) << std::format("Could not find line number {} in error message {}", expectedFirstLineNumber, actualErrorPointedOut);

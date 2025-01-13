@@ -2,6 +2,7 @@
 
 #include <format>
 #include <fstream>
+#include <sstream>
 
 #include "parser.hpp"
 #include "tsl_collector.hpp"
@@ -62,21 +63,14 @@ std::string getPointingMsg(const yy::location& location) {
 * Prints an error message pointing to some location.
 */
 void reportError(const std::string& errorMessage, const yy::location& location) {
-    std::cerr << errorMessage << std::endl;
+    std::stringstream errorMessageSummary;
+    errorMessageSummary << errorMessage << std::endl;
 
-    std::cerr << " --> " << location << std::endl;
+    errorMessageSummary << " --> " << location << std::endl;
 
     std::string errorPointingToMsg = getPointingMsg(location);
-    std::cerr << errorPointingToMsg;
-}
-
-/**
-* Prints an error message pointing to the property in the file that is undefined,
-* then aborts.
-*/
-void reportUndefinedPropertyError(std::shared_ptr<Expression> simpleExpression, const yy::location& location) {
-    std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", simpleExpression->asString());
-    reportError(errorSummaryMsg, location);
+    errorMessageSummary << errorPointingToMsg;
+    throw yy::parser::syntax_error(location, errorMessageSummary.str());
 }
 
 /**
@@ -88,7 +82,6 @@ void checkIfCurrentPropertyRedefined(const std::string property, const TSLCollec
     if (collector.propertyDefinedInCategory.contains(propertyWithoutComma)) {
         auto errorSummaryMsg = std::format("Error: Property {} was already defined elsewhere.", propertyWithoutComma);
         reportError(errorSummaryMsg, locationInCode);
-        throw yy::parser::syntax_error(locationInCode, "Please see the error message above for more details.");
     }
 }
 
@@ -104,6 +97,5 @@ void checkIfCurrentPropertyUndefined(const std::string property, const TSLCollec
     if (propertyInExpressionIsUndefined) {
         std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", property);
         reportError(errorSummaryMsg, locationInCode);
-        throw yy::parser::syntax_error(locationInCode, "Please see the error message above for more details.");
     }
 }
