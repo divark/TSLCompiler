@@ -6,8 +6,6 @@
 #include <unordered_map>
 
 #include "expressions.hpp"
-#include "error_reporting.hpp"
-#include "location.hh"
 
 struct TSLCollector {
     std::vector<std::string> categories;
@@ -51,16 +49,16 @@ struct TSLCollector {
 
     int recordExpression(std::shared_ptr<Expression>);
 
-    int recordSimpleExpression(std::string, const yy::location& location);
+    int recordSimpleExpression(std::string);
     int recordUnaryExpression(ExpType);
     int recordBinaryExpression(ExpType);
     std::shared_ptr<Expression> getChoiceExpression(unsigned int);
-    bool isExpressionUndefined(std::shared_ptr<Expression>);
+    bool isExpressionUndefined(std::shared_ptr<Expression>) const;
 
     int recordCategory(std::string);
     int recordChoice(std::string);
 
-    int recordProperty(std::string, const yy::location& location);
+    int recordProperty(std::string);
     int convertPropertiesToIfProperties();
     int convertPropertiesToElseProperties();
 
@@ -70,3 +68,5 @@ struct TSLCollector {
     int markChoiceHasElse();
     bool hasElseExpression(unsigned int);
 };
+
+std::string getPropertyWithoutComma(const std::string&);

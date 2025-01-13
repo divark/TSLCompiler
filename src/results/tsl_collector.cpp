@@ -1,6 +1,4 @@
 #include "tsl_collector.hpp"
-#include "error_reporting.hpp"
-#include "parser.hpp"
 
 /**
  * Returns an index to the recently stored Category.
@@ -42,24 +40,14 @@ int TSLCollector::recordChoice(std::string choiceContents) {
 /**
  * Returns an index to the recently stored Property for the most recently recorded Choice.
  */
-int TSLCollector::recordProperty(std::string propertyContents, const yy::location& location) {
-    // We could be recording multiple properties, so we want
-    // to remove commas if found, since we don't care about them.
-    if (propertyContents.ends_with(',')) {
-        propertyContents.pop_back();
-    }
-
-    properties.push_back(propertyContents);
+int TSLCollector::recordProperty(std::string propertyContents) {
+    auto propertyWithoutComma = getPropertyWithoutComma(propertyContents);
+    properties.push_back(propertyWithoutComma);
 
     int propertiesIdx = properties.size() - 1;
     int choiceIdx = choices.size() - 1;
     choiceProperties[choiceIdx].push_back(propertiesIdx);
-    if (propertyDefinedInCategory.contains(propertyContents)) {
-        auto errorSummaryMsg = std::format("Error: Property {} was already defined elsewhere.", propertyContents);
-        reportError(errorSummaryMsg, location);
-        throw yy::parser::syntax_error(location, "Please see the error message above for more details.");
-    }
-    propertyDefinedInCategory[propertyContents] = categories.size() - 1;
+    propertyDefinedInCategory[propertyWithoutComma] = categories.size() - 1;
 
     return propertiesIdx;
 }
@@ -107,13 +95,8 @@ int TSLCollector::recordExpression(std::shared_ptr<Expression> expression) {
  * Returns the index of the recently created SimpleExpression for the
  * current choice.
  */
-int TSLCollector::recordSimpleExpression(std::string propertyContents, const yy::location& location) {
+int TSLCollector::recordSimpleExpression(std::string propertyContents) {
     auto simpleExpression = std::make_shared<Expression>(propertyContents);
-    auto propertyInExpressionIsUndefined = isExpressionUndefined(simpleExpression);
-    if (propertyInExpressionIsUndefined) {
-        reportUndefinedPropertyError(simpleExpression, location);
-        throw yy::parser::syntax_error(location, "Please see the error message above for more details.");
-    }
 
     return recordExpression(simpleExpression);
 }
@@ -154,11 +137,11 @@ int TSLCollector::recordBinaryExpression(ExpType binaryType) {
 * Returns whether the property defined in a simple expression is
 * defined in the program or not.
 */
-bool TSLCollector::isExpressionUndefined(std::shared_ptr<Expression> expression) {
+bool TSLCollector::isExpressionUndefined(std::shared_ptr<Expression> expression) const {
     auto currentCategoryIdx = categories.size() - 1;
     auto property = expression->asString();
 
-    return !propertyDefinedInCategory.contains(property) || propertyDefinedInCategory[property] >= currentCategoryIdx;
+    return !propertyDefinedInCategory.contains(property) || propertyDefinedInCategory.find(property)->second >= currentCategoryIdx;
 }
 
 /**
@@ -215,4 +198,19 @@ int TSLCollector::markChoiceHasElse() {
     choiceHasElseStatement[currentChoiceIdx] = true;
 
     return currentChoiceIdx;
+}
+
+/**
+* Returns a Property without a comma attached if found in a property list,
+* or the string as-is.
+*/
+std::string getPropertyWithoutComma(const std::string &uncleanedProperty) {
+    std::string propertyWithoutComma(uncleanedProperty);
+    // We could be recording multiple properties, so we want
+    // to remove commas if found, since we don't care about them.
+    if (propertyWithoutComma.ends_with(',')) {
+        propertyWithoutComma.pop_back();
+    }
+
+    return propertyWithoutComma;
 }

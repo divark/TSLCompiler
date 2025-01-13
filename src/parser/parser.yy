@@ -82,7 +82,7 @@ expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpre
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
           | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
-          | PROPERTY_ELEMENT { $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents(), @$); }
+          | PROPERTY_ELEMENT { checkIfCurrentPropertyUndefined(lexer.getCurrentTokenContents(), collector, @$); $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking
      |  CONSTRAINT_START property_list CONSTRAINT_END
@@ -92,7 +92,7 @@ property_list:  PROPERTY_LIST property_elements
 property_elements: property_element
                  | property_elements property_element
                  ;
-property_element:   PROPERTY_ELEMENT { $$ = collector.recordProperty(lexer.getCurrentTokenContents(), @$); }
+property_element:   PROPERTY_ELEMENT { checkIfCurrentPropertyRedefined(lexer.getCurrentTokenContents(), collector, @$); $$ = collector.recordProperty(lexer.getCurrentTokenContents()); }
 marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
        |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;

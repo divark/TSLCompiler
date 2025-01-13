@@ -3,6 +3,9 @@
 #include <format>
 #include <fstream>
 
+#include "parser.hpp"
+#include "tsl_collector.hpp"
+
 FileReader::FileReader(std::string fileName) {
     std::ifstream inputContents(fileName);
 
@@ -74,4 +77,33 @@ void reportError(const std::string& errorMessage, const yy::location& location) 
 void reportUndefinedPropertyError(std::shared_ptr<Expression> simpleExpression, const yy::location& location) {
     std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", simpleExpression->asString());
     reportError(errorSummaryMsg, location);
+}
+
+/**
+* Throws an exception if the property recorded for some Choice
+* was already defined somewhere else.
+*/
+void checkIfCurrentPropertyRedefined(const std::string property, const TSLCollector &collector, const yy::location &locationInCode) {
+    std::string propertyWithoutComma = getPropertyWithoutComma(property);
+    if (collector.propertyDefinedInCategory.contains(propertyWithoutComma)) {
+        auto errorSummaryMsg = std::format("Error: Property {} was already defined elsewhere.", propertyWithoutComma);
+        reportError(errorSummaryMsg, locationInCode);
+        throw yy::parser::syntax_error(locationInCode, "Please see the error message above for more details.");
+    }
+}
+
+/**
+* Throws an exception if the property recorded for some Choice
+* is undefined.
+*/
+void checkIfCurrentPropertyUndefined(const std::string property, const TSLCollector &collector, const yy::location &locationInCode) {
+    auto currentCategoryIdx = collector.categories.size() - 1;
+    auto foundPropertyLocation = collector.propertyDefinedInCategory.find(property);
+    auto propertyNotFound = foundPropertyLocation == collector.propertyDefinedInCategory.end();
+    auto propertyInExpressionIsUndefined = propertyNotFound || foundPropertyLocation->second >= currentCategoryIdx;
+    if (propertyInExpressionIsUndefined) {
+        std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", property);
+        reportError(errorSummaryMsg, locationInCode);
+        throw yy::parser::syntax_error(locationInCode, "Please see the error message above for more details.");
+    }
 }
