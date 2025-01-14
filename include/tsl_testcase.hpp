@@ -11,6 +11,6 @@ class TSLTestCase {
         std::map<std::string, std::string> categoryChoices;
     public:
         size_t getTestCaseNumber();
-        size_t getNumCategories();
+        std::vector<std::string>& getCategories();
         std::string getCategoryChoice(const std::string& category);
 };

@@ -14,3 +14,5 @@ class TSLCompiler {
         TSLCollector& getCollector();
         std::vector<TSLTestCase>& getTestCases();
 };
+
+std::vector<TSLTestCase> generateTestCases(TSLCollector&);

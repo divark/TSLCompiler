@@ -11,8 +11,8 @@ size_t TSLTestCase::getTestCaseNumber() {
  * Returns the number of Categories tracked in this
  * test case.
  */
-size_t TSLTestCase::getNumCategories() {
-    return categoryChoices.size();
+std::vector<std::string>& TSLTestCase::getCategories() {
+    return chosenCategories;
 }
 
 /**

@@ -1,4 +1,5 @@
 #include "tsl_compiler.hpp"
+#include "tsl_testcase.hpp"
 
 /**
  * Returns a TSLCompiler with the loaded inputFile.
@@ -25,5 +26,20 @@ TSLCollector& TSLCompiler::getCollector() {
  * Runs the Compiler to generate test cases.
  */
 int TSLCompiler::compile() {
-    return parser->run();
+    auto programStatus = parser->run();
+
+    generatedTestCases = generateTestCases(parser->getCollector());
+
+    return programStatus;
+}
+
+/**
+* Derives test cases recorded from the results of the tsl input so far.
+*/
+std::vector<TSLTestCase> generateTestCases(TSLCollector &tslVariables) {
+    std::vector<TSLTestCase> foundTestCases;
+
+    foundTestCases.push_back(TSLTestCase());
+
+    return foundTestCases;
 }
