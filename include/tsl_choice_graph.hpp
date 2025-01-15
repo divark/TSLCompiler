@@ -1,10 +1,11 @@
 #pragma once
 
-#include <string>
+#include <memory>
 #include <vector>
 #include <cstddef>
 
 #include "tsl_collector.hpp"
+#include "tsl_testcase.hpp"
 
 class TSLChoice {
     private:
@@ -34,9 +35,43 @@ class Edges {
     private:
         std::vector<std::vector<size_t>> edges;
     public:
+        Edges();
         Edges(std::vector<std::vector<size_t>>);
 
         std::vector<size_t>& getNodeEdges(const Node&);
+};
+
+class TSLGraph;
+
+class TestCaseListener {
+    private:
+        TSLCollector& tslVariables;
+        std::vector<TSLTestCase> foundTestCases;
+
+        size_t numTestCases = 1;
+    public:
+        TestCaseListener(TSLCollector&);
+
+        void checkIn(const TSLGraph&);
+        std::vector<TSLTestCase> getTestCases();
+};
+
+class TSLGraph {
+    private:
+        std::vector<Node> nodes;
+        std::vector<Node> visitedNodes;
+        Edges edges;
+
+        std::shared_ptr<TestCaseListener> deadEndListener;
+    public:
+        TSLGraph();
+        TSLGraph(const TSLCollector&, std::shared_ptr<TestCaseListener>);
+
+        const std::vector<Node>& getNodes() const;
+        std::vector<Node> getEdges(const Node&);
+        const std::vector<Node>& getVisitedNodes() const;
+
+        void visitDFS(const Node&);
 };
 
 // These are the adapters that gets us Nodes from a TSLCollector, just

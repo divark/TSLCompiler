@@ -1,5 +1,7 @@
 #include "tsl_compiler.hpp"
+#include "tsl_choice_graph.hpp"
 #include "tsl_testcase.hpp"
+#include <memory>
 
 /**
  * Returns a TSLCompiler with the loaded inputFile.
@@ -28,18 +30,15 @@ TSLCollector& TSLCompiler::getCollector() {
 int TSLCompiler::compile() {
     auto programStatus = parser->run();
 
-    generatedTestCases = generateTestCases(parser->getCollector());
+    auto deadEndListener = std::make_shared<TestCaseListener>(parser->getCollector());
+    auto tslGraph = TSLGraph(parser->getCollector(), deadEndListener);
+
+    auto firstCategoryNodes = filterToNodesWithCategoryIdx(tslGraph.getNodes(), 0);
+    for (auto categoryNode : firstCategoryNodes) {
+        tslGraph.visitDFS(categoryNode);
+    }
+
+    generatedTestCases = deadEndListener->getTestCases();
 
     return programStatus;
-}
-
-/**
-* Derives test cases recorded from the results of the tsl input so far.
-*/
-std::vector<TSLTestCase> generateTestCases(TSLCollector &tslVariables) {
-    std::vector<TSLTestCase> foundTestCases;
-
-    foundTestCases.push_back(TSLTestCase());
-
-    return foundTestCases;
 }

@@ -1,4 +1,7 @@
 #include "tsl_choice_graph.hpp"
+#include "tsl_collector.hpp"
+#include "tsl_testcase.hpp"
+#include <memory>
 
 /**
  * Returns a collection of Nodes holding all Choices found in their respective Categories.
@@ -116,6 +119,8 @@ size_t TSLChoice::getChoiceIdx() {
     return choiceIdx;
 }
 
+Edges::Edges() {}
+
 Edges::Edges(std::vector<std::vector<size_t>> edges) {
     this->edges = edges;
 }
@@ -125,4 +130,90 @@ Edges::Edges(std::vector<std::vector<size_t>> edges) {
  */
 std::vector<size_t>& Edges::getNodeEdges(const Node& node) {
     return edges[node.getID()];
+}
+
+TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variables) {}
+
+/**
+* Creates a TSLTestCase on checking in.
+*/
+void TestCaseListener::checkIn(const TSLGraph& currentGraph) {
+    auto testCase = TSLTestCase();
+    testCase.setTestCaseNumber(this->numTestCases);
+    numTestCases++;
+
+    auto visitedNodes = currentGraph.getVisitedNodes();
+    for (auto node : visitedNodes) {
+        auto chosenCategoryIdx = node.getData().getCategoryIdx();
+        auto chosenChoiceIdx = node.getData().getChoiceIdx();
+
+        auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
+        auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
+        testCase.addCategoryChoice(chosenCategory, chosenChoice);
+    }
+
+    foundTestCases.push_back(testCase);
+}
+
+std::vector<TSLTestCase> TestCaseListener::getTestCases() {
+    return foundTestCases;
+}
+
+TSLGraph::TSLGraph() {}
+
+/**
+* Constructs a permutation-based directed graph derived from
+* variables found in the TSLCollector.
+*/
+TSLGraph::TSLGraph(const TSLCollector& tslVariables, std::shared_ptr<TestCaseListener> deadEndListener) {
+    this->nodes = getNodesFromCollector(tslVariables);
+    this->edges = getEdgesFromTSLNodes(this->nodes, tslVariables);
+
+    this->deadEndListener = deadEndListener;
+}
+
+/**
+* Returns a list of nodes currently recorded in the graph.
+*/
+const std::vector<Node>& TSLGraph::getNodes() const {
+    return this->nodes;
+}
+
+/**
+* Returns a list of Nodes connected to the current node.
+*/
+std::vector<Node> TSLGraph::getEdges(const Node& currentNode) {
+    std::vector<Node> foundEdges;
+
+    auto edgesFound = this->edges.getNodeEdges(currentNode);
+    for (auto nodeEdgeID : edgesFound) {
+        foundEdges.push_back(this->nodes[nodeEdgeID]);
+    }
+
+    return foundEdges;
+}
+
+/**
+* Returns the list of Nodes visited so far.
+*/
+const std::vector<Node>& TSLGraph::getVisitedNodes() const {
+    return this->visitedNodes;
+}
+
+/**
+* Visits the TSLGraph in a DFS fashion.
+*/
+void TSLGraph::visitDFS(const Node& currentNode) {
+    auto nodeEdges = this->getEdges(currentNode);
+    visitedNodes.push_back(currentNode);
+
+    if (nodeEdges.empty()) {
+        deadEndListener->checkIn(*this);
+    } else {
+        for (auto edgeNode : nodeEdges) {
+            visitDFS(edgeNode);
+        }
+    }
+
+    visitedNodes.pop_back();
 }

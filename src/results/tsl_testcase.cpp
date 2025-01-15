@@ -8,6 +8,13 @@ size_t TSLTestCase::getTestCaseNumber() {
 }
 
 /**
+* Sets the test case number.
+*/
+void TSLTestCase::setTestCaseNumber(size_t testCaseNum) {
+    this->testCaseNumber = testCaseNum;
+}
+
+/**
  * Returns the number of Categories tracked in this
  * test case.
  */
@@ -21,4 +28,12 @@ std::vector<std::string>& TSLTestCase::getCategories() {
  */
 std::string TSLTestCase::getCategoryChoice(const std::string& category) {
     return categoryChoices[category];
+}
+
+/**
+* Records a Choice for some given Category chosen.
+*/
+void TSLTestCase::addCategoryChoice(const std::string& chosenCategory, const std::string& chosenChoice) {
+    categoryChoices[chosenCategory] = chosenChoice;
+    chosenCategories.push_back(chosenCategory);
 }

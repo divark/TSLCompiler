@@ -31,8 +31,14 @@ int main(int argc, const char** argv) {
                   };
 
                   steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](uint testCaseNum, std::string expected_category, uint category_num) {
-                      auto actual_category = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num];
+                      auto actual_category = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
                       expect_eq(expected_category, actual_category);
+                  };
+
+                  steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](uint testCaseNum, std::string expected_choice, uint category_num) {
+                      auto foundCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[testCaseNum - 1];
+                      auto actual_choice = compiler.getTestCases()[testCaseNum - 1].getCategoryChoice(foundCategory);
+                      expect_eq(expected_choice, actual_choice);
                   };
               };
           };
