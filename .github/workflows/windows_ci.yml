@@ -1,0 +1,32 @@
+on: [push]
+
+name: Continuous Integration
+
+jobs:
+  check:
+    name: Check if code compiles
+
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Install dependencies for the project (Windows)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            mingw-w64-x86_64-clang
+            meson
+            bison
+            flex
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup build directory
+        run: meson setup build
+
+      - name: Run all tests
+        run: meson test -C build
