@@ -15,9 +15,10 @@ jobs:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson bison flex clang cmake
+            sudo apt update && sudo apt install meson bison flex cmake libfl-dev
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison cmake gcc
+            echo "CXX=g++" >> $GITHUB_ENV
           fi
 
       - name: Append Bison and Flex to Path (macOS-latest)
@@ -36,10 +37,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install subprojects
-        run: CXX=g++ meson wrap install catch2
+        run: meson wrap install catch2
 
       - name: Setup build directory
-        run: CXX=g++ meson setup build
+        run: meson setup build
 
       - name: Run all tests
-        run: CXX=g++ meson test -C build
+        run: meson test -C build
