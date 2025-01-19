@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson bison flex clang cmake
+            sudo apt update && sudo apt install meson bison clang cmake
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison flex cmake
           fi
@@ -24,13 +24,11 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           echo "/opt/homebrew/opt/bison/bin" >> $GITHUB_PATH
-          echo "/opt/homebrew/opt/flex/bin" >> $GITHUB_PATH
 
       - name: Append Bison and Flex to Path (macOS-13)
         if: matrix.os == 'macos-13'
         run: |
           echo "/usr/local/opt/bison/bin" >> $GITHUB_PATH
-          echo "/usr/local/opt/flex/bin" >> $GITHUB_PATH
 
       - name: Checkout sources
         uses: actions/checkout@v4

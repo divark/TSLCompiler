@@ -18,7 +18,7 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-clang
-            mingw-w64-python
+            mingw-w64-x86_64-python
             meson
             bison
             flex
