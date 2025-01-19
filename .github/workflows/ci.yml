@@ -1,35 +1,37 @@
 on: [push]
 
-name: Continuous Integration (UNIX-based)
+name: Continuous Integration
 
 jobs:
   check:
     name: Check if code compiles
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13]
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson bison clang cmake
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            choco install winflexbison3 meson
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update && sudo apt install meson bison flex clang cmake
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install meson bison flex cmake llvm
+            brew install meson bison cmake llvm
           fi
 
       - name: Append Bison and Flex to Path (macOS-latest)
         if: matrix.os == 'macos-latest'
         run: |
-          echo "/opt/homebrew/opt/bison/bin" >> $GITHUB_PATH
+          echo "/opt/homebrew/opt/bison/bin:$GITHUB_PATH" > $GITHUB_PATH
 
       - name: Append dependencies to Path (macOS-13)
         if: matrix.os == 'macos-13'
         run: |
-          echo "/usr/local/opt/bison/bin" >> $GITHUB_PATH
-          echo "/usr/local/opt/llvm/bin" >> $GITHUB_PATH
+          echo "/usr/local/opt/bison/bin:$GITHUB_PATH" > $GITHUB_PATH
+          echo "/usr/local/opt/llvm/bin:$GITHUB_PATH" > $GITHUB_PATH
 
       - name: Checkout sources
         uses: actions/checkout@v4
