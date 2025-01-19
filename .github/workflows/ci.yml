@@ -23,12 +23,12 @@ jobs:
       - name: Append Bison and Flex to Path (macOS-latest)
         if: matrix.os == 'macos-latest'
         run: |
-          echo "/opt/homebrew/bin" >> $GITHUB_PATH
+          export GITHUB_PATH=/opt/homebrew/bin:$GITHUB_PATH
 
       - name: Append dependencies to Path (macOS-13)
         if: matrix.os == 'macos-13'
         run: |
-          echo "/usr/local/bin" >> $GITHUB_PATH
+          export GITHUB_PATH=/usr/local/bin:$GITHUB_PATH
 
       - name: Checkout sources
         uses: actions/checkout@v4
