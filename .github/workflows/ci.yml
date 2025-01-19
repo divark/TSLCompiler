@@ -1,0 +1,42 @@
+on: [push]
+
+name: Continuous Integration
+
+jobs:
+  check:
+    name: Check if code compiles
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13]
+
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Install dependencies for the project (Windows)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            mingw-w64-x86_64-clang
+            bison
+            flex
+
+      - name: Install dependencies for the project (macOS, Linux)
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update && sudo apt install meson bison flex clang
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install meson bison flex
+          fi
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup build directory
+        run: meson setup build
+
+      - name: Run all tests
+        run: meson test -C build
