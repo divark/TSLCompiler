@@ -18,7 +18,16 @@ jobs:
             sudo apt update && sudo apt install meson bison flex clang cmake
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison flex cmake
-            brew shellenv
+          fi
+
+      - name: Append Bison and Flex to Path (macOS)
+        run: |
+          if [ "$matrix.os" == "macos-latest" ]; then
+            echo "/opt/homebrew/opt/bison/bin" >> $GITHUB_PATH
+            echo "/opt/homebrew/opt/flex/bin" >> $GITHUB_PATH
+          elif [ "$matrix.os" == "macos-13" ]; then
+            echo "/usr/local/opt/bison/bin" >> $GITHUB_PATH
+            echo "/usr/local/opt/flex/bin" >> $GITHUB_PATH
           fi
 
       - name: Checkout sources
