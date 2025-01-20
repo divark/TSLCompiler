@@ -5,8 +5,6 @@ on:
         required: true
         type: string
 
-name: Setup build for the project (Unix-based)
-
 jobs:
   setup:
     name: Verify code behaves as intended
