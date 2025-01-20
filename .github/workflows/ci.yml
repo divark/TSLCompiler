@@ -23,10 +23,10 @@ jobs:
             echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
           fi
 
-      - name: Use newer version of clang on Intel-based macos
+      - name: Use gcc on Intel-based macos
         if: matrix.os == 'macos-13'
         run: |
-          echo "CXX=$(brew --prefix gcc)/bin/g++" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
 
       - name: Checkout sources
         uses: actions/checkout@v4
