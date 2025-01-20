@@ -16,7 +16,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           choco install winflexbison meson
-          call refreshenv
+          refreshenv
           echo ::set-env name=PATH::%PATH%
           
       - name: Install dependencies for the project (macOS, Linux)
