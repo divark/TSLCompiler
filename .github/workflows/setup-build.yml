@@ -6,7 +6,7 @@ on:
         type: string
 
 jobs:
-  check:
+  setup:
     name: Verify code behaves as intended
     runs-on: ${{ inputs.os }}
 
