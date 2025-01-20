@@ -6,6 +6,9 @@ jobs:
   check:
     name: Check if code compiles
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
       - uses: actions/setup-python@v5
