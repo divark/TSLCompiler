@@ -11,9 +11,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    steps:          
+    steps:
       - name: Install dependencies for the project (macOS, Linux)
-        if: matrix.os != 'windows-latest'
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt update && sudo apt install meson bison flex cmake libfl-dev clang

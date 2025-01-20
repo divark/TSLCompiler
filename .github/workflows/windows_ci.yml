@@ -1,0 +1,33 @@
+on: [push]
+
+name: Continuous Integration
+
+jobs:
+  check:
+    name: Check if code compiles
+    runs-on: windows-latest
+
+    steps:
+      - name: Install dependencies for the project (Windows)
+        run: choco install winflexbison3 meson
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install subprojects
+        run: |
+          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+          refreshenv
+          meson wrap install catch2
+
+      - name: Setup build directory
+        run: |
+          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+          refreshenv
+          meson setup build
+
+      - name: Run all tests
+        run: |
+          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+          refreshenv
+          meson test -C build
