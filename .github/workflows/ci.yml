@@ -7,11 +7,16 @@ jobs:
     name: Check if code compiles
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13]
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: Install dependencies for the project (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install winflexbison meson
+          
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
