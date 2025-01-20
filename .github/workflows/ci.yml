@@ -18,8 +18,8 @@ jobs:
             sudo apt update && sudo apt install meson bison flex cmake libfl-dev
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison cmake llvm
-            brew link --force --overwrite bison
-            brew link --force --overwrite llvm
+            echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
           fi
 
       - name: Checkout sources
