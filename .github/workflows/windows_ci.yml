@@ -14,6 +14,7 @@ jobs:
       - name: Install dependencies for the project (Windows)
         uses: msys2/setup-msys2@v2
         with:
+          path-type: inherit
           update: true
           install: >-
             bison
@@ -22,6 +23,7 @@ jobs:
             mingw-w64-x86_64-meson
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-ca-certificates
+            mingw-w64-cross-clang
             openssl
             ca-certificates
             meson
@@ -32,6 +34,7 @@ jobs:
 
       - name: Install subprojects
         run: |
+          echo "CXX=clang++" >> $GITHUB_ENV
           meson wrap install catch2
 
       - name: Setup build directory
