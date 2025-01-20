@@ -15,7 +15,8 @@ jobs:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson bison flex cmake libfl-dev
+            sudo apt update && sudo apt install meson bison flex cmake libfl-dev clang
+            echo "CXX=clang++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison cmake llvm
             echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
