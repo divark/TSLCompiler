@@ -11,9 +11,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
-
       - name: Setup project build
         uses: ./.github/workflows/setup-build.yml
         with:
@@ -30,9 +27,6 @@ jobs:
         os: [ubuntu-latest, macos-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
-
       - name: Setup project build
         uses: ./.github/workflows/setup-build.yml
         with:
