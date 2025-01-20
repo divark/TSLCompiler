@@ -1,6 +1,6 @@
 on: [push]
 
-name: Continuous Integration / Continuous Deployment (Unix-based)
+name: Continuous Integration (Unix-based)
 
 jobs:
   check:
@@ -11,10 +11,32 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Setup project build
-        uses: ./.github/workflows/setup-build.yml
-        with:
-          os: ${{ matrix.os }}
+      - name: Install dependencies for the project (macOS, Linux)
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update && sudo apt install meson bison flex cmake libfl-dev clang
+            echo "CXX=clang++" >> $GITHUB_ENV
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install meson bison flex llvm
+            echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            # on macOS, bison and flex are already provided, but we want
+            # to use the newer versions provided by Homebrew, so we have
+            # to append them into the path via GitHub's GITHUB_PATH variable.
+            echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+            echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
+            # Likewise, we want to use the latest header files for flex.
+            echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
+            echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install subprojects
+        run: meson wrap install catch2
+
+      - name: Setup build directory
+        run: meson setup build
 
       - name: Run all tests
         run: meson test -C build
@@ -27,10 +49,36 @@ jobs:
         os: [ubuntu-latest, macos-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Setup project build
-        uses: ./.github/workflows/setup-build.yml
-        with:
-          os: ${{ matrix.os }}
+      - name: Install dependencies for the project (macOS, Linux)
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update && sudo apt install meson libbison-dev bison flex cmake libfl-dev clang
+            echo "CXX=clang++" >> $GITHUB_ENV
+            echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install meson bison flex llvm
+            # On an Intel-based mac, clang++ provided by Apple does not support all C++20 features.
+            # Therefore, it's safe to just download the latest, no matter what type of mac is being
+            # used.
+            echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            # on macOS, bison and flex are already provided, but we want
+            # to use the newer versions provided by Homebrew, so we have
+            # to append them into the path via GitHub's GITHUB_PATH variable.
+            echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+            echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
+            # Likewise, we want to use the latest header files for flex.
+            echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
+            echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install subprojects
+        run: meson wrap install catch2
+
+      - name: Setup build directory
+        run: meson setup build
 
       - name: Compile the project
         run: meson compile -C build
