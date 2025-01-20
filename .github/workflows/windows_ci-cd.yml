@@ -1,6 +1,6 @@
 on: [push]
 
-name: Continuous Integration (Windows)
+name: Continuous Integration / Continuous Deployment (Windows)
 
 jobs:
   check:
