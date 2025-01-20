@@ -1,4 +1,4 @@
-flex = find_program('flex', version: '>=2.6')
+flex = find_program('flex')
 flex_input = files('lexer.l')
 flex_generated_sources = custom_target('lexer.cpp',
   output: ['lexer.cpp', 'lexer.hpp'],
