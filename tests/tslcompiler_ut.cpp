@@ -25,17 +25,17 @@ int main(int argc, const char** argv) {
                   TSLCompiler compiler(tslInput);
                   expect_eq(0, compiler.compile());
 
-                  steps.then("the TSLCompiler's result should contain {expected_num_test_cases} test cases.") = [&](unsigned int expected_num_test_cases) {
+                  steps.then("the TSLCompiler's result should contain {expected_num_test_cases} test cases.") = [&](int expected_num_test_cases) {
                       auto actual_num_test_cases = compiler.getTestCases().size();
                       expect_eq(expected_num_test_cases, actual_num_test_cases);
                   };
 
-                  steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](unsigned int testCaseNum, std::string expected_category, unsigned int category_num) {
+                  steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](int testCaseNum, std::string expected_category, int category_num) {
                       auto actual_category = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
                       expect_eq(expected_category, actual_category);
                   };
 
-                  steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](unsigned int testCaseNum, std::string expected_choice, unsigned int category_num) {
+                  steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](int testCaseNum, std::string expected_choice, int category_num) {
                       auto foundCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[testCaseNum - 1];
                       auto actual_choice = compiler.getTestCases()[testCaseNum - 1].getCategoryChoice(foundCategory);
                       expect_eq(expected_choice, actual_choice);

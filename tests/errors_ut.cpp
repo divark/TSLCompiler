@@ -21,7 +21,7 @@ class ErrorMessageListener {
         ~ErrorMessageListener();
 
         std::string getCurrentErrorMsg();
-        std::string getLine(unsigned int);
+        std::string getLine(int);
 };
 
 /**
@@ -61,7 +61,7 @@ std::string ErrorMessageListener::getCurrentErrorMsg() {
 /**
 * Returns a line from the currently read stderr message.
 */
-std::string ErrorMessageListener::getLine(unsigned int lineNumber) {
+std::string ErrorMessageListener::getLine(int lineNumber) {
     auto errorMessage = std::istringstream(this->getCurrentErrorMsg());
     std::string errorLine = "";
     for (auto i = 0; i < lineNumber; i++) {
@@ -97,28 +97,28 @@ int main(int argc, const char** argv) {
                           stderrListener = std::make_unique<ErrorMessageListener>(std::string(syntaxException.what()));
                       }
 
-                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](unsigned int lineNumber, std::string errorFound) {
+                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](int lineNumber, std::string errorFound) {
                           auto expectedErrorSummary = std::format("Error: {}", errorFound);
                           auto actualErrorSummary = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
-                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](unsigned int lineNumber, std::string errorFound) {
+                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](int lineNumber, std::string errorFound) {
                           auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
                           auto actualErrorSummary = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
-                      steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](unsigned int lineNumber, unsigned int inputLineNumber, unsigned int inputLineColumn) {
+                      steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](int lineNumber, int inputLineNumber, int inputLineColumn) {
                           auto expectedFileLine = std::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
                           auto actualFileLine = stderrListener->getLine(lineNumber);
 
                           expect_eq(expectedFileLine, actualFileLine);
                       };
 
-                      steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](unsigned int lineNumber, std::string errorToken, unsigned int expectedFirstLineNumber, unsigned int expectedNextLineNumber) {
+                      steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](int lineNumber, std::string errorToken, int expectedFirstLineNumber, int expectedNextLineNumber) {
                           auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\n"
                             + stderrListener->getLine(lineNumber + 1) + "\n";
 
