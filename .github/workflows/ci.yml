@@ -14,11 +14,9 @@ jobs:
     steps:
       - name: Install dependencies for the project (Windows)
         if: matrix.os == 'windows-latest'
-        run: |
-          choco install winflexbison3 meson
-          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-          refreshenv
-          echo ::set-env name=PATH::%PATH%
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install winflexbison3 meson
           
       - name: Install dependencies for the project (macOS, Linux)
         if: matrix.os != 'windows-latest'
