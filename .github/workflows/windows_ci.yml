@@ -25,6 +25,7 @@ jobs:
             openssl
             ca-certificates
             meson
+            git
 
       - name: Checkout sources
         uses: actions/checkout@v4
