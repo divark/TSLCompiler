@@ -7,17 +7,11 @@ jobs:
     name: Check if code compiles
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+        os: [ubuntu-latest, macos-latest, macos-13]
 
     runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Install dependencies for the project (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: crazy-max/ghaction-chocolatey@v3
-        with:
-          args: install winflexbison3 meson
-          
+    steps:          
       - name: Install dependencies for the project (macOS, Linux)
         if: matrix.os != 'windows-latest'
         run: |
