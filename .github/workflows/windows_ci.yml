@@ -18,8 +18,8 @@ jobs:
           install: >-
             bison
             flex
-            mingw-w64-python
-            mingw-w64-meson
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-meson
             meson
 
       - name: Checkout sources
