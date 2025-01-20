@@ -23,7 +23,6 @@ jobs:
             mingw-w64-x86_64-meson
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-ca-certificates
-            mingw-w64-cross-clang
             openssl
             ca-certificates
             meson
@@ -34,7 +33,8 @@ jobs:
 
       - name: Install subprojects
         run: |
-          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/include" >> $GITHUB_ENV
           meson wrap install catch2
 
       - name: Setup build directory
