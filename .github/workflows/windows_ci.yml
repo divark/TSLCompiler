@@ -1,6 +1,6 @@
 on: [push]
 
-name: Continuous Integration
+name: Continuous Integration (Windows)
 
 jobs:
   check:
@@ -8,26 +8,32 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "x64"
+
       - name: Install dependencies for the project (Windows)
-        run: choco install winflexbison3 meson
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            bison
+            flex
+            python
+            meson
 
       - name: Checkout sources
         uses: actions/checkout@v4
 
       - name: Install subprojects
         run: |
-          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-          refreshenv
           meson wrap install catch2
 
       - name: Setup build directory
         run: |
-          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-          refreshenv
           meson setup build
 
       - name: Run all tests
         run: |
-          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-          refreshenv
           meson test -C build
