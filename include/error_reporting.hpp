@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdint>
 
 class FileReader {
     private:
@@ -13,7 +14,7 @@ class FileReader {
         FileReader(std::string);
 
         bool hasLine(int);
-        std::string getLine(uint);
+        std::string getLine(size_t);
 };
 
 std::string getPointingMsg(const yy::location&);

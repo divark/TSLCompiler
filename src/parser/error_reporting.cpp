@@ -20,7 +20,7 @@ bool FileReader::hasLine(int lineNumber) {
     return adjustedLineNumber >= 0 && adjustedLineNumber < inputLines.size();
 }
 
-std::string FileReader::getLine(uint lineNumber) {
+std::string FileReader::getLine(size_t lineNumber) {
     return inputLines[lineNumber - 1];
 }
 
