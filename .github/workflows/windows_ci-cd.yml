@@ -4,7 +4,7 @@ name: Continuous Integration (Windows)
 
 jobs:
   check:
-    name: Check if code compiles
+    name: Verify code behaves as intended
     runs-on: windows-latest
     defaults:
       run:
@@ -34,8 +34,11 @@ jobs:
 
       - name: Install subprojects
         run: |
+          # Flex and Bison are not found by default, so we have
+          # to add them such that the compiler and build system will see them.
           echo "LDFLAGS=-L/usr/lib" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/include" >> $GITHUB_ENV
+          # Testing currently breaks if gcc is used, so clang it is!
           echo "CXX=clang++" >> $GITHUB_ENV
           meson wrap install catch2
 
@@ -79,9 +82,13 @@ jobs:
 
       - name: Install subprojects
         run: |
+          # Flex and Bison are not found by default, so we have
+          # to add them into the PATH via GitHub's GITHUB_ENV variable.
           echo "LDFLAGS=-L/usr/lib" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/include" >> $GITHUB_ENV
+          # Testing currently breaks if gcc is used, so clang it is!
           echo "CXX=clang++" >> $GITHUB_ENV
+
           meson wrap install catch2
 
       - name: Setup build directory
@@ -95,4 +102,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: build/tslchecker.exe
-          name: tslchecker-windows-latest.exe
+          name: tslchecker-windows-latest

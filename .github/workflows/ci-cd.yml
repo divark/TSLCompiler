@@ -4,7 +4,7 @@ name: Continuous Integration (Unix-based)
 
 jobs:
   check:
-    name: Verify code compiles
+    name: Verify code behaves as intended
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, macos-13]
@@ -19,8 +19,12 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison flex llvm
             echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            # on macOS, bison and flex are already provided, but we want
+            # to use the newer versions provided by Homebrew, so we have
+            # to append them into the path via GitHub's GITHUB_PATH variable.
             echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
             echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
+            # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
           fi
@@ -53,9 +57,16 @@ jobs:
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install meson bison flex llvm
+            # On an Intel-based mac, clang++ provided by Apple does not support all C++20 features.
+            # Therefore, it's safe to just download the latest, no matter what type of mac is being
+            # used.
             echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            # on macOS, bison and flex are already provided, but we want
+            # to use the newer versions provided by Homebrew, so we have
+            # to append them into the path via GitHub's GITHUB_PATH variable.
             echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
             echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
+            # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
           fi
