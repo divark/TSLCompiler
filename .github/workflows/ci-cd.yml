@@ -83,6 +83,9 @@ jobs:
       - name: Compile the project
         run: meson compile -C build
 
+      - name: Strip unnecessary bits from TSLChecker
+        run: strip build/tslchecker
+
       - name: Upload TSLChecker binary
         uses: actions/upload-artifact@v4
         with:
