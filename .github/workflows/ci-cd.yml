@@ -36,7 +36,7 @@ jobs:
         run: meson wrap install catch2
 
       - name: Setup build directory
-        run: meson setup build
+        run: meson setup build -Db_sanitize=address
 
       - name: Run all tests
         run: meson test -C build
