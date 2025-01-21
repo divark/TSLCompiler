@@ -1,0 +1,115 @@
+# Test specification for Siena HierarchicalDispatcher "application"
+#
+# This specification is designed to test methods publish(SENPPacket),
+# subscribe(SENPPacket), unsubscribe(SENPPacket) and unsubscribe(Notifiable)
+# of interface Siena, which is implemented by class HierarchicalDispatcher.
+#
+# In this specification, an instance of HierarchicalDispatcher is called a
+# "server", any non-server entity interacting with a server (including a
+# test program) is called a "client" or a "pub" (for publisher) or a
+# "sub" (for subscriber), and an attribute is called an "attr".  A "matching
+# pub" is a publisher whose notifications match the subscriber's subscriptions,
+# while a "non-matching pub" is a publisher whose notifcations do not match
+# the subscriber's subscriptions.
+
+#Environments:
+Server configuration:
+    one server.
+    one child and one parent.	[single]
+    two children and one parent.	[single]
+    at least three levels.		[single]
+
+Client configuration:
+   	one pub only.			[property PublisherOnly]
+   	one sub only.			[property SubscriberOnly]
+   	one sub and one matching pub.	[property Matching]
+   	one sub and two matching pubs.	[single]
+   	two subs and one matching pub.	[single]
+   	one sub and one non-matching pub.
+   					[single]
+   	two subs and one non-matching pub.
+   					[single]
+   	multiple subs and pubs.		[single]
+
+#Parameters:
+Server IDs:
+    empty string.			[error]
+    valid string.
+
+Type of attrs in notifications:
+    invalid name.			[if !SubscriberOnly][error]
+    string.				[if Matching][single]
+    int.				[if !SubscriberOnly]
+    double.				[if Matching][single]
+    boolean.			[if Matching][single]
+    multiple with same type.	[if !SubscriberOnly]
+    				[property MultiSameAttrs]
+    multiple with mixed types.	[if !SubscriberOnly]
+    				[property MultiMixedAttrs]
+
+Form of notifications:
+    no attrs.			[if !SubscriberOnly][error]
+    multiple attrs with same name.	[if !SubscriberOnly][error]
+    one attr.			[if !(SubscriberOnly || (MultiSameAttrs || MultiMixedAttrs))]
+    two attrs.			[if !SubscriberOnly]
+    three to ten attrs.		[if !SubscriberOnly][single]
+    one hundred attrs.		[if !SubscriberOnly][single]
+
+Number of notifications:
+    one.				[if !SubscriberOnly]
+    two same.			[if !SubscriberOnly]
+    two different.			[if !SubscriberOnly]
+    multiple.			[if !SubscriberOnly]
+
+Type of constraints in subscriptions:
+    invalid name.			[if !PublisherOnly][error]
+    string.				[if Matching][single]
+    int.				[if !PublisherOnly]
+    double.				[if Matching][single]
+    boolean.			[if Matching][single]
+    multiple with same type.	[if !PublisherOnly]
+    				[property MultiSameConstraints]
+    multiple with mixed types.	[if !PublisherOnly]
+    				[property MultiMixedConstraints]
+
+Operator of constraints in subscriptions:
+    invalid op.			[if !PublisherOnly][error]
+    equal.				[if !PublisherOnly]
+    less than.			[if !PublisherOnly][single]
+    greater than.			[if !PublisherOnly]
+    less equal.			[if !PublisherOnly][single]
+    greater equal.			[if !PublisherOnly][single]
+    prefix.				[if !PublisherOnly][single]
+    suffix.				[if !PublisherOnly][single]
+    any.				[if !PublisherOnly][single]
+    not equal.			[if !PublisherOnly][single]
+    substring.			[if !PublisherOnly][single]
+    multiple.			[if !PublisherOnly && (MultiSameConstraints || MultiMixedConstraints)]
+
+Form of subscriptions:
+    no constraints.			[if !PublisherOnly][error]
+    one constraint.			[if !(PublisherOnly || (MultiSameConstraints || MultiMixedConstraints))]
+    two consistent constraints for same attr.
+    				[if !PublisherOnly][single]
+    two inconsistent constraints for same attr.
+    				[if !PublisherOnly][single]
+    two constraints for different attrs.
+    				[if !PublisherOnly]
+    three to ten constraints.	[if !PublisherOnly][single]
+    one hundred constraints.	[if !PublisherOnly][single]
+
+Number of subscriptions:
+    one.				[if !PublisherOnly]
+    one with unsubscription.	[if !PublisherOnly]
+    				[property Unsubscribe]
+    two same.			[if !PublisherOnly][single]
+    two same with unsubscription.	[if !PublisherOnly][single]
+    two different.			[if !PublisherOnly][single]
+    two different with unsubscription.
+    				[if !PublisherOnly][single]
+    multiple.			[if !PublisherOnly][single]
+    multiple with unsubscription.	[if !PublisherOnly][single]
+
+Unsubscriptions:
+   	with filter.			[if !PublisherOnly && Unsubscribe]
+   	without filter.			[if !PublisherOnly && Unsubscribe]
