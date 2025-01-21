@@ -32,7 +32,7 @@ int main(int argc, const char** argv) {
                       steps.when("the edges are created from the nodes,") = [&] {
                           auto edges = getEdgesFromTSLNodes(nodes, compiler.getCollector());
 
-                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](int firstNodeNum, int nextNodeNum) {
+                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](size_t firstNodeNum, size_t nextNodeNum) {
                               auto firstNode = nodes[firstNodeNum - 1];
                               auto firstNodeEdges = edges.getNodeEdges(firstNode);
 
@@ -47,7 +47,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedNumNodes, actualNumNodes);
                       };
 
-                      steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](int nodeNum, std::string expectedCategory) {
+                      steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](size_t nodeNum, std::string expectedCategory) {
                           auto chosenNode = nodes[nodeNum - 1];
                           auto nodeCategoryIdx = chosenNode.getData().getCategoryIdx();
 
@@ -55,7 +55,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedCategory, actualCategory);
                       };
 
-                      steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](int nodeNum, std::string expectedChoice) {
+                      steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](size_t nodeNum, std::string expectedChoice) {
                           auto chosenNode = nodes[nodeNum - 1];
                           auto nodeChoiceIdx = chosenNode.getData().getChoiceIdx();
 
@@ -64,17 +64,17 @@ int main(int argc, const char** argv) {
                       };
                   };
 
-                  steps.then("the TSLCompiler's result should contain {expected_num_test_cases} test cases.") = [&](int expected_num_test_cases) {
+                  steps.then("the TSLCompiler's result should contain {expected_num_test_cases} test cases.") = [&](size_t expected_num_test_cases) {
                       auto actual_num_test_cases = compiler.getTestCases().size();
                       expect_eq(expected_num_test_cases, actual_num_test_cases);
                   };
 
-                  steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](int testCaseNum, std::string expected_category, int category_num) {
+                  steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](size_t testCaseNum, std::string expected_category, size_t category_num) {
                       auto actual_category = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
                       expect_eq(expected_category, actual_category);
                   };
 
-                  steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](int testCaseNum, std::string expected_choice, int category_num) {
+                  steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](size_t testCaseNum, std::string expected_choice, size_t category_num) {
                       auto foundCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[testCaseNum - 1];
                       auto actual_choice = compiler.getTestCases()[testCaseNum - 1].getCategoryChoice(foundCategory);
                       expect_eq(expected_choice, actual_choice);
@@ -91,5 +91,5 @@ int main(int argc, const char** argv) {
                             std::istreambuf_iterator<char>()};
     };
 
-    "tslcompiler"_test = steps | file(argv[1]);
+    "compiler"_test = steps | file(argv[1]);
 }
