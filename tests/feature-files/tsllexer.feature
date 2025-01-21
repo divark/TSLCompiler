@@ -1,77 +1,77 @@
 Feature: The Lexer recognizes valid TSL input.
     Scenario: An Else Statement should be recongized from the Lexer from a valid TSL file.
-        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an Else Statement,
+        Given a TSL file called choice_with_else_alone.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice's Else Statement.
+        Then the Lexer should have retrieved the Choice's Else Statement.
 
     Scenario: An Or Expression should be recognized from the Lexer from a valid TSL file.
-        Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an OR Expression,
+        Given a TSL file called choice_with_or_expression.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice Expression's OR Operator.
+        Then the Lexer should have retrieved the Choice Expression's OR Operator.
 
     Scenario: An And Expression should be recognized from the Lexer from a valid TSL file.
-        Given a TSL input with three Categories with one Choice each, where the first two Choices contain a property, and the last an If Statement with an AND Expression,
+        Given a TSL file called choice_with_and_expression.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice Expression's AND Operator.
+        Then the Lexer should have retrieved the Choice Expression's AND Operator.
 
     Scenario: A Grouped Expression should be recognized from the Lexer from a valid TSL file.
-        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing a grouped expression,
+        Given a TSL file called choice_with_grouped_expression.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Grouped Expression's beginning and end.
+        Then the Lexer should have retrieved the Grouped Expression's beginning and end.
 
     Scenario: A Negated Logical Operator should be recognized from the Lexer from a valid TSL file.
-        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement containing an unary expression,
+        Given a TSL file called choice_with_unary_expression.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice Expression's Negated Operator.
+        Then the Lexer should have retrieved the Choice Expression's Negated Operator.
 
     Scenario: An If Statement should be recognized from the Lexer from a valid TSL file.
-        Given a TSL input with two Categories, one with a Choice with a Property, and another with a Choice with an If Statement,
+        Given a TSL file called choices_with_simple_if.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice's If Statement.
+        Then the Lexer should have retrieved the Choice's If Statement.
 
     Scenario: Multiple Properties from a Choice should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, Choice, and multiple Properties,
+        Given a TSL file called choice_with_multiple_properties.txt,
         When the Lexer consumes the input,
-        Then the Lexer should return each Property's contents as a string.
+        Then the Lexer should have retrieved each Property's contents as a string.
 
     Scenario: A Property from a Choice should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, Choice, and a single Property,
+        Given a TSL file called choice_with_one_property.txt,
         When the Lexer consumes the input,
-        Then the Lexer should return the Property's contents as a string.
+        Then the Lexer should have retrieved 'ABC'.
 
     Scenario: An error marking from a Choice should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with a Category, Choice, and one error marking constraint,
+        Given a TSL file called one_category_choice_with_error_marking.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice's error Marking.
+        Then the Lexer should have retrieved '[error]'.
 
     Scenario: A single marking from a Choice should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with a Category, Choice, and one single marking constraint,
+        Given a TSL file called one_category_choice_with_marking.txt,
         When the Lexer consumes the input,
-        Then the Lexer should detect the Choice's single Marking.
+        Then the Lexer should have retrieved '[single]'.
 
     Scenario: A Choice from a Category should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
+        Given a TSL file called one_category_one_choice.txt,
         When the Lexer consumes the input,
-        Then the Lexer should return the Category's Choice contents as a string.
+        Then the Lexer should have retrieved 'Simple Choice 1.'.
 
     Scenario: A Comment should not be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
+        Given a TSL file called one_category_one_choice.txt,
         When the Lexer consumes the input,
-        Then the Lexer should not return the Category Comment contents as a string.
+        Then the Lexer should not have retrieved '# Comments are quite helpful as reminders.'.
 
     Scenario: The Line Number should be tracking the whereabouts of a single Category.
-        Given a TSL input with one Category, and one Choice,
+        Given a TSL file called one_category_one_choice.txt,
         When the Lexer consumes the input,
-        And the Lexer reads the first Category,
+        When the Lexer reads up to first Category,
         Then the Lexer should be on Line Number 2.
 
     Scenario: The Line Number should be tracking the whereabouts of a single Choice.
-        Given a TSL input with one Category, and one Choice,
+        Given a TSL file called one_category_one_choice.txt,
         When the Lexer consumes the input,
-        And the Lexer reads the first Choice,
+        When the Lexer reads up to first Choice,
         Then the Lexer should be on Line Number 3.
 
     Scenario: A Category should be returned from the Lexer from a valid TSL file.
-        Given a TSL input with one Category, and one Choice,
+        Given a TSL file called one_category_one_choice.txt,
         When the Lexer consumes the input,
-        Then the Lexer should return the Category contents as a string.
+        Then the Lexer should have retrieved 'Simple Category 1:'.
