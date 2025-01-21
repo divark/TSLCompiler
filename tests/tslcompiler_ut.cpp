@@ -32,7 +32,7 @@ int main(int argc, const char** argv) {
                       steps.when("the edges are created from the nodes,") = [&] {
                           auto edges = getEdgesFromTSLNodes(nodes, compiler.getCollector());
 
-                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](size_t firstNodeNum, size_t nextNodeNum) {
+                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](int firstNodeNum, int nextNodeNum) {
                               auto firstNode = nodes[firstNodeNum - 1];
                               auto firstNodeEdges = edges.getNodeEdges(firstNode);
 
@@ -47,7 +47,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedNumNodes, actualNumNodes);
                       };
 
-                      steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](size_t nodeNum, std::string expectedCategory) {
+                      steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](int nodeNum, std::string expectedCategory) {
                           auto chosenNode = nodes[nodeNum - 1];
                           auto nodeCategoryIdx = chosenNode.getData().getCategoryIdx();
 
@@ -55,7 +55,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedCategory, actualCategory);
                       };
 
-                      steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](size_t nodeNum, std::string expectedChoice) {
+                      steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](int nodeNum, std::string expectedChoice) {
                           auto chosenNode = nodes[nodeNum - 1];
                           auto nodeChoiceIdx = chosenNode.getData().getChoiceIdx();
 
