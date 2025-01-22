@@ -7,7 +7,7 @@
 %option yyclass="TSLLexer"
 
 /* Lexer Definitions */
-NEWLINES    \n
+NEWLINES    (\r\n)|\n
 WHITESPACE  [[:blank:]]
 COMMENT     #.*
 CATEGORY    [[:alnum:][:graph:][:punct:]][[:alnum:][:graph:][:punct:][:blank:]]*:
