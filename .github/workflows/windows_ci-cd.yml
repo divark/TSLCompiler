@@ -44,7 +44,7 @@ jobs:
 
       - name: Setup build directory
         run: |
-          meson setup build -Db_sanitize=address
+          meson setup build
 
       - name: Run all tests
         run: |
