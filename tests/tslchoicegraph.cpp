@@ -26,19 +26,16 @@ int main(int argc, const char** argv) {
                   TSLCompiler compiler(tslInput);
                   expect_eq(0, compiler.compile());
 
-                  steps.when("the nodes are created from the TSLCollector,") = [&] {
+                  steps.when("the nodes and edges are created from the TSLCollector,") = [&] {
                       auto nodes = getNodesFromCollector(compiler.getCollector());
+                      auto edges = getEdgesFromTSLNodes(nodes, compiler.getCollector());
 
-                      steps.when("the edges are created from the nodes,") = [&] {
-                          auto edges = getEdgesFromTSLNodes(nodes, compiler.getCollector());
+                      steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](size_t firstNodeNum, size_t nextNodeNum) {
+                          auto firstNode = nodes[firstNodeNum - 1];
+                          auto firstNodeEdges = edges.getNodeEdges(firstNode);
 
-                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](size_t firstNodeNum, size_t nextNodeNum) {
-                              auto firstNode = nodes[firstNodeNum - 1];
-                              auto firstNodeEdges = edges.getNodeEdges(firstNode);
-
-                              auto hasNextNodeNum = std::find(firstNodeEdges.begin(), firstNodeEdges.end(), nextNodeNum - 1) != firstNodeEdges.end();
-                              expect(hasNextNodeNum);
-                          };
+                          auto hasNextNodeNum = std::find(firstNodeEdges.begin(), firstNodeEdges.end(), nextNodeNum - 1) != firstNodeEdges.end();
+                          expect(hasNextNodeNum);
                       };
 
                       steps.then("the number of Nodes should match the number of Choices.") = [&] {
