@@ -1,5 +1,6 @@
 #include "error_reporting.hpp"
 
+#include <algorithm>
 #include <format>
 #include <fstream>
 #include <sstream>
@@ -11,6 +12,11 @@ FileReader::FileReader(std::string fileName) {
     std::ifstream inputContents(fileName);
 
     for (std::string line; std::getline(inputContents, line);) {
+        // Everyone has a preference for how tabs are rendered in their terminal.
+        // I'd rather not have to read that preference from a terminal, since C++
+        // itself does not care about the width of a tab, only that it exists.
+        // Thus, it's best to just replace each tab with a space.
+        std::replace(line.begin(), line.end(), '\t', ' ');
         inputLines.push_back(line);
     }
 }
