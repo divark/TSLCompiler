@@ -3,7 +3,6 @@
 #include <string>
 #include <format>
 
-#include "tsl_choice_graph.hpp"
 #include "tsl_compiler.hpp"
 
 namespace fs = std::filesystem;
@@ -25,44 +24,6 @@ int main(int argc, const char** argv) {
               steps.when("the input is consumed by the TSLCompiler,") = [&] {
                   TSLCompiler compiler(tslInput);
                   expect_eq(0, compiler.compile());
-
-                  steps.when("the nodes are created from the TSLCollector,") = [&] {
-                      auto nodes = getNodesFromCollector(compiler.getCollector());
-
-                      steps.when("the edges are created from the nodes,") = [&] {
-                          auto edges = getEdgesFromTSLNodes(nodes, compiler.getCollector());
-
-                          steps.then("Node {firstNodeNum} should have an edge to Node {nextNodeNum}.") = [&](size_t firstNodeNum, size_t nextNodeNum) {
-                              auto firstNode = nodes[firstNodeNum - 1];
-                              auto firstNodeEdges = edges.getNodeEdges(firstNode);
-
-                              auto hasNextNodeNum = std::find(firstNodeEdges.begin(), firstNodeEdges.end(), nextNodeNum - 1) != firstNodeEdges.end();
-                              expect(hasNextNodeNum);
-                          };
-                      };
-
-                      steps.then("the number of Nodes should match the number of Choices.") = [&] {
-                          auto expectedNumNodes = compiler.getCollector().choices.size();
-                          auto actualNumNodes = nodes.size();
-                          expect_eq(expectedNumNodes, actualNumNodes);
-                      };
-
-                      steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](size_t nodeNum, std::string expectedCategory) {
-                          auto chosenNode = nodes[nodeNum - 1];
-                          auto nodeCategoryIdx = chosenNode.getData().getCategoryIdx();
-
-                          auto actualCategory = compiler.getCollector().categories[nodeCategoryIdx];
-                          expect_eq(expectedCategory, actualCategory);
-                      };
-
-                      steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](size_t nodeNum, std::string expectedChoice) {
-                          auto chosenNode = nodes[nodeNum - 1];
-                          auto nodeChoiceIdx = chosenNode.getData().getChoiceIdx();
-
-                          auto actualChoice = compiler.getCollector().choices[nodeChoiceIdx];
-                          expect_eq(expectedChoice, actualChoice);
-                      };
-                  };
 
                   steps.then("the TSLCompiler's result should contain {expected_num_test_cases} test cases.") = [&](size_t expected_num_test_cases) {
                       auto actual_num_test_cases = compiler.getTestCases().size();

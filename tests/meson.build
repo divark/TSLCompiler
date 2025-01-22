@@ -133,6 +133,22 @@ test(
   depends: test_files,
 )
 
+graph_test_sources = files('tslchoicegraph.cpp')
+graph_feature_file = fs.copyfile('feature-files/tslchoicegraph.feature', 'tslchoicegraph.feature')
+graph_test_executable = executable(
+  'graph-test',
+  sources: graph_test_sources + app_sources,
+  dependencies: test_ut_dep,
+  include_directories: inc,
+)
+test(
+  'graph',
+  graph_test_executable,
+  args: graph_feature_file,
+  verbose: true,
+  depends: test_files,
+)
+
 # Testing error messages generated from the TSL Lexer or TSL Parser.
 invalid_symbol_test_file = fs.copyfile('test-files/invalid_category.txt', 'invalid_category.txt')
 invalid_choice_test_file = fs.copyfile('test-files/invalid_choice.txt', 'invalid_choice.txt')
