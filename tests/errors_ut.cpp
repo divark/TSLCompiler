@@ -118,7 +118,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedFileLine, actualFileLine);
                       };
 
-                      steps.then("line {lineNumber} of the error message should posize_t to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](size_t lineNumber, std::string errorToken, size_t expectedFirstLineNumber, size_t expectedNextLineNumber) {
+                      steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](size_t lineNumber, std::string errorToken, size_t expectedFirstLineNumber, size_t expectedNextLineNumber) {
                           auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\n"
                             + stderrListener->getLine(lineNumber + 1) + "\n";
 
