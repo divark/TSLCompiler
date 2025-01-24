@@ -1,0 +1,1 @@
+option('build_for_release', type: 'boolean', value: false)

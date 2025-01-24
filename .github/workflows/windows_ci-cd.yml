@@ -80,7 +80,7 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Install subprojects
+      - name: Configure environment variables
         run: |
           # Flex and Bison are not found by default, so we have
           # to add them into the PATH via GitHub's GITHUB_ENV variable.
@@ -89,11 +89,9 @@ jobs:
           # Testing currently breaks if gcc is used, so clang it is!
           echo "CXX=clang++" >> $GITHUB_ENV
 
-          meson wrap install catch2
-
       - name: Setup build directory
         run: |
-          meson setup build
+          meson setup build -Dbuild_for_release=true
 
       - name: Compile the project
         run: meson compile -C build
