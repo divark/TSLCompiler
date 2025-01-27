@@ -97,14 +97,21 @@ expression_test_files = [
 test_files = simple_test_files + marking_test_files + properties_test_files + expression_test_files
 
 # Testing just the TSL Lexer.
-lexer_test_sources = files('tsllexer.cpp')
-lexer_test_executable = executable(
-  'tsllexer-test',
-  sources: lexer_test_sources + app_sources,
-  dependencies: test_dep,
+lexer_feature_file = fs.copyfile('feature-files/tsllexer.feature', 'tsllexer.feature')
+lexer_ut_test_sources = files('tsllexer_ut.cpp')
+lexer_ut_test_executable = executable(
+  'tsllexer-ut-test',
+  sources: lexer_ut_test_sources + app_sources,
+  dependencies: test_ut_dep,
   include_directories: inc,
 )
-test('tsl_lexer', lexer_test_executable, verbose: true, depends: test_files)
+test(
+  'tsl_lexer_ut',
+  lexer_ut_test_executable,
+  args: lexer_feature_file,
+  verbose: true,
+  depends: test_files,
+)
 
 # Testing the TSL Parser.
 parser_test_sources = files('tslparser.cpp')
