@@ -1,5 +1,4 @@
 #include <boost/ut.hpp>
-#include <bsm/audit.h>
 #include <fstream>
 #include <string>
 #include <format>
@@ -63,7 +62,7 @@ void waitUntil(TSLLexer &lexer, yy::parser::token::token_kind_type desiredToken,
 
     while (true) {
         auto currentTokenFound = lexer.getNextToken();
-        if (currentTokenFound != desiredToken) {
+        if (currentTokenFound != desiredToken || currentTokenFound == yy::parser::token::token_kind_type::YYEOF) {
             continue;
         }
 
