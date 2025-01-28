@@ -1,6 +1,5 @@
 fs = import('fs')
 
-test_dep = dependency('catch2-with-main')
 test_ut_dep = dependency('boost.ut')
 # Without these, the tests will not be able to find their input files since
 # paths are relative, and the test-files directory by default is not brought over.
@@ -114,14 +113,21 @@ test(
 )
 
 # Testing the TSL Parser.
-parser_test_sources = files('tslparser.cpp')
-parser_test_executable = executable(
-  'tslparser-test',
-  sources: parser_test_sources + app_sources,
-  dependencies: test_dep,
+parser_feature_file = fs.copyfile('feature-files/tslparser.feature', 'tslparser.feature')
+parser_ut_test_sources = files('tslparser_ut.cpp')
+parser_ut_test_executable = executable(
+  'tslparser-ut-test',
+  sources: parser_ut_test_sources + app_sources,
+  dependencies: test_ut_dep,
   include_directories: inc,
 )
-test('tsl_parser', parser_test_executable, verbose: true, depends: test_files)
+test(
+  'tsl_parser_ut',
+  parser_ut_test_executable,
+  args: parser_feature_file,
+  verbose: true,
+  depends: test_files,
+)
 
 # Testing the TSL Compiler overall.
 compiler_ut_test_sources = files('tslcompiler_ut.cpp')
