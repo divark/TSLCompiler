@@ -17,10 +17,20 @@ Finally, to remain fairly close to the original C implementation of the TSLgener
 - The Lexer library Flex.
 - The Parser library Bison version >= 3.2.
 - [The Meson Build System](https://mesonbuild.com/SimpleStart.html).
-- [Catch2](https://github.com/catchorg/Catch2), which can be installed into the project locally using meson via `meson wrap install catch2`
 
 ## Steps
 1. Clone this repository.
 2. Make a build directory called `build` for meson.
 3. Run `meson setup build`, where `build` is the name of the build directory.
-4. Open the `build` directory, then run `meson test` to check the status of the codebase via compilation and tests ran.
+
+# Verifying
+1. Open the `build` directory from the `Building` step.
+2. Run `meson test`.
+3. Confirm that all tests are passing as intended.
+
+# Running
+## TSLChecker
+1. Open the `build` directory from the `Building` step.
+2. Run `meson compile`.
+3. Verify that there is now an executable in there called `tslchecker` if you're on Linux or macOS, `tslchecker.exe` if you're on Windows.
+4. Run `./tslchecker path/to/input/file`.
