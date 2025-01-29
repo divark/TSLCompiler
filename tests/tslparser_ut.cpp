@@ -26,14 +26,26 @@ std::vector<int> getChoicePropertiesDependingOn(const std::string& typeOfPropert
 * Returns true if the specific Choice contains the type of marking, or
 * false otherwise.
 */
-bool containsMarkingDependingOn(const std::string& typeOfMarking, size_t choiceNum, TSLParser& parser) {
+bool containsMarkingDependingOn(const std::string& typeOfMarking, const std::string& typeOfSelector, size_t choiceNum, TSLParser& parser) {
     bool containsMarking = false;
 
     auto variableCollection = parser.getCollector();
     if (typeOfMarking == "single") {
-        containsMarking = variableCollection.singleMarkings[choiceNum - 1];
+        if (typeOfSelector == "If") {
+            containsMarking = variableCollection.singleIfMarkings[choiceNum - 1];
+        } else if (typeOfSelector == "Else") {
+            containsMarking = variableCollection.singleElseMarkings[choiceNum - 1];
+        } else {
+            containsMarking = variableCollection.singleMarkings[choiceNum - 1];
+        }
     } else if (typeOfMarking == "error") {
-        containsMarking = variableCollection.errorMarkings[choiceNum - 1];
+        if (typeOfSelector == "If") {
+            containsMarking = variableCollection.errorIfMarkings[choiceNum - 1];
+        } else if (typeOfSelector == "Else") {
+            containsMarking = variableCollection.errorElseMarkings[choiceNum - 1];
+        } else {
+            containsMarking = variableCollection.errorMarkings[choiceNum - 1];
+        }
     }
 
     return containsMarking;
@@ -82,7 +94,12 @@ int main(int argc, const char** argv) {
                   };
 
                   steps.then("the Collector should contain a {typeOfMarking} marking for Choice {choiceNum}") = [&](std::string typeOfMarking, size_t choiceNum) {
-                      bool choiceContainsMarking = containsMarkingDependingOn(typeOfMarking, choiceNum, parser);
+                      bool choiceContainsMarking = containsMarkingDependingOn(typeOfMarking, "", choiceNum, parser);
+                      boost::ut::expect(choiceContainsMarking);
+                  };
+
+                  steps.then("the Collector should contain a {typeOfMarking} marking in an {typeOfSelector} Statement for Choice {choiceNum}") = [&](std::string typeOfMarking, std::string typeOfSelector, size_t choiceNum) {
+                      bool choiceContainsMarking = containsMarkingDependingOn(typeOfMarking, typeOfSelector, choiceNum, parser);
                       boost::ut::expect(choiceContainsMarking);
                   };
 
@@ -111,6 +128,11 @@ int main(int argc, const char** argv) {
                   steps.then("the Collector should contain a {typeOfExpression} Expression in Choice {choiceNum} as '{expectedExpressionString}'.") = [&](std::string typeOfExpression, size_t choiceNum, std::string expectedExpressionString) {
                       std::string actualExpressionString = parser.getCollector().getChoiceExpression(choiceNum - 1)->asString();
                       expect_eq(expectedExpressionString, actualExpressionString);
+                  };
+
+                  steps.then("the Collector should flag Choice {choiceNum} for having an Else Statement.") = [&](size_t choiceNum) {
+                      auto choiceContainsElseStatement = parser.getCollector().hasElseExpression(choiceNum - 1);
+                      boost::ut::expect(choiceContainsElseStatement);
                   };
               };
           };

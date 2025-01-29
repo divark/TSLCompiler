@@ -80,36 +80,33 @@ Feature: The Parser handles valid TSL input.
         When the Parser collects the variables from the TSL input,
         Then the Collector should contain Property 2 in an Else statement in Choice 2 as 'simple2'.
 
-### TODO: Translate these
-
-    Scenario: An Error Marking from an Else Expression is found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the Else Statement,
+    Scenario: A Single Marking from an If Expression is found in the Collector from a valid TSL file.
+        Given a TSL file called choice_with_single_in_if.txt,
         When the Parser collects the variables from the TSL input,
-        Then the Collector should contain the Choice's Error Else Marking.
-
-    Scenario: A Single Marking from an Else Expression is found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the Else Statement,
-        When the Parser collects the variables from the TSL input,
-        Then the Collector should contain the Choice's Single Else Marking.
-
-
-    Scenario: An Else Statement following an If Statement with a Label should be found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice containing an If Label Else,
-        When the Parser collects the variables from the TSL input,
-        Then the Collector should have the second Choice flagged as having an Else Statement.
-        And the Collector should have the second Choice flagged as having an Error marking defined from the If Statement.
-
-    Scenario: An Else Statement should be found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice with an Else Statement,
-        When the Parser collects the variables from the TSL input,
-        Then the Collector should have the Choice flagged as having an Else Statement.
+        Then the Collector should contain a single marking in an If Statement for Choice 2
 
     Scenario: An Error Marking from an If Expression is found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice defining an Error Marking in the If Statement,
+        Given a TSL file called choice_with_error_in_if.txt,
         When the Parser collects the variables from the TSL input,
-        Then the Collector should contain the Choice's Error If Marking.
+        Then the Collector should contain a error marking in an If Statement for Choice 2
 
-    Scenario: A Single Marking from an If Expression is found in the Collector from a valid TSL file.
-        Given a TSL file called two Categories, one with a Choice with a Property, and another with a Choice defining a Single Marking in the If Statement,
+    Scenario: A Single Marking from an Else Expression is found in the Collector from a valid TSL file.
+        Given a TSL file called choice_with_single_in_else.txt,
         When the Parser collects the variables from the TSL input,
-        Then the Collector should contain the Choice's Single If Marking.
+        Then the Collector should contain a single marking in an Else Statement for Choice 2
+
+    Scenario: An Error Marking from an Else Expression is found in the Collector from a valid TSL file.
+        Given a TSL file called choice_with_error_in_else.txt,
+        When the Parser collects the variables from the TSL input,
+        Then the Collector should contain a error marking in an Else Statement for Choice 2
+
+    Scenario: An Else Statement should be found in the Collector from a valid TSL file.
+        Given a TSL file called choice_with_else_alone.txt,
+        When the Parser collects the variables from the TSL input,
+        Then the Collector should flag Choice 2 for having an Else Statement.
+
+    Scenario: An Else Statement following an If Statement with a Label should be found in the Collector from a valid TSL file.
+        Given a TSL file called choice_with_if_label_else.txt,
+        When the Parser collects the variables from the TSL input,
+        Then the Collector should flag Choice 2 for having an Else Statement.
+        Then the Collector should contain a error marking in an If Statement for Choice 2
