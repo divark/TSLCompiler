@@ -111,9 +111,69 @@ void yy::parser::error(const location_type& l, const std::string &message) {
 }
 
 /**
+* Returns a human-readable context message for some identified token.
+*/
+std::string getContextMessage(const yy::parser::symbol_kind_type& identifiedToken) {
+    std::string contextMessage = "";
+
+    switch (identifiedToken) {
+        case yy::parser::symbol_kind::S_CATEGORY_CONTENTS:
+            contextMessage += "Category";
+            break;
+        case yy::parser::symbol_kind::S_CHOICE_CONTENTS:
+            contextMessage += "Choice";
+            break;
+        case yy::parser::symbol_kind::S_CONSTRAINT_START:
+            contextMessage += "Constraint";
+            break;
+        case yy::parser::symbol_kind::S_CONSTRAINT_END:
+            contextMessage += "]";
+            break;
+        case yy::parser::symbol_kind::S_IF:
+            contextMessage += "If statement";
+            break;
+        case yy::parser::symbol_kind::S_ELSE:
+            contextMessage += "Else statement";
+            break;
+        case yy::parser::symbol_kind::S_LOGICAL_NOT:
+            contextMessage += "Logical operator !";
+            break;
+        case yy::parser::symbol_kind::S_LOGICAL_GROUP_START:
+            contextMessage += "Logical grouping character (";
+            break;
+        case yy::parser::symbol_kind::S_LOGICAL_GROUP_END:
+            contextMessage += "Logical grouping character )";
+            break;
+        case yy::parser::symbol_kind::S_LOGICAL_AND:
+            contextMessage += "Logical operator &&";
+            break;
+        case yy::parser::symbol_kind::S_LOGICAL_OR:
+            contextMessage += "Logical operator ||";
+            break;
+        case yy::parser::symbol_kind::S_MARKING_SINGLE:
+            contextMessage += "Single marking";
+            break;
+        case yy::parser::symbol_kind::S_MARKING_ERROR:
+            contextMessage += "Error marking";
+            break;
+        case yy::parser::symbol_kind::S_PROPERTY_LIST:
+            contextMessage += "Property list definition";
+            break;
+        case yy::parser::symbol_kind::S_PROPERTY_ELEMENT:
+            contextMessage += "Property variable";
+            break;
+        default:
+            return yy::parser::symbol_name(identifiedToken);
+    }
+
+    return contextMessage;
+}
+
+/**
  * Prints a detailed error message when a problem occurs in the parser.
 */
 void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
-    std::string errorSummaryMsg = std::format("Error: A {} is not allowed in its current spot.", symbol_name(yyctx.token()));
+    std::string contextMessage = getContextMessage(yyctx.token());
+    std::string errorSummaryMsg = std::format("Error: A {} is not allowed in its current spot.", contextMessage);
     reportError(errorSummaryMsg, yyctx.location());
 }

@@ -104,7 +104,7 @@ int main(int argc, const char** argv) {
                           expect_eq(expectedErrorSummary, actualErrorSummary);
                       };
 
-                      steps.then("line {lineNumber} of the error message should mention finding {errorFound} in the wrong spot.") = [&](size_t lineNumber, std::string errorFound) {
+                      steps.then("line {lineNumber} of the error message should mention finding '{errorFound}' in the wrong spot.") = [&](size_t lineNumber, std::string errorFound) {
                           auto expectedErrorSummary = std::format("Error: A {} is not allowed in its current spot.", errorFound);
                           auto actualErrorSummary = stderrListener->getLine(lineNumber);
 
