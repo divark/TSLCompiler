@@ -38,12 +38,17 @@ class Edges {
         Edges();
         Edges(std::vector<std::vector<size_t>>);
 
-        std::vector<size_t>& getNodeEdges(const Node&);
+        const std::vector<size_t>& getNodeEdges(const Node&) const;
 };
 
 class TSLGraph;
 
-class TestCaseListener {
+class Listener {
+    public:
+        virtual void checkIn(const TSLGraph&, const Node&) = 0;
+};
+
+class TestCaseListener : public Listener {
     private:
         TSLCollector& tslVariables;
         std::vector<TSLTestCase> foundTestCases;
@@ -52,7 +57,7 @@ class TestCaseListener {
     public:
         TestCaseListener(TSLCollector&);
 
-        void checkIn(const TSLGraph&);
+        void checkIn(const TSLGraph&, const Node&);
         std::vector<TSLTestCase> getTestCases();
 };
 
@@ -62,13 +67,17 @@ class TSLGraph {
         std::vector<Node> visitedNodes;
         Edges edges;
 
-        std::shared_ptr<TestCaseListener> deadEndListener;
+        std::vector<std::shared_ptr<Listener>> preorderListeners;
+
+        void preorderCheckin(const Node&);
     public:
         TSLGraph();
-        TSLGraph(const TSLCollector&, std::shared_ptr<TestCaseListener>);
+        TSLGraph(const TSLCollector&);
+
+        void addPreorderListener(std::shared_ptr<Listener>);
 
         const std::vector<Node>& getNodes() const;
-        std::vector<Node> getEdges(const Node&);
+        const std::vector<Node> getEdges(const Node&) const;
         const std::vector<Node>& getVisitedNodes() const;
 
         void visitDFS(const Node&);

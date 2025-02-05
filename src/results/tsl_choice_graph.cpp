@@ -128,7 +128,7 @@ Edges::Edges(std::vector<std::vector<size_t>> edges) {
 /**
  * Returns a set of edges recorded for some node.
  */
-std::vector<size_t>& Edges::getNodeEdges(const Node& node) {
+const std::vector<size_t>& Edges::getNodeEdges(const Node& node) const {
     return edges[node.getID()];
 }
 
@@ -137,7 +137,11 @@ TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variab
 /**
 * Creates a TSLTestCase on checking in.
 */
-void TestCaseListener::checkIn(const TSLGraph& currentGraph) {
+void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
+    if (!currentGraph.getEdges(currentNode).empty()) {
+        return;
+    }
+
     auto testCase = TSLTestCase();
     testCase.setTestCaseNumber(this->numTestCases);
     numTestCases++;
@@ -165,11 +169,9 @@ TSLGraph::TSLGraph() {}
 * Constructs a permutation-based directed graph derived from
 * variables found in the TSLCollector.
 */
-TSLGraph::TSLGraph(const TSLCollector& tslVariables, std::shared_ptr<TestCaseListener> deadEndListener) {
+TSLGraph::TSLGraph(const TSLCollector& tslVariables) {
     this->nodes = getNodesFromCollector(tslVariables);
     this->edges = getEdgesFromTSLNodes(this->nodes, tslVariables);
-
-    this->deadEndListener = deadEndListener;
 }
 
 /**
@@ -182,7 +184,7 @@ const std::vector<Node>& TSLGraph::getNodes() const {
 /**
 * Returns a list of Nodes connected to the current node.
 */
-std::vector<Node> TSLGraph::getEdges(const Node& currentNode) {
+const std::vector<Node> TSLGraph::getEdges(const Node& currentNode) const {
     std::vector<Node> foundEdges;
 
     auto edgesFound = this->edges.getNodeEdges(currentNode);
@@ -201,18 +203,33 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 }
 
 /**
+* Checks in with listeners subscribed to preorder events.
+*/
+void TSLGraph::preorderCheckin(const Node& currentNode) {
+    for (const auto &preorderListener : preorderListeners) {
+        preorderListener->checkIn(*this, currentNode);
+    }
+}
+
+/**
+* Subscribes a listener to preorder traversal events.
+*/
+void TSLGraph::addPreorderListener(std::shared_ptr<Listener> preorderListener) {
+    this->preorderListeners.push_back(preorderListener);
+}
+
+/**
 * Visits the TSLGraph in a DFS fashion.
 */
 void TSLGraph::visitDFS(const Node& currentNode) {
     auto nodeEdges = this->getEdges(currentNode);
     visitedNodes.push_back(currentNode);
 
-    if (nodeEdges.empty()) {
-        deadEndListener->checkIn(*this);
-    } else {
-        for (auto edgeNode : nodeEdges) {
-            visitDFS(edgeNode);
-        }
+    //    deadEndListener->checkIn(*this);
+    this->preorderCheckin(currentNode);
+
+    for (auto edgeNode : nodeEdges) {
+        visitDFS(edgeNode);
     }
 
     visitedNodes.pop_back();

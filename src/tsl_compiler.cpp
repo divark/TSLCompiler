@@ -31,7 +31,8 @@ int TSLCompiler::compile() {
     auto programStatus = parser->run();
 
     auto deadEndListener = std::make_shared<TestCaseListener>(parser->getCollector());
-    auto tslGraph = TSLGraph(parser->getCollector(), deadEndListener);
+    auto tslGraph = TSLGraph(parser->getCollector());
+    tslGraph.addPreorderListener(deadEndListener);
 
     auto firstCategoryNodes = filterToNodesWithCategoryIdx(tslGraph.getNodes(), 0);
     for (auto categoryNode : firstCategoryNodes) {
