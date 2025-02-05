@@ -36,7 +36,7 @@ int main(int argc, const char** argv) {
                   };
 
                   steps.then("test case {testCaseNum} should have '{expected_choice}' chosen in category {category_num}.") = [&](size_t testCaseNum, std::string expected_choice, size_t category_num) {
-                      auto foundCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[testCaseNum - 1];
+                      auto foundCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
                       auto actual_choice = compiler.getTestCases()[testCaseNum - 1].getCategoryChoice(foundCategory);
                       expect_eq(expected_choice, actual_choice);
                   };
