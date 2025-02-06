@@ -225,7 +225,6 @@ void TSLGraph::visitDFS(const Node& currentNode) {
     auto nodeEdges = this->getEdges(currentNode);
     visitedNodes.push_back(currentNode);
 
-    //    deadEndListener->checkIn(*this);
     this->preorderCheckin(currentNode);
 
     for (auto edgeNode : nodeEdges) {

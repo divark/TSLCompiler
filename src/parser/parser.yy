@@ -127,7 +127,7 @@ std::string getContextMessage(const yy::parser::symbol_kind_type& identifiedToke
             contextMessage += "Constraint";
             break;
         case yy::parser::symbol_kind::S_CONSTRAINT_END:
-            contextMessage += "]";
+            contextMessage += "end of a Constraint";
             break;
         case yy::parser::symbol_kind::S_IF:
             contextMessage += "If statement";
