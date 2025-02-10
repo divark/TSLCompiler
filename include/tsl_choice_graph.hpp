@@ -59,6 +59,9 @@ class TestCaseListener : public Listener {
         std::vector<TSLTestCase> foundTestCases;
 
         size_t numTestCases = 1;
+
+        void addTestCase(bool);
+        void addTestChoice(const Node&);
     public:
         TestCaseListener(TSLCollector&);
 

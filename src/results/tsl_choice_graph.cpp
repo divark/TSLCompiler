@@ -178,6 +178,32 @@ const std::vector<size_t>& Edges::getNodeEdges(const Node& node) const {
 TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variables) {}
 
 /**
+* Adds a chosen Choice to a currently populated test case.
+*/
+void TestCaseListener::addTestChoice(const Node& currentNode) {
+    size_t currentTestCase = foundTestCases.size() - 1;
+
+    auto chosenCategoryIdx = currentNode.getData().getCategoryIdx();
+    auto chosenChoiceIdx = currentNode.getData().getChoiceIdx();
+
+    auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
+    auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
+    foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoice);
+}
+
+/**
+* Inserts a test case populated by variables found in a node.
+*/
+void TestCaseListener::addTestCase(bool isMarkerCase) {
+    auto testCase = TSLTestCase();
+    testCase.toggleIsMarker(isMarkerCase);
+    testCase.setTestCaseNumber(this->numTestCases);
+    numTestCases++;
+
+    foundTestCases.push_back(testCase);
+}
+
+/**
 * Creates a TSLTestCase on checking in.
 */
 void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
@@ -186,21 +212,12 @@ void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& current
     }
 
     auto isMarkerCase = currentNode.getData().hasMarker();
-    auto testCase = TSLTestCase();
-    testCase.toggleIsMarker(isMarkerCase);
-    testCase.setTestCaseNumber(this->numTestCases);
-    numTestCases++;
+    addTestCase(isMarkerCase);
 
     auto visitedNodes = currentGraph.getVisitedNodes();
     for (auto node : visitedNodes) {
-        auto chosenCategoryIdx = node.getData().getCategoryIdx();
-        auto chosenChoiceIdx = node.getData().getChoiceIdx();
-        auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
-        auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
-        testCase.addCategoryChoice(chosenCategory, chosenChoice);
+        addTestChoice(node);
     }
-
-    foundTestCases.push_back(testCase);
 }
 
 std::vector<TSLTestCase> TestCaseListener::getTestCases() {
