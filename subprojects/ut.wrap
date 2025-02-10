@@ -1,5 +1,5 @@
 [wrap-git]
-url = https://github.com/boost-ext/ut.git
+url = https://github.com/divark/ut.git
 revision = HEAD
 depth = 1
 
