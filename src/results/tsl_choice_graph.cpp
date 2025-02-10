@@ -213,6 +213,7 @@ void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& current
 
     auto isMarkerCase = currentNode.getData().hasMarker();
     addTestCase(isMarkerCase);
+
     auto visitedNodes = currentGraph.getVisitedNodes();
     for (auto node : visitedNodes) {
         addTestChoice(node);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <unordered_set>
 #include <vector>
 #include <cstddef>
 
@@ -58,8 +57,6 @@ class TestCaseListener : public Listener {
     private:
         TSLCollector& tslVariables;
         std::vector<TSLTestCase> foundTestCases;
-
-        std::unordered_set<size_t> nodesVisitedWithMarkers;
 
         size_t numTestCases = 1;
 
