@@ -13,6 +13,9 @@ std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
         auto categoryChoices = recordedVariables.categoryChoicesGraph[categoryIdx];
         for (auto choiceIdx : categoryChoices) {
             auto nodeData = TSLChoice(categoryIdx, choiceIdx);
+            auto hasMarker = recordedVariables.singleMarkings[choiceIdx] || recordedVariables.errorMarkings[choiceIdx];
+            nodeData.toggleIfMarker(hasMarker);
+
             auto node = Node(nodeData);
             nodes.push_back(node);
         }
@@ -50,7 +53,27 @@ Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, const TSLCollector& recorde
 }
 
 /**
+ * Returns a collection of Nodes that contain some Marker.
+ */
+std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
+    std::vector<Node> foundNodes;
+
+    for (auto node : nodes) {
+        auto nodeData = node.getData();
+
+        if (!nodeData.hasMarker()) {
+            continue;
+        }
+
+        foundNodes.push_back(node);
+    }
+
+    return foundNodes;
+}
+
+/**
  * Returns a collection of Nodes that match the desired Category index.
+ * NOTE: This excludes any nodes with markers by default.
  */
 std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>& nodes, size_t desiredCategoryIdx) {
     std::vector<Node> foundNodes;
@@ -60,6 +83,10 @@ std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>& nodes, s
         auto nodeCategoryIdx = nodeData.getCategoryIdx();
 
         if (nodeCategoryIdx != desiredCategoryIdx) {
+            continue;
+        }
+
+        if (nodeData.hasMarker()) {
             continue;
         }
 
@@ -91,32 +118,48 @@ void Node::setID(size_t newID) {
 /**
  * Returns the contents of what is held in the current Node.
  */
-TSLChoice& Node::getData() {
+const TSLChoice& Node::getData() const {
     return data;
 }
 
 TSLChoice::TSLChoice() {
     categoryIdx = 0;
     choiceIdx = 0;
+    isMarker = false;
 }
 
 TSLChoice::TSLChoice(size_t categoryIdx, size_t choiceIdx) {
     this->categoryIdx = categoryIdx;
     this->choiceIdx = choiceIdx;
+    isMarker = false;
 }
 
 /**
  * Returns the recorded Category.
  */
-size_t TSLChoice::getCategoryIdx() {
+size_t TSLChoice::getCategoryIdx() const {
     return categoryIdx;
 }
 
 /**
  * Returns the recorded Choice.
  */
-size_t TSLChoice::getChoiceIdx() {
+size_t TSLChoice::getChoiceIdx() const {
     return choiceIdx;
+}
+
+/**
+* Returns whether the Choice recorded has a single or error marking.
+*/
+bool TSLChoice::hasMarker() const {
+    return isMarker;
+}
+
+/**
+* Sets whether the Choice recorded has a single or error marking.
+*/
+void TSLChoice::toggleIfMarker(bool hasMarker) {
+    isMarker = hasMarker;
 }
 
 Edges::Edges() {}
@@ -135,6 +178,32 @@ const std::vector<size_t>& Edges::getNodeEdges(const Node& node) const {
 TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variables) {}
 
 /**
+* Adds a chosen Choice to a currently populated test case.
+*/
+void TestCaseListener::addTestChoice(const Node& currentNode) {
+    size_t currentTestCase = foundTestCases.size() - 1;
+
+    auto chosenCategoryIdx = currentNode.getData().getCategoryIdx();
+    auto chosenChoiceIdx = currentNode.getData().getChoiceIdx();
+
+    auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
+    auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
+    foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoice);
+}
+
+/**
+* Inserts a test case populated by variables found in a node.
+*/
+void TestCaseListener::addTestCase(bool isMarkerCase) {
+    auto testCase = TSLTestCase();
+    testCase.toggleIsMarker(isMarkerCase);
+    testCase.setTestCaseNumber(this->numTestCases);
+    numTestCases++;
+
+    foundTestCases.push_back(testCase);
+}
+
+/**
 * Creates a TSLTestCase on checking in.
 */
 void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
@@ -142,21 +211,12 @@ void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& current
         return;
     }
 
-    auto testCase = TSLTestCase();
-    testCase.setTestCaseNumber(this->numTestCases);
-    numTestCases++;
-
+    auto isMarkerCase = currentNode.getData().hasMarker();
+    addTestCase(isMarkerCase);
     auto visitedNodes = currentGraph.getVisitedNodes();
     for (auto node : visitedNodes) {
-        auto chosenCategoryIdx = node.getData().getCategoryIdx();
-        auto chosenChoiceIdx = node.getData().getChoiceIdx();
-
-        auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
-        auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
-        testCase.addCategoryChoice(chosenCategory, chosenChoice);
+        addTestChoice(node);
     }
-
-    foundTestCases.push_back(testCase);
 }
 
 std::vector<TSLTestCase> TestCaseListener::getTestCases() {

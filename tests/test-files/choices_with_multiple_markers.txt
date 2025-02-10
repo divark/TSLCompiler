@@ -1,0 +1,7 @@
+Simple Category 1:
+    Simple Choice 1.
+    Simple Choice 2.    [single]
+
+Simple Category 2:
+    Simple Choice 3.    [error]
+    Simple Choice 4.

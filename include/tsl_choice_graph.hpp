@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include <cstddef>
 
@@ -11,12 +12,17 @@ class TSLChoice {
     private:
         size_t categoryIdx;
         size_t choiceIdx;
+
+        bool isMarker;
     public:
         TSLChoice();
         TSLChoice(size_t, size_t);
 
-        size_t getCategoryIdx();
-        size_t getChoiceIdx();
+        size_t getCategoryIdx() const;
+        size_t getChoiceIdx() const;
+
+        bool hasMarker() const;
+        void toggleIfMarker(bool);
 };
 
 class Node {
@@ -26,7 +32,7 @@ class Node {
     public:
         Node(TSLChoice);
 
-        TSLChoice& getData();
+        const TSLChoice& getData() const;
         size_t getID() const;
         void setID(size_t);
 };
@@ -53,7 +59,12 @@ class TestCaseListener : public Listener {
         TSLCollector& tslVariables;
         std::vector<TSLTestCase> foundTestCases;
 
+        std::unordered_set<size_t> nodesVisitedWithMarkers;
+
         size_t numTestCases = 1;
+
+        void addTestCase(bool);
+        void addTestChoice(const Node&);
     public:
         TestCaseListener(TSLCollector&);
 
@@ -88,4 +99,5 @@ class TSLGraph {
 std::vector<Node> getNodesFromCollector(const TSLCollector&);
 Edges getEdgesFromTSLNodes(std::vector<Node>&, const TSLCollector&);
 
+std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>&);
 std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>&, size_t);

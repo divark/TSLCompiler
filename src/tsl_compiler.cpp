@@ -34,6 +34,11 @@ int TSLCompiler::compile() {
     auto tslGraph = TSLGraph(parser->getCollector());
     tslGraph.addPreorderListener(deadEndListener);
 
+    auto nodesWithMarkers = filterToNodesWithMarkers(tslGraph.getNodes());
+    for (auto categoryNode : nodesWithMarkers) {
+        tslGraph.visitDFS(categoryNode);
+    }
+
     auto firstCategoryNodes = filterToNodesWithCategoryIdx(tslGraph.getNodes(), 0);
     for (auto categoryNode : firstCategoryNodes) {
         tslGraph.visitDFS(categoryNode);

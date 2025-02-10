@@ -37,3 +37,19 @@ void TSLTestCase::addCategoryChoice(const std::string& chosenCategory, const std
     categoryChoices[chosenCategory] = chosenChoice;
     chosenCategories.push_back(chosenCategory);
 }
+
+/**
+* Returns whether the test case has a Choice containing a
+* single or error marking, or false otherwise.
+*/
+bool TSLTestCase::hasMarker() const {
+    return isMarkerCase;
+}
+
+/**
+* Sets whether the test case has a Choice containing
+* a single or error marking.
+*/
+void TSLTestCase::toggleIsMarker(bool isMarkerCase) {
+    this->isMarkerCase = isMarkerCase;
+}

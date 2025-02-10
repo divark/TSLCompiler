@@ -30,10 +30,15 @@ single_and_error_marking_test_file = fs.copyfile(
   'test-files/one_category_choices_with_single_and_error_markings.txt',
   'one_category_choices_with_single_and_error_markings.txt',
 )
+multiple_markings_test_file = fs.copyfile(
+  'test-files/choices_with_multiple_markers.txt',
+  'choices_with_multiple_markers.txt',
+)
 marking_test_files = [
   single_marking_test_file,
   error_marking_test_file,
   single_and_error_marking_test_file,
+  multiple_markings_test_file,
 ]
 
 choice_with_one_property_test_file = fs.copyfile('test-files/choice_with_one_property.txt', 'choice_with_one_property.txt')
@@ -97,16 +102,16 @@ test_files = simple_test_files + marking_test_files + properties_test_files + ex
 
 # Testing just the TSL Lexer.
 lexer_feature_file = fs.copyfile('feature-files/tsllexer.feature', 'tsllexer.feature')
-lexer_ut_test_sources = files('tsllexer_ut.cpp')
-lexer_ut_test_executable = executable(
+lexer_test_sources = files('tsllexer_ut.cpp')
+lexer_test_executable = executable(
   'tsllexer-ut-test',
-  sources: lexer_ut_test_sources + app_sources,
+  sources: lexer_test_sources + app_sources,
   dependencies: test_ut_dep,
   include_directories: inc,
 )
 test(
-  'tsl_lexer_ut',
-  lexer_ut_test_executable,
+  'tsl_lexer',
+  lexer_test_executable,
   args: lexer_feature_file,
   verbose: true,
   depends: test_files,
@@ -114,33 +119,33 @@ test(
 
 # Testing the TSL Parser.
 parser_feature_file = fs.copyfile('feature-files/tslparser.feature', 'tslparser.feature')
-parser_ut_test_sources = files('tslparser_ut.cpp')
-parser_ut_test_executable = executable(
+parser_test_sources = files('tslparser_ut.cpp')
+parser_test_executable = executable(
   'tslparser-ut-test',
-  sources: parser_ut_test_sources + app_sources,
+  sources: parser_test_sources + app_sources,
   dependencies: test_ut_dep,
   include_directories: inc,
 )
 test(
-  'tsl_parser_ut',
-  parser_ut_test_executable,
+  'tsl_parser',
+  parser_test_executable,
   args: parser_feature_file,
   verbose: true,
   depends: test_files,
 )
 
 # Testing the TSL Compiler overall.
-compiler_ut_test_sources = files('tslcompiler_ut.cpp')
+compiler_test_sources = files('tslcompiler_ut.cpp')
 compiler_feature_file = fs.copyfile('feature-files/tslcompiler.feature', 'tslcompiler.feature')
-compiler_ut_test_executable = executable(
-  'compiler_ut-test',
-  sources: compiler_ut_test_sources + app_sources,
+compiler_test_executable = executable(
+  'compiler-test',
+  sources: compiler_test_sources + app_sources,
   dependencies: test_ut_dep,
   include_directories: inc,
 )
 test(
-  'compiler_ut',
-  compiler_ut_test_executable,
+  'compiler',
+  compiler_test_executable,
   args: compiler_feature_file,
   verbose: true,
   depends: test_files,
@@ -190,16 +195,16 @@ error_test_files = [
   duplicate_property_test_file,
 ]
 
-error_ut_test_sources = files('errors_ut.cpp')
-error_ut_test_executable = executable(
-  'errors_ut-test',
-  sources: error_ut_test_sources + app_sources,
+error_test_sources = files('errors_ut.cpp')
+error_test_executable = executable(
+  'errors-test',
+  sources: error_test_sources + app_sources,
   dependencies: test_ut_dep,
   include_directories: inc,
 )
 test(
-  'errors_ut',
-  error_ut_test_executable,
+  'errors',
+  error_test_executable,
   args: error_feature_file,
   verbose: true,
   depends: error_test_files,

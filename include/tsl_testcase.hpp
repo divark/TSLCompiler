@@ -7,6 +7,7 @@
 class TSLTestCase {
     private:
         size_t testCaseNumber;
+        bool isMarkerCase = false;
         std::vector<std::string> chosenCategories;
         std::map<std::string, std::string> categoryChoices;
     public:
@@ -17,4 +18,7 @@ class TSLTestCase {
 
         std::string getCategoryChoice(const std::string& category);
         void addCategoryChoice(const std::string&, const std::string&);
+
+        bool hasMarker() const;
+        void toggleIsMarker(bool);
 };
