@@ -119,8 +119,8 @@ int main(int argc, const char** argv) {
                       };
 
                       steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](size_t lineNumber, std::string errorToken, size_t expectedFirstLineNumber, size_t expectedNextLineNumber) {
-                          auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\n"
-                            + stderrListener->getLine(lineNumber + 1) + "\n";
+                          auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\r\n"
+                            + stderrListener->getLine(lineNumber + 1) + "\r\n";
 
                           auto errorTokenLineNumberFound = actualErrorPointedOut.find(std::format(" {} |", expectedFirstLineNumber)) != std::string::npos;
                           expect(errorTokenLineNumberFound) << std::format("Could not find line number {} in error message {}", expectedFirstLineNumber, actualErrorPointedOut);
