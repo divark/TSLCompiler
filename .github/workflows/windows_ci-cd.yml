@@ -16,14 +16,15 @@ jobs:
         with:
           path-type: inherit
           update: true
+          msystem: UCRT64
           install: >-
             bison
             flex
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-openssl
-            mingw-w64-x86_64-ca-certificates
-            mingw-w64-x86_64-clang
+            mingw-w64-ucrt-python
+            mingw-w64-ucrt-meson
+            mingw-w64-ucrt-openssl
+            mingw-w64-ucrt-ca-certificates
+            mingw-w64-ucrt-clang
             openssl
             ca-certificates
             meson
@@ -66,11 +67,11 @@ jobs:
           install: >-
             bison
             flex
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-openssl
-            mingw-w64-x86_64-ca-certificates
-            mingw-w64-x86_64-clang
+            mingw-w64-ucrt-python
+            mingw-w64-ucrt-meson
+            mingw-w64-ucrt-openssl
+            mingw-w64-ucrt-ca-certificates
+            mingw-w64-ucrt-clang
             openssl
             ca-certificates
             meson
