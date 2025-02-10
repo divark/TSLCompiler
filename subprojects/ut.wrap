@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://github.com/boost-ext/ut.git
-revision = HEAD
+revision = f83e15c
 depth = 1
 
 [provide]
