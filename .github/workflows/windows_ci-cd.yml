@@ -85,7 +85,7 @@ jobs:
         run: |
           # Flex and Bison are not found by default, so we have
           # to add them into the PATH via GitHub's GITHUB_ENV variable.
-          echo "LDFLAGS=-L/usr/lib" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/lib -static-libstdc++" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/include" >> $GITHUB_ENV
           # Testing currently breaks if gcc is used, so clang it is!
           echo "CXX=clang++" >> $GITHUB_ENV
