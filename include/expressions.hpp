@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <unordered_set>
 
 enum ExpType {
     Simple,
@@ -25,6 +26,7 @@ class Expression {
         std::shared_ptr<Expression> rightExpression;
     public:
         std::string asString();
+        bool evaluate(const std::unordered_set<std::string>&);
 
         Expression(std::string);
         Expression(ExpType, std::shared_ptr<Expression>);

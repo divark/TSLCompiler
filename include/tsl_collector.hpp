@@ -66,6 +66,7 @@ struct TSLCollector {
     int markChoiceAsError();
 
     int markChoiceHasElse();
+    bool hasStandardExpression(unsigned int);
     bool hasElseExpression(unsigned int);
 };
 

@@ -1,4 +1,5 @@
 #include "expressions.hpp"
+#include <unordered_set>
 
 /**
  * Constructs a Simple Expression, only holding
@@ -46,5 +47,24 @@ std::string Expression::asString() {
             return leftExpression->asString() + " || " + rightExpression->asString();
         default:
             return property;
+    }
+}
+
+/**
+* Returns true if all properties from the Expression were found in the
+* symbol table, or false otherwise.
+*/
+bool Expression::evaluate(const std::unordered_set<std::string>& properties) {
+    switch (expressionType) {
+        case ExpType::Negated:
+            return !leftExpression->evaluate(properties);
+        case ExpType::Grouped:
+            return leftExpression->evaluate(properties);
+        case ExpType::And:
+            return leftExpression->evaluate(properties) && rightExpression->evaluate(properties);
+        case ExpType::Or:
+            return leftExpression->evaluate(properties) || rightExpression->evaluate(properties);
+        default:
+            return properties.contains(property);
     }
 }

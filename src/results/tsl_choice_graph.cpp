@@ -206,9 +206,10 @@ void TestCaseListener::addTestCase(bool isMarkerCase) {
 /**
 * Creates a TSLTestCase on checking in.
 */
-void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
+bool TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
+    bool canProceed = true;
     if (!currentGraph.getEdges(currentNode).empty()) {
-        return;
+        return canProceed;
     }
 
     auto isMarkerCase = currentNode.getData().hasMarker();
@@ -218,10 +219,72 @@ void TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& current
     for (auto node : visitedNodes) {
         addTestChoice(node);
     }
+
+    return canProceed;
 }
 
 std::vector<TSLTestCase> TestCaseListener::getTestCases() {
     return foundTestCases;
+}
+
+SymbolTableListener::SymbolTableListener(TSLCollector& collectorVariables): tslVariables(collectorVariables) {}
+
+/**
+* Adds the latest properties into the symbol table.
+*/
+void SymbolTableListener::addLatestProperties() {
+    for (auto property : latestPropertiesRecorded) {
+        symbolTable.insert(property);
+    }
+}
+
+/**
+* Removes, then clears the latest properties in the symbol table.
+*/
+void SymbolTableListener::removeLatestProperties() {
+    for (auto property : latestPropertiesRecorded) {
+        symbolTable.erase(property);
+    }
+
+    latestPropertiesRecorded.clear();
+}
+
+/**
+* Registers properties for the current node if any were found if checked in
+* preorder, otherwise removes them.
+
+* Returns true if no issues were found upon checking in, or false otherwise.
+*/
+bool SymbolTableListener::checkIn(const TSLGraph& graph, const Node& currentNode) {
+    bool canProceed = true;
+
+    if (graph.getVisitedNodes().empty()) {
+        return canProceed;
+    }
+
+    const Node& lastVisitedNode = graph.getVisitedNodes().back();
+    bool isPreorderCheckin = currentNode.getID() == lastVisitedNode.getID();
+    if (isPreorderCheckin) {
+        bool choiceHasExpression = tslVariables.hasStandardExpression(currentNode.getData().getChoiceIdx());
+
+        bool conditionalsSatisfied = !choiceHasExpression || tslVariables.getChoiceExpression(currentNode.getData().getChoiceIdx())->evaluate(symbolTable);
+        if (!conditionalsSatisfied) {
+            canProceed = false;
+            return canProceed;
+        }
+
+        auto normalProperties = tslVariables.choiceProperties[currentNode.getData().getChoiceIdx()];
+        for (const auto propertyIdx : normalProperties) {
+            auto foundProperty = tslVariables.properties[propertyIdx];
+            latestPropertiesRecorded.push_back(foundProperty);
+        }
+
+        addLatestProperties();
+    } else {
+        removeLatestProperties();
+    }
+
+    return canProceed;
 }
 
 TSLGraph::TSLGraph() {}
@@ -266,10 +329,16 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 /**
 * Checks in with listeners subscribed to preorder events.
 */
-void TSLGraph::preorderCheckin(const Node& currentNode) {
+bool TSLGraph::preorderCheckin(const Node& currentNode) {
+    bool canProceed = false;
     for (const auto &preorderListener : preorderListeners) {
-        preorderListener->checkIn(*this, currentNode);
+        canProceed = preorderListener->checkIn(*this, currentNode);
+        if (!canProceed) {
+            return canProceed;
+        }
     }
+
+    return canProceed;
 }
 
 /**
@@ -280,17 +349,45 @@ void TSLGraph::addPreorderListener(std::shared_ptr<Listener> preorderListener) {
 }
 
 /**
+* Checks in with listeners subscribed to postorder events.
+*/
+bool TSLGraph::postorderCheckin(const Node& currentNode) {
+    bool canProceed = false;
+    for (const auto &postorderListener : postorderListeners) {
+        canProceed = postorderListener->checkIn(*this, currentNode);
+        if (!canProceed) {
+            return canProceed;
+        }
+    }
+
+    return canProceed;
+}
+
+/**
+* Subscribes a listener to preorder traversal events.
+*/
+void TSLGraph::addPostorderListener(std::shared_ptr<Listener> postorderListener) {
+    this->postorderListeners.push_back(postorderListener);
+}
+
+/**
 * Visits the TSLGraph in a DFS fashion.
 */
 void TSLGraph::visitDFS(const Node& currentNode) {
-    auto nodeEdges = this->getEdges(currentNode);
     visitedNodes.push_back(currentNode);
 
-    this->preorderCheckin(currentNode);
+    bool preorderChecksOut = this->preorderCheckin(currentNode);
+    if (!preorderChecksOut) {
+        visitedNodes.pop_back();
+        return;
+    }
 
+    auto nodeEdges = this->getEdges(currentNode);
     for (auto edgeNode : nodeEdges) {
         visitDFS(edgeNode);
     }
 
     visitedNodes.pop_back();
+
+    this->postorderCheckin(currentNode);
 }

@@ -189,6 +189,14 @@ bool TSLCollector::hasElseExpression(unsigned int choiceIdx) {
 }
 
 /**
+* Returns whether a Choice has been flagged as having an If
+* statement, essentially.
+*/
+bool TSLCollector::hasStandardExpression(unsigned int choiceIdx) {
+    return !choiceExpressions[choiceIdx].empty();
+}
+
+/**
  * Returns the most recent Choice index that has
  * now been flagged to have an Else Statement.
  */

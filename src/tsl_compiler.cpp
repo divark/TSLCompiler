@@ -31,8 +31,12 @@ int TSLCompiler::compile() {
     auto programStatus = parser->run();
 
     auto deadEndListener = std::make_shared<TestCaseListener>(parser->getCollector());
+    auto symbolTableListener = std::make_shared<SymbolTableListener>(parser->getCollector());
     auto tslGraph = TSLGraph(parser->getCollector());
+    tslGraph.addPreorderListener(symbolTableListener);
     tslGraph.addPreorderListener(deadEndListener);
+
+    tslGraph.addPostorderListener(symbolTableListener);
 
     auto nodesWithMarkers = filterToNodesWithMarkers(tslGraph.getNodes());
     for (auto categoryNode : nodesWithMarkers) {

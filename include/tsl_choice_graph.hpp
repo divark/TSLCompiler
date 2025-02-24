@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include <cstddef>
 
@@ -50,7 +51,7 @@ class TSLGraph;
 
 class Listener {
     public:
-        virtual void checkIn(const TSLGraph&, const Node&) = 0;
+        virtual bool checkIn(const TSLGraph&, const Node&) = 0;
 };
 
 class TestCaseListener : public Listener {
@@ -65,8 +66,23 @@ class TestCaseListener : public Listener {
     public:
         TestCaseListener(TSLCollector&);
 
-        void checkIn(const TSLGraph&, const Node&);
+        bool checkIn(const TSLGraph&, const Node&);
         std::vector<TSLTestCase> getTestCases();
+};
+
+class SymbolTableListener: public Listener {
+    private:
+        std::vector<std::string> latestPropertiesRecorded;
+
+        TSLCollector& tslVariables;
+        std::unordered_set<std::string> symbolTable;
+
+        void addLatestProperties();
+        void removeLatestProperties();
+    public:
+        SymbolTableListener(TSLCollector&);
+
+        bool checkIn(const TSLGraph&, const Node&);
 };
 
 class TSLGraph {
@@ -76,13 +92,16 @@ class TSLGraph {
         Edges edges;
 
         std::vector<std::shared_ptr<Listener>> preorderListeners;
+        std::vector<std::shared_ptr<Listener>> postorderListeners;
 
-        void preorderCheckin(const Node&);
+        bool preorderCheckin(const Node&);
+        bool postorderCheckin(const Node&);
     public:
         TSLGraph();
         TSLGraph(const TSLCollector&);
 
         void addPreorderListener(std::shared_ptr<Listener>);
+        void addPostorderListener(std::shared_ptr<Listener>);
 
         const std::vector<Node>& getNodes() const;
         const std::vector<Node> getEdges(const Node&) const;
