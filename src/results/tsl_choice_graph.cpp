@@ -206,7 +206,7 @@ void TestCaseListener::addTestCase(bool isMarkerCase) {
 /**
 * Creates a TSLTestCase on checking in.
 */
-bool TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& currentNode) {
+bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, const Node& currentNode) {
     bool canProceed = true;
     if (!currentGraph.getEdges(currentNode).empty()) {
         return canProceed;
@@ -219,6 +219,12 @@ bool TestCaseListener::checkIn(const TSLGraph& currentGraph, const Node& current
     for (auto node : visitedNodes) {
         addTestChoice(node);
     }
+
+    return canProceed;
+}
+
+bool TestCaseListener::postorderCheckIn(const TSLGraph& currentGraph, const Node& currentNode) {
+    bool canProceed = true;
 
     return canProceed;
 }
@@ -255,35 +261,38 @@ void SymbolTableListener::removeLatestProperties() {
 
 * Returns true if no issues were found upon checking in, or false otherwise.
 */
-bool SymbolTableListener::checkIn(const TSLGraph& graph, const Node& currentNode) {
+bool SymbolTableListener::preorderCheckIn(const TSLGraph& graph, const Node& currentNode) {
     bool canProceed = true;
 
-    if (graph.getVisitedNodes().empty()) {
+    bool choiceHasExpression = tslVariables.hasStandardExpression(currentNode.getData().getChoiceIdx());
+
+    bool conditionalsSatisfied = !choiceHasExpression || tslVariables.getChoiceExpression(currentNode.getData().getChoiceIdx())->evaluate(symbolTable);
+    if (!conditionalsSatisfied) {
+        canProceed = false;
         return canProceed;
     }
 
-    const Node& lastVisitedNode = graph.getVisitedNodes().back();
-    bool isPreorderCheckin = currentNode.getID() == lastVisitedNode.getID();
-    if (isPreorderCheckin) {
-        bool choiceHasExpression = tslVariables.hasStandardExpression(currentNode.getData().getChoiceIdx());
-
-        bool conditionalsSatisfied = !choiceHasExpression || tslVariables.getChoiceExpression(currentNode.getData().getChoiceIdx())->evaluate(symbolTable);
-        if (!conditionalsSatisfied) {
-            canProceed = false;
-            return canProceed;
-        }
-
-        auto normalProperties = tslVariables.choiceProperties[currentNode.getData().getChoiceIdx()];
-        for (const auto propertyIdx : normalProperties) {
-            auto foundProperty = tslVariables.properties[propertyIdx];
-            latestPropertiesRecorded.push_back(foundProperty);
-        }
-
-        addLatestProperties();
-    } else {
-        removeLatestProperties();
+    auto normalProperties = tslVariables.choiceProperties[currentNode.getData().getChoiceIdx()];
+    for (const auto propertyIdx : normalProperties) {
+        auto foundProperty = tslVariables.properties[propertyIdx];
+        latestPropertiesRecorded.push_back(foundProperty);
     }
 
+    addLatestProperties();
+
+    return canProceed;
+}
+
+/**
+* Registers properties for the current node if any were found if checked in
+* preorder, otherwise removes them.
+
+* Returns true if no issues were found upon checking in, or false otherwise.
+*/
+bool SymbolTableListener::postorderCheckIn(const TSLGraph& graph, const Node& currentNode) {
+    bool canProceed = true;
+
+    removeLatestProperties();
     return canProceed;
 }
 
@@ -332,7 +341,7 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 bool TSLGraph::preorderCheckin(const Node& currentNode) {
     bool canProceed = false;
     for (const auto &preorderListener : preorderListeners) {
-        canProceed = preorderListener->checkIn(*this, currentNode);
+        canProceed = preorderListener->preorderCheckIn(*this, currentNode);
         if (!canProceed) {
             return canProceed;
         }
@@ -354,7 +363,7 @@ void TSLGraph::addPreorderListener(std::shared_ptr<Listener> preorderListener) {
 bool TSLGraph::postorderCheckin(const Node& currentNode) {
     bool canProceed = false;
     for (const auto &postorderListener : postorderListeners) {
-        canProceed = postorderListener->checkIn(*this, currentNode);
+        canProceed = postorderListener->postorderCheckIn(*this, currentNode);
         if (!canProceed) {
             return canProceed;
         }

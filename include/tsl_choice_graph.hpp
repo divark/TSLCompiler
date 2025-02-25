@@ -51,7 +51,8 @@ class TSLGraph;
 
 class Listener {
     public:
-        virtual bool checkIn(const TSLGraph&, const Node&) = 0;
+        virtual bool preorderCheckIn(const TSLGraph&, const Node&) = 0;
+        virtual bool postorderCheckIn(const TSLGraph&, const Node&) = 0;
 };
 
 class TestCaseListener : public Listener {
@@ -66,7 +67,9 @@ class TestCaseListener : public Listener {
     public:
         TestCaseListener(TSLCollector&);
 
-        bool checkIn(const TSLGraph&, const Node&);
+        bool preorderCheckIn(const TSLGraph&, const Node&);
+        bool postorderCheckIn(const TSLGraph&, const Node&);
+
         std::vector<TSLTestCase> getTestCases();
 };
 
@@ -82,7 +85,8 @@ class SymbolTableListener: public Listener {
     public:
         SymbolTableListener(TSLCollector&);
 
-        bool checkIn(const TSLGraph&, const Node&);
+        bool preorderCheckIn(const TSLGraph&, const Node&);
+        bool postorderCheckIn(const TSLGraph&, const Node&);
 };
 
 class TSLGraph {
