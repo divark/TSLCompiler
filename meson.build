@@ -10,4 +10,4 @@ if get_option('build_for_release') == false
     subdir('tests')
 endif
 
-executable('tslchecker', tslchecker_sources + app_sources, include_directories: inc)
+executable('tslchecker', tslchecker_sources + lexer_sources + parser_sources, include_directories: inc)

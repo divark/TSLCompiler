@@ -7,4 +7,9 @@ bison_generated_sources = custom_target(
   command: [bison, '-d', '-Wcounterexamples', '-o@OUTPUT0@', '@INPUT@'],
 )
 
-parser_sources = files('error_reporting.cpp', 'expressions.cpp', 'tsl_parser.cpp') + bison_generated_sources
+parser_sources = files(
+  'error_reporting.cpp',
+  'expressions.cpp',
+  'tsl_collector.cpp',
+  'tsl_parser.cpp',
+) + bison_generated_sources
