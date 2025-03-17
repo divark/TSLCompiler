@@ -17,7 +17,12 @@ int main(int argc, char* argv[]) {
 
     try {
         TSLParser parser(inputFilePath);
-        return parser.run();
+        auto parserStatus = parser.run();
+        if (parserStatus == 0) {
+            std::cout << "No errors detected in file " << inputFilePath << "." << std::endl;
+        }
+
+        return parserStatus;
     } catch (yy::parser::syntax_error exception) {
         std::cerr << exception.what() << std::endl;
         return 1;
