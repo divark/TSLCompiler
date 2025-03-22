@@ -13,7 +13,7 @@ Finally, to remain fairly close to the original C implementation of the TSLgener
 
 # Building
 ## Prerequisites
-- A C++ Compiler supporting the C++20 standard.
+- A C++ Compiler supporting the C++20 standard (Tested and built with Clang++ on GitHub).
 - The Lexer library Flex.
 - The Parser library Bison version >= 3.2.
 - [The Meson Build System](https://mesonbuild.com/SimpleStart.html).
