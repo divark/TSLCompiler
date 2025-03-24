@@ -106,7 +106,7 @@ lexer_test_sources = files('tsllexer_ut.cpp')
 lexer_test_executable = executable(
   'tsllexer-ut-test',
   sources: lexer_test_sources + app_sources,
-  dependencies: test_ut_dep,
+  dependencies: [test_ut_dep, format_dependency],
   include_directories: inc,
 )
 test(
@@ -123,7 +123,7 @@ parser_test_sources = files('tslparser_ut.cpp')
 parser_test_executable = executable(
   'tslparser-ut-test',
   sources: parser_test_sources + app_sources,
-  dependencies: test_ut_dep,
+  dependencies: [test_ut_dep, format_dependency],
   include_directories: inc,
 )
 test(
@@ -140,7 +140,7 @@ compiler_feature_file = fs.copyfile('feature-files/tslcompiler.feature', 'tslcom
 compiler_test_executable = executable(
   'compiler-test',
   sources: compiler_test_sources + app_sources,
-  dependencies: test_ut_dep,
+  dependencies: [test_ut_dep, format_dependency],
   include_directories: inc,
 )
 test(
@@ -156,7 +156,7 @@ graph_feature_file = fs.copyfile('feature-files/tslchoicegraph.feature', 'tslcho
 graph_test_executable = executable(
   'graph-test',
   sources: graph_test_sources + app_sources,
-  dependencies: test_ut_dep,
+  dependencies: [test_ut_dep, format_dependency],
   include_directories: inc,
 )
 test(
@@ -199,7 +199,7 @@ error_test_sources = files('errors_ut.cpp')
 error_test_executable = executable(
   'errors-test',
   sources: error_test_sources + app_sources,
-  dependencies: test_ut_dep,
+  dependencies: [test_ut_dep, format_dependency],
   include_directories: inc,
 )
 test(

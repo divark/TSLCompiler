@@ -6,9 +6,7 @@ project(
   default_options: ['cpp_std=c++20'],
 )
 
-if meson.get_compiler('cpp').get_id() == 'clang' and meson.get_compiler('cpp').version() == '14.0.0-1ubuntu1'
-  add_global_arguments('-fexperimental-library', language: 'cpp')
-endif
+format_dependency = dependency('fmt', required: true)
 
 inc = include_directories('include')
 
@@ -21,4 +19,5 @@ executable(
   'tslchecker',
   tslchecker_sources + lexer_sources + parser_sources,
   include_directories: inc,
+  dependencies: format_dependency,
 )
