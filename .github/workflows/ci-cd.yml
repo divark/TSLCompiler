@@ -15,7 +15,10 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             pipx install meson
-            sudo apt update && sudo apt install bison flex cmake libfl-dev clang
+            sudo apt update && sudo apt install bison flex cmake libfl-dev
+            # This installs the latest version of clang automatically.
+            # This is needed for backwards compatibility purposes.
+            bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
             echo "CXX=clang++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex llvm
@@ -55,7 +58,10 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             pipx install meson
-            sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev clang
+            # This installs the latest version of clang automatically.
+            # This is needed for backwards compatibility purposes.
+            bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+            sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev
             echo "CXX=clang++" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
