@@ -14,7 +14,8 @@ jobs:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson bison flex cmake libfl-dev clang
+            pipx install meson
+            sudo apt update && sudo apt install bison flex cmake libfl-dev clang
             echo "CXX=clang++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex llvm
@@ -51,7 +52,8 @@ jobs:
       - name: Install dependencies for the project (macOS, Linux)
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt update && sudo apt install meson libbison-dev bison flex cmake libfl-dev clang
+            pipx install meson
+            sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev clang
             echo "CXX=clang++" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
