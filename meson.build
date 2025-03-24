@@ -6,7 +6,7 @@ project(
   default_options: ['cpp_std=c++20'],
 )
 
-if meson.get_compiler('cpp').get_id() == 'clang' and meson.get_compiler('cpp').version() == '14.0.0'
+if meson.get_compiler('cpp').get_id() == 'clang' and meson.get_compiler('cpp').version() == '14.0.0-1ubuntu1'
   add_global_arguments('-fexperimental-library', language: 'cpp')
 endif
 
