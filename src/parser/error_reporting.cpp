@@ -1,7 +1,7 @@
 #include "error_reporting.hpp"
 
 #include <algorithm>
-#include <fmt/format.h>
+#include <format>
 #include <fstream>
 #include <sstream>
 
@@ -43,10 +43,10 @@ std::string getPointingMsg(const yy::location& location) {
     auto lineNumber = location.end.line;
     auto columnNumber = location.end.column;
     if (fileReader.hasLine(lineNumber - 1)) {
-        pointingMsg += fmt::format("{:^3}| {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
+        pointingMsg += std::format("{:^3}| {}\n", lineNumber - 1, fileReader.getLine(lineNumber - 1));
     }
 
-    pointingMsg += fmt::format("{:^3}| {}\n", lineNumber, fileReader.getLine(lineNumber));
+    pointingMsg += std::format("{:^3}| {}\n", lineNumber, fileReader.getLine(lineNumber));
     std::string errorPointer = "";
     for (auto i = 0; i < columnNumber; i++) {
         if (i + 1 == columnNumber) {
@@ -56,10 +56,10 @@ std::string getPointingMsg(const yy::location& location) {
 
         errorPointer += "-";
     }
-    pointingMsg += fmt::format("{:^3}| {}\n", "", errorPointer);
+    pointingMsg += std::format("{:^3}| {}\n", "", errorPointer);
 
     if (fileReader.hasLine(lineNumber + 1)) {
-        pointingMsg += fmt::format("{:^3}| {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
+        pointingMsg += std::format("{:^3}| {}\n", lineNumber + 1, fileReader.getLine(lineNumber + 1));
     }
 
     return pointingMsg;
@@ -86,7 +86,7 @@ void reportError(const std::string& errorMessage, const yy::location& location) 
 void checkIfCurrentPropertyRedefined(const std::string property, const TSLCollector &collector, const yy::location &locationInCode) {
     std::string propertyWithoutComma = getPropertyWithoutComma(property);
     if (collector.propertyDefinedInCategory.contains(propertyWithoutComma)) {
-        auto errorSummaryMsg = fmt::format("Error: Property {} was already defined elsewhere.", propertyWithoutComma);
+        auto errorSummaryMsg = std::format("Error: Property {} was already defined elsewhere.", propertyWithoutComma);
         reportError(errorSummaryMsg, locationInCode);
     }
 }
@@ -101,7 +101,7 @@ void checkIfCurrentPropertyUndefined(const std::string property, const TSLCollec
     auto propertyNotFound = foundPropertyLocation == collector.propertyDefinedInCategory.end();
     auto propertyInExpressionIsUndefined = propertyNotFound || foundPropertyLocation->second >= currentCategoryIdx;
     if (propertyInExpressionIsUndefined) {
-        std::string errorSummaryMsg = fmt::format("Error: Property {} not defined in any prior Categories.", property);
+        std::string errorSummaryMsg = std::format("Error: Property {} not defined in any prior Categories.", property);
         reportError(errorSummaryMsg, locationInCode);
     }
 }

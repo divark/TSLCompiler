@@ -42,7 +42,6 @@ jobs:
 
       - name: Setup build directory
         run: |
-          meson wrap install fmt
           meson setup build
 
       - name: Run all tests
@@ -91,7 +90,6 @@ jobs:
 
       - name: Setup build directory
         run: |
-          meson wrap install fmt
           meson setup build -Dbuild_for_release=true
 
       - name: Compile the project

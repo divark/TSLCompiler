@@ -1,7 +1,7 @@
 #include <boost/ut.hpp>
 #include <fstream>
 #include <string>
-#include <fmt/format.h>
+#include <format>
 
 #include "tsl_parser.hpp"
 
@@ -71,7 +71,7 @@ std::string getContentsDependingOn(const std::string& typeOfItem, const size_t t
 }
 
 void expect_eq(auto expected, auto actual) {
-    auto assertErrorMsg = fmt::format("Expected {},\n Found {}", expected, actual);
+    auto assertErrorMsg = std::format("Expected {},\n Found {}", expected, actual);
     boost::ut::expect(expected == actual) << assertErrorMsg;
 }
 
@@ -82,7 +82,7 @@ int main(int argc, const char** argv) {
     steps.feature("The Parser handles valid TSL input.") = [&] {
       steps.scenario("*") = [&] {
           steps.given("a TSL file called {file_name}") = [&](std::string file_name) {
-              fs::path tslInput = fmt::format("tests/{}", file_name);
+              fs::path tslInput = std::format("tests/{}", file_name);
 
               steps.when("the Parser collects the variables from the TSL input,") = [&] {
                   TSLParser parser(tslInput);

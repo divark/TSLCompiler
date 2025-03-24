@@ -6,9 +6,6 @@ project(
   default_options: ['cpp_std=c++20'],
 )
 
-fmt = subproject('fmt', default_options: 'default_library=static')
-format_dependency = fmt.get_variable('fmt_dep')
-
 inc = include_directories('include')
 
 subdir('src')
@@ -20,5 +17,4 @@ executable(
   'tslchecker',
   tslchecker_sources + lexer_sources + parser_sources,
   include_directories: inc,
-  dependencies: format_dependency,
 )
