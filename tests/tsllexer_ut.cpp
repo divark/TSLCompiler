@@ -1,7 +1,7 @@
 #include <boost/ut.hpp>
 #include <fstream>
 #include <string>
-#include <format>
+#include <fmt/format.h>
 
 #include "tsl_lexer.hpp"
 #include "parser.hpp"
@@ -51,7 +51,7 @@ yy::parser::token_type parseTokenType(const std::string& tokenTypeAsked) {
         return yy::parser::token_type::IF;
     }
 
-    throw std::format("Unsupported token asked: {}", tokenTypeAsked);
+    throw fmt::format("Unsupported token asked: {}", tokenTypeAsked);
 }
 
 /**
@@ -74,12 +74,12 @@ void waitUntil(TSLLexer &lexer, yy::parser::token::token_kind_type desiredToken,
 }
 
 void expect_eq(auto expected, auto actual) {
-    auto assertErrorMsg = std::format("Expected {},\n Found {}", expected, actual);
+    auto assertErrorMsg = fmt::format("Expected {},\n Found {}", expected, actual);
     boost::ut::expect(expected == actual) << assertErrorMsg;
 }
 
 void expect_ne(auto expected, auto actual) {
-    auto assertErrorMsg = std::format("Expected not to find {},\n Found {}", expected, actual);
+    auto assertErrorMsg = fmt::format("Expected not to find {},\n Found {}", expected, actual);
     boost::ut::expect(expected != actual) << assertErrorMsg;
 }
 
@@ -90,7 +90,7 @@ int main(int argc, const char** argv) {
     steps.feature("The Lexer recognizes valid TSL input.") = [&] {
       steps.scenario("*") = [&] {
           steps.given("a TSL file called {file_name}") = [&](std::string file_name) {
-              fs::path tslInput = std::format("tests/{}", file_name);
+              fs::path tslInput = fmt::format("tests/{}", file_name);
 
               steps.when("the Lexer consumes the input,") = [&] {
                   TSLLexer lexer;

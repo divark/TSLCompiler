@@ -1,7 +1,7 @@
 /* Prologue (Imports, Macros, etc) */
 %code requires {
     #include <string>
-    #include <format>
+    #include <fmt/format.h>
 
     #include "tsl_lexer.hpp"
     #include "tsl_collector.hpp"
@@ -174,6 +174,6 @@ std::string getContextMessage(const yy::parser::symbol_kind_type& identifiedToke
 */
 void yy::parser::report_syntax_error(const yy::parser::context& yyctx) const {
     std::string contextMessage = getContextMessage(yyctx.token());
-    std::string errorSummaryMsg = std::format("Error: A {} is not allowed in its current spot.", contextMessage);
+    std::string errorSummaryMsg = fmt::format("Error: A {} is not allowed in its current spot.", contextMessage);
     reportError(errorSummaryMsg, yyctx.location());
 }
