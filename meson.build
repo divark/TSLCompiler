@@ -6,7 +6,8 @@ project(
   default_options: ['cpp_std=c++20'],
 )
 
-format_dependency = dependency('fmt', required: true)
+fmt = subproject('fmt', default_options: 'default_library=static')
+format_dependency = fmt.get_variable('fmt_dep')
 
 inc = include_directories('include')
 
