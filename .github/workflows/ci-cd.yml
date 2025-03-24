@@ -7,7 +7,7 @@ jobs:
     name: Verify code behaves as intended
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13]
+        os: [ubuntu-latest, ubuntu-22.04, macos-latest, macos-13]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -45,7 +45,7 @@ jobs:
     needs: check
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13]
+        os: [ubuntu-latest, ubuntu-22.04, macos-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install dependencies for the project (macOS, Linux)
