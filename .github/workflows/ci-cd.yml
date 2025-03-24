@@ -20,8 +20,8 @@ jobs:
             # This is needed for backwards compatibility purposes.
             wget https://apt.llvm.org/llvm.sh
             chmod +x llvm.sh
-            sudo ./llvm.sh
-            echo "CXX=clang++" >> $GITHUB_ENV
+            sudo ./llvm.sh 19
+            echo "CXX=clang++-19" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex llvm
             echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
@@ -64,9 +64,9 @@ jobs:
             # This is needed for backwards compatibility purposes.
             wget https://apt.llvm.org/llvm.sh
             chmod +x llvm.sh
-            sudo ./llvm.sh
+            sudo ./llvm.sh 19
             sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev
-            echo "CXX=clang++" >> $GITHUB_ENV
+            echo "CXX=clang++-19" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex llvm
