@@ -15,6 +15,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             pipx install meson
+            meson wrap install fmt
             sudo apt update && sudo apt install bison flex cmake libfl-dev clang
             echo "CXX=clang++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
@@ -30,6 +31,7 @@ jobs:
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
             # Finally, we want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+            meson wrap install fmt
           fi
 
       - name: Checkout sources
@@ -53,6 +55,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             pipx install meson
+            meson wrap install fmt
             sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev clang
             echo "CXX=clang++" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
@@ -72,6 +75,7 @@ jobs:
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
             # Finally, we want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+            meson wrap install fmt
           fi
 
       - name: Checkout sources
