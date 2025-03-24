@@ -1,7 +1,7 @@
 #include <boost/ut.hpp>
 #include <fstream>
 #include <string>
-#include <format>
+#include <fmt/format.h>
 
 #include "tsl_choice_graph.hpp"
 #include "tsl_compiler.hpp"
@@ -9,7 +9,7 @@
 namespace fs = std::filesystem;
 
 void expect_eq(auto expected, auto actual) {
-    auto assertErrorMsg = std::format("Expected {},\n Found {}", expected, actual);
+    auto assertErrorMsg = fmt::format("Expected {},\n Found {}", expected, actual);
     boost::ut::expect(expected == actual) << assertErrorMsg;
 }
 
@@ -20,7 +20,7 @@ int main(int argc, const char** argv) {
     steps.feature("A Directed Graph should be derived from the TSLCompiler.") = [&] {
       steps.scenario("*") = [&] {
           steps.given("a TSL file called {file_name}") = [&](std::string file_name) {
-              fs::path tslInput = std::format("tests/{}", file_name);
+              fs::path tslInput = fmt::format("tests/{}", file_name);
 
               steps.when("the input is consumed by the TSLCompiler,") = [&] {
                   TSLCompiler compiler(tslInput);
