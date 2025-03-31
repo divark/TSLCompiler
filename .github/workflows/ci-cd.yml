@@ -7,7 +7,7 @@ jobs:
     name: Verify code behaves as intended
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-22.04, macos-latest, macos-13]
+        os: [ubuntu-22.04, macos-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -33,8 +33,9 @@ jobs:
             # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
-            # Finally, we want to support macOS since Big Sur.
+            # Finally, we want to support macOS since Big Sur, and make a universal binary.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+            echo "CPPFLAGS=$CPPFLAGS -arch arm64 -arch x86_64"
           fi
 
       - name: Checkout sources
@@ -53,7 +54,7 @@ jobs:
     needs: check
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-22.04, macos-latest, macos-13]
+        os: [ubuntu-22.04, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install dependencies for the project (macOS, Linux)
@@ -82,8 +83,9 @@ jobs:
             # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
             echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
-            # Finally, we want to support macOS since Big Sur.
+            # Finally, we want to support macOS since Big Sur, and make a universal binary.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+            echo "CPPFLAGS=$CPPFLAGS -arch arm64 -arch x86_64"
           fi
 
       - name: Checkout sources
@@ -104,4 +106,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: build/tslchecker
-          name: tslchecker-${{ matrix.os }}
+          name: tslchecker-${{ RUNNER_OS }}
