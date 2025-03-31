@@ -106,4 +106,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: build/tslchecker
-          name: tslchecker-${{ RUNNER_OS }}
+          name: tslchecker-${{ matrix.os }}
