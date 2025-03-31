@@ -84,7 +84,7 @@ int main(int argc, const char** argv) {
     steps.feature("An error message should be provided when an issue comes up with the Lexer or Parser.") = [&] {
       steps.scenario("*") = [&] {
           steps.given("a TSL input file called {file_name}") = [&](std::string file_name) {
-              fs::path tslInput = fmt::format("tests/{}", file_name);
+              fs::path tslInput = fmt::format("test-files/{}", file_name);
 
               steps.when("the error messages are redirected to be read by us,") = [&] {
                   auto stderrListener = std::make_unique<ErrorMessageListener>();

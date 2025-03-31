@@ -19,7 +19,7 @@ int main(int argc, const char** argv) {
     steps.feature("The TSLCompiler should generate test frames.") = [&] {
       steps.scenario("*") = [&] {
           steps.given("a TSL file called {file_name}") = [&](std::string file_name) {
-              fs::path tslInput = fmt::format("tests/{}", file_name);
+              fs::path tslInput = fmt::format("test-files/{}", file_name);
 
               steps.when("the input is consumed by the TSLCompiler,") = [&] {
                   TSLCompiler compiler(tslInput);
