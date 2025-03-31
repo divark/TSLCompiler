@@ -23,8 +23,7 @@ jobs:
             sudo ./llvm.sh 19
             echo "CXX=clang++-19" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew upgrade && brew install meson bison flex llvm
-            echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            brew upgrade && brew install meson bison flex
             # on macOS, bison and flex are already provided, but we want
             # to use the newer versions provided by Homebrew, so we have
             # to append them into the path via GitHub's GITHUB_PATH variable.
@@ -32,10 +31,10 @@ jobs:
             echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
             # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
-            echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
-            # Finally, we want to support macOS since Big Sur, and make a universal binary.
+            # And besides importing the flex headers, also make a universal binary.
+            echo "CPPFLAGS=-I$(brew --prefix flex)/include -arch arm64 -arch x86_64" >> $GITHUB_ENV
+            # Finally, we want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
-            echo "CPPFLAGS=$CPPFLAGS -arch arm64 -arch x86_64"
           fi
 
       - name: Checkout sources
@@ -70,11 +69,7 @@ jobs:
             echo "CXX=clang++-19" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew upgrade && brew install meson bison flex llvm
-            # On an Intel-based mac, clang++ provided by Apple does not support all C++20 features.
-            # Therefore, it's safe to just download the latest, no matter what type of mac is being
-            # used.
-            echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+            brew upgrade && brew install meson bison flex
             # on macOS, bison and flex are already provided, but we want
             # to use the newer versions provided by Homebrew, so we have
             # to append them into the path via GitHub's GITHUB_PATH variable.
@@ -82,10 +77,10 @@ jobs:
             echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
             # Likewise, we want to use the latest header files for flex.
             echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
-            echo "CPPFLAGS=-I$(brew --prefix flex)/include" >> $GITHUB_ENV
-            # Finally, we want to support macOS since Big Sur, and make a universal binary.
+            # And besides importing the flex headers, also make a universal binary.
+            echo "CPPFLAGS=-I$(brew --prefix flex)/include -arch arm64 -arch x86_64" >> $GITHUB_ENV
+            # Finally, we want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
-            echo "CPPFLAGS=$CPPFLAGS -arch arm64 -arch x86_64"
           fi
 
       - name: Checkout sources
