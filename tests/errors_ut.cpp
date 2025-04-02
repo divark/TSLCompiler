@@ -12,41 +12,26 @@ namespace fs = std::filesystem;
  */
 class ErrorMessageListener {
     private:
-        std::streambuf* originalCerrStream;
-
         std::stringstream currentErrorContents;
     public:
         ErrorMessageListener();
         ErrorMessageListener(std::string);
-        ~ErrorMessageListener();
 
         std::string getCurrentErrorMsg();
+        void setCurrentErrorMsg(std::string);
         std::string getLine(size_t);
 };
 
-/**
- * Intercepts stderr on construction to be read later.
- */
 ErrorMessageListener::ErrorMessageListener() {
-    auto oldCerrStream = std::cerr.rdbuf();
-    std::cerr.rdbuf(currentErrorContents.rdbuf());
-
-    originalCerrStream = oldCerrStream;
+    currentErrorContents = std::stringstream("");
 }
 
 /**
 * Populates the error message listener with some string
 * before intercepting the stderr.
 */
-ErrorMessageListener::ErrorMessageListener(std::string exceptionMsg) : ErrorMessageListener() {
+ErrorMessageListener::ErrorMessageListener(std::string exceptionMsg) {
     currentErrorContents << exceptionMsg;
-}
-
-/**
- * Resets stderr back to its original location.
- */
-ErrorMessageListener::~ErrorMessageListener() {
-    std::cerr.rdbuf(originalCerrStream);
 }
 
 /**
@@ -56,6 +41,13 @@ std::string ErrorMessageListener::getCurrentErrorMsg() {
     std::string currentErrorMsg(currentErrorContents.str());
 
     return currentErrorMsg;
+}
+
+/**
+* Sets the contents of the error message.
+*/
+void ErrorMessageListener::setCurrentErrorMsg(std::string currentErrorMsg) {
+    currentErrorContents = std::stringstream(currentErrorMsg);
 }
 
 /**
@@ -86,49 +78,48 @@ int main(int argc, const char** argv) {
           steps.given("a TSL input file called {file_name}") = [&](std::string file_name) {
               fs::path tslInput = fmt::format("test-files/{}", file_name);
 
-              steps.when("the error messages are redirected to be read by us,") = [&] {
-                  auto stderrListener = std::make_unique<ErrorMessageListener>();
+              steps.when("the Parser consumes the input,") = [&] {
+                    ErrorMessageListener stderrListener;
+                    TSLParser parser(tslInput);
+                    try {
+                        parser.run();
+                    } catch (yy::parser::syntax_error syntaxException) {
+                        stderrListener.setCurrentErrorMsg(syntaxException.what());
+                    } catch (std::string errorMessage) {
+                        stderrListener.setCurrentErrorMsg(errorMessage);
+                    }
 
-                  steps.when("the Parser consumes the input,") = [&] {
-                      TSLParser parser(tslInput);
-                      try {
-                          parser.run();
-                      } catch (yy::parser::syntax_error syntaxException) {
-                          stderrListener = std::make_unique<ErrorMessageListener>(std::string(syntaxException.what()));
-                      }
+                    steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](size_t lineNumber, std::string errorFound) {
+                        auto expectedErrorSummary = fmt::format("Error: {}", errorFound);
+                        auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
-                      steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](size_t lineNumber, std::string errorFound) {
-                          auto expectedErrorSummary = fmt::format("Error: {}", errorFound);
-                          auto actualErrorSummary = stderrListener->getLine(lineNumber);
+                        expect_eq(expectedErrorSummary, actualErrorSummary);
+                    };
 
-                          expect_eq(expectedErrorSummary, actualErrorSummary);
-                      };
+                    steps.then("line {lineNumber} of the error message should mention finding '{errorFound}' in the wrong spot.") = [&](size_t lineNumber, std::string errorFound) {
+                        auto expectedErrorSummary = fmt::format("Error: A {} is not allowed in its current spot.", errorFound);
+                        auto actualErrorSummary = stderrListener.getLine(lineNumber);
 
-                      steps.then("line {lineNumber} of the error message should mention finding '{errorFound}' in the wrong spot.") = [&](size_t lineNumber, std::string errorFound) {
-                          auto expectedErrorSummary = fmt::format("Error: A {} is not allowed in its current spot.", errorFound);
-                          auto actualErrorSummary = stderrListener->getLine(lineNumber);
+                        expect_eq(expectedErrorSummary, actualErrorSummary);
+                    };
 
-                          expect_eq(expectedErrorSummary, actualErrorSummary);
-                      };
+                    steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](size_t lineNumber, size_t inputLineNumber, size_t inputLineColumn) {
+                        auto expectedFileLine = fmt::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
+                        auto actualFileLine = stderrListener.getLine(lineNumber);
 
-                      steps.then("line {lineNumber} of the error message should mention the given TSL input file at line {inputLineNumber}, column {inputColumnNumber}.") = [&](size_t lineNumber, size_t inputLineNumber, size_t inputLineColumn) {
-                          auto expectedFileLine = fmt::format(" --> {}:{}.{}", parser.getLexer().getFileName(), inputLineNumber, inputLineColumn);
-                          auto actualFileLine = stderrListener->getLine(lineNumber);
+                        expect_eq(expectedFileLine, actualFileLine);
+                    };
 
-                          expect_eq(expectedFileLine, actualFileLine);
-                      };
+                    steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](size_t lineNumber, std::string errorToken, size_t expectedFirstLineNumber, size_t expectedNextLineNumber) {
+                        auto actualErrorPointedOut = stderrListener.getLine(lineNumber) + "\n"
+                            + stderrListener.getLine(lineNumber + 1) + "\n";
 
-                      steps.then("line {lineNumber} of the error message should point to the token {errorToken} in line {expectedFirstLineNumber} with line {expectedNextLineNumber} below it.") = [&](size_t lineNumber, std::string errorToken, size_t expectedFirstLineNumber, size_t expectedNextLineNumber) {
-                          auto actualErrorPointedOut = stderrListener->getLine(lineNumber) + "\n"
-                            + stderrListener->getLine(lineNumber + 1) + "\n";
-
-                          auto errorTokenLineNumberFound = actualErrorPointedOut.find(fmt::format(" {} |", expectedFirstLineNumber)) != std::string::npos;
-                          expect(errorTokenLineNumberFound) << fmt::format("Could not find line number {} in error message {}", expectedFirstLineNumber, actualErrorPointedOut);
-                          auto errorTokenFoundInInput = actualErrorPointedOut.find(errorToken) != std::string::npos;
-                          expect(errorTokenFoundInInput) << fmt::format("Could not find error token {} in error message {}", errorToken, actualErrorPointedOut);
-                      };
-                  };
-              };
+                        auto errorTokenLineNumberFound = actualErrorPointedOut.find(fmt::format(" {} |", expectedFirstLineNumber)) != std::string::npos;
+                        expect(errorTokenLineNumberFound) << fmt::format("Could not find line number {} in error message {}", expectedFirstLineNumber, actualErrorPointedOut);
+                        auto errorTokenFoundInInput = actualErrorPointedOut.find(errorToken) != std::string::npos;
+                        expect(errorTokenFoundInInput) << fmt::format("Could not find error token {} in error message {}", errorToken, actualErrorPointedOut);
+                    };
+                };
           };
       };
     };
