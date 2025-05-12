@@ -47,8 +47,25 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 1 should have 'Simple Category 2:' as category 2.
         Then test case 1 should have 'Simple Choice 2.' chosen in category 2.
 
-    Scenario: Conditionals with single markers are similar to normal test cases.
+    Scenario: If statements with single markers are similar to normal test cases.
         Given a TSL file called choice_with_conditional_single_marker.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 2 test cases.
+        Then test case 1 should have 2 categories.
+        Then test case 1 should have 'Simple Category 1:' as category 1.
+        Then test case 1 should have 'Simple Choice 1.' chosen in category 1.
+        Then test case 1 should have 'Simple Category 2:' as category 2.
+        Then test case 1 should have 'Simple Choice 2.' chosen in category 2.
+        Then test case 2 should have 3 categories.
+        Then test case 2 should have 'Simple Category 1:' as category 1.
+        Then test case 2 should have 'Simple Choice 1.' chosen in category 1.
+        Then test case 2 should have 'Simple Category 2:' as category 2.
+        Then test case 2 should have 'Simple Choice 3.' chosen in category 2.
+        Then test case 2 should have 'Simple Category 3:' as category 3.
+        Then test case 2 should have 'Simple Choice 4.' chosen in category 3.
+
+    Scenario: If statements with error markers are similar to normal test cases.
+        Given a TSL file called choice_with_conditional_error_marker.txt,
         When the input is consumed by the TSLCompiler,
         Then the TSLCompiler's result should contain 2 test cases.
         Then test case 1 should have 2 categories.
