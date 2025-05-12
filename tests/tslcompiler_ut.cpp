@@ -30,6 +30,11 @@ int main(int argc, const char** argv) {
                       expect_eq(expected_num_test_cases, actual_num_test_cases);
                   };
 
+                  steps.then("test case {testCaseNum} should have {expected_num_categories} categories.") = [&](size_t testCaseNum, size_t expectedNumCategories) {
+                      auto actualNumCategories = compiler.getTestCases()[testCaseNum - 1].getCategories().size();
+                      expect_eq(expectedNumCategories, actualNumCategories);
+                  };
+
                   steps.then("test case {testCaseNum} should have '{expected_category}' as category {category_num}.") = [&](size_t testCaseNum, std::string expected_category, size_t category_num) {
                       auto actual_category = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
                       expect_eq(expected_category, actual_category);

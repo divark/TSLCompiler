@@ -14,6 +14,7 @@ class TSLChoice {
         size_t choiceIdx;
 
         bool isMarker;
+        bool containsConditionalMarker;
     public:
         TSLChoice();
         TSLChoice(size_t, size_t);
@@ -22,7 +23,10 @@ class TSLChoice {
         size_t getChoiceIdx() const;
 
         bool hasMarker() const;
+        bool hasConditionalMarker() const;
+
         void toggleIfMarker(bool);
+        void toggleIfConditionalMarkers(bool);
 };
 
 class Node {

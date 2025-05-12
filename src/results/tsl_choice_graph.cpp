@@ -16,6 +16,9 @@ std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
             auto hasMarker = recordedVariables.singleMarkings[choiceIdx] || recordedVariables.errorMarkings[choiceIdx];
             nodeData.toggleIfMarker(hasMarker);
 
+            auto hasConditionalMarker = recordedVariables.singleIfMarkings[choiceIdx] || recordedVariables.errorIfMarkings[choiceIdx];
+            nodeData.toggleIfConditionalMarkers(hasConditionalMarker);
+
             auto node = Node(nodeData);
             nodes.push_back(node);
         }
@@ -156,10 +159,24 @@ bool TSLChoice::hasMarker() const {
 }
 
 /**
+* Returns whether the Choice recorded has a single or error marking in a conditional statement.
+*/
+bool TSLChoice::hasConditionalMarker() const {
+    return containsConditionalMarker;
+}
+
+/**
 * Sets whether the Choice recorded has a single or error marking.
 */
 void TSLChoice::toggleIfMarker(bool hasMarker) {
     isMarker = hasMarker;
+}
+
+/**
+* Sets whether the Choice recorded has a conditional single or error marking.
+*/
+void TSLChoice::toggleIfConditionalMarkers(bool hasConditionalMarkers) {
+    containsConditionalMarker = hasConditionalMarkers;
 }
 
 Edges::Edges() {}
@@ -207,12 +224,13 @@ void TestCaseListener::addTestCase(bool isMarkerCase) {
 * Creates a TSLTestCase on checking in.
 */
 bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, const Node& currentNode) {
-    bool canProceed = true;
-    if (!currentGraph.getEdges(currentNode).empty()) {
+    bool hasConditionalMarkers = currentNode.getData().hasConditionalMarker();
+    bool canProceed = !currentGraph.getEdges(currentNode).empty() && !hasConditionalMarkers;
+    if (canProceed) {
         return canProceed;
     }
 
-    auto isMarkerCase = currentNode.getData().hasMarker();
+    auto isMarkerCase = currentNode.getData().hasMarker() || hasConditionalMarkers;
     addTestCase(isMarkerCase);
 
     auto visitedNodes = currentGraph.getVisitedNodes();
