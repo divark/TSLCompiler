@@ -19,6 +19,10 @@ std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
             auto hasConditionalMarker = recordedVariables.singleIfMarkings[choiceIdx] || recordedVariables.errorIfMarkings[choiceIdx];
             nodeData.toggleIfConditionalMarkers(hasConditionalMarker);
 
+            if (hasConditionalMarker) {
+                nodeData.setChoiceExpression(recordedVariables.getChoiceExpression(choiceIdx)->asString());
+            }
+
             auto node = Node(nodeData);
             nodes.push_back(node);
         }
@@ -128,13 +132,21 @@ const TSLChoice& Node::getData() const {
 TSLChoice::TSLChoice() {
     categoryIdx = 0;
     choiceIdx = 0;
+
     isMarker = false;
+    containsConditionalMarker = false;
+
+    choiceExpression = "";
 }
 
 TSLChoice::TSLChoice(size_t categoryIdx, size_t choiceIdx) {
     this->categoryIdx = categoryIdx;
     this->choiceIdx = choiceIdx;
+
     isMarker = false;
+    containsConditionalMarker = false;
+
+    choiceExpression = "";
 }
 
 /**
@@ -163,6 +175,20 @@ bool TSLChoice::hasMarker() const {
 */
 bool TSLChoice::hasConditionalMarker() const {
     return containsConditionalMarker;
+}
+
+/**
+* Sets the Choice's Expression as a string.
+*/
+void TSLChoice::setChoiceExpression(std::string newChoiceExpression) {
+    choiceExpression = newChoiceExpression;
+}
+
+/**
+* Gets the Choice's Expression as a string.
+*/
+std::string TSLChoice::getChoiceExpression() const {
+    return choiceExpression;
 }
 
 /**
@@ -206,6 +232,11 @@ void TestCaseListener::addTestChoice(const Node& currentNode) {
     auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
     auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
     foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoice);
+
+    if (currentNode.getData().hasConditionalMarker()) {
+        auto choiceDependency = currentNode.getData().getChoiceExpression();
+        foundTestCases[currentTestCase].setChoiceDependency(chosenCategory, choiceDependency, true);
+    }
 }
 
 /**

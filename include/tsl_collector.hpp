@@ -52,7 +52,7 @@ struct TSLCollector {
     int recordSimpleExpression(std::string);
     int recordUnaryExpression(ExpType);
     int recordBinaryExpression(ExpType);
-    std::shared_ptr<Expression> getChoiceExpression(unsigned int);
+    std::shared_ptr<Expression> getChoiceExpression(unsigned int) const;
     bool isExpressionUndefined(std::shared_ptr<Expression>) const;
 
     int recordCategory(std::string);

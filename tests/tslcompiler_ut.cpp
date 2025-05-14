@@ -46,6 +46,12 @@ int main(int argc, const char** argv) {
                       expect_eq(expected_choice, actual_choice);
                   };
 
+                  steps.then("test case {testCaseNum} should have '{expectedChoiceDependency}' as a dependency for the chosen choice in category {category_num}.") = [&](size_t testCaseNum, std::string expectedChoiceDependency, size_t category_num) {
+                      auto chosenCategory = compiler.getTestCases()[testCaseNum - 1].getCategories()[category_num - 1];
+                      auto actualChoiceDependency = compiler.getTestCases()[testCaseNum - 1].getChoiceDependency(chosenCategory);
+                      expect_eq(expectedChoiceDependency, actualChoiceDependency);
+                  };
+
                   steps.then("test case {testCaseNum} should be flagged as having a marker.") = [&](size_t testCaseNum) {
                       auto testCase = compiler.getTestCases()[testCaseNum - 1];
                       bool testCaseHasMarker = testCase.hasMarker();

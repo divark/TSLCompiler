@@ -39,6 +39,29 @@ void TSLTestCase::addCategoryChoice(const std::string& chosenCategory, const std
 }
 
 /**
+* Returns the expression as a string for some Choice in the chosen Category.
+*/
+std::string TSLTestCase::getChoiceDependency(const std::string& chosenCategory) {
+    auto categoryChoice = categoryChoices[chosenCategory];
+    return choiceDependencies[categoryChoice];
+}
+
+/**
+* Sets the expression for some Choice in the chosen Category.
+*/
+void TSLTestCase::setChoiceDependency(const std::string& chosenCategory, std::string choiceDependency, bool isIf) {
+    auto categoryChoice = categoryChoices[chosenCategory];
+    std::string newChoiceDependency = "";
+    if (isIf) {
+        newChoiceDependency = "follows [if " + choiceDependency + "]";
+    } else {
+        newChoiceDependency = "follows [else] after [if " + choiceDependency + "]";
+    }
+
+    choiceDependencies[categoryChoice] = newChoiceDependency;
+}
+
+/**
 * Returns whether the test case has a Choice containing a
 * single or error marking, or false otherwise.
 */

@@ -80,3 +80,8 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 2 should have 'Simple Choice 3.' chosen in category 2.
         Then test case 2 should have 'Simple Category 3:' as category 3.
         Then test case 2 should have 'Simple Choice 4.' chosen in category 3.
+
+    Scenario: A Choice references its dependency when chosen from an if statement.
+        Given a TSL file called choice_with_conditional_single_marker.txt,
+        When the input is consumed by the TSLCompiler,
+        Then test case 1 should have 'follows [if simple]' as a dependency for the chosen choice in category 2.

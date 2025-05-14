@@ -77,7 +77,7 @@ int TSLCollector::markChoiceAsError() {
 /**
  * Returns the Expression found for some Choice.
  */
-std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choiceIdx) {
+std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choiceIdx) const {
     return choiceExpressions[choiceIdx][0];
 }
 

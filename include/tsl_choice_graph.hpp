@@ -15,6 +15,8 @@ class TSLChoice {
 
         bool isMarker;
         bool containsConditionalMarker;
+
+        std::string choiceExpression;
     public:
         TSLChoice();
         TSLChoice(size_t, size_t);
@@ -24,6 +26,9 @@ class TSLChoice {
 
         bool hasMarker() const;
         bool hasConditionalMarker() const;
+
+        void setChoiceExpression(std::string);
+        std::string getChoiceExpression() const;
 
         void toggleIfMarker(bool);
         void toggleIfConditionalMarkers(bool);
