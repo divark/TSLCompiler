@@ -13,6 +13,9 @@ std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
         auto categoryChoices = recordedVariables.categoryChoicesGraph[categoryIdx];
         for (auto choiceIdx : categoryChoices) {
             auto nodeData = TSLChoice(categoryIdx, choiceIdx);
+            // TODO: Refactor the following lines into something like:
+            // auto markerType = parseMarkerType(recordedVariables, choiceIdx);
+            // nodeData.setMarkerType(markerType);
             auto hasMarker = recordedVariables.singleMarkings[choiceIdx] || recordedVariables.errorMarkings[choiceIdx];
             nodeData.toggleIfMarker(hasMarker);
 
@@ -127,82 +130,6 @@ void Node::setID(size_t newID) {
  */
 const TSLChoice& Node::getData() const {
     return data;
-}
-
-TSLChoice::TSLChoice() {
-    categoryIdx = 0;
-    choiceIdx = 0;
-
-    isMarker = false;
-    containsConditionalMarker = false;
-
-    choiceExpression = "";
-}
-
-TSLChoice::TSLChoice(size_t categoryIdx, size_t choiceIdx) {
-    this->categoryIdx = categoryIdx;
-    this->choiceIdx = choiceIdx;
-
-    isMarker = false;
-    containsConditionalMarker = false;
-
-    choiceExpression = "";
-}
-
-/**
- * Returns the recorded Category.
- */
-size_t TSLChoice::getCategoryIdx() const {
-    return categoryIdx;
-}
-
-/**
- * Returns the recorded Choice.
- */
-size_t TSLChoice::getChoiceIdx() const {
-    return choiceIdx;
-}
-
-/**
-* Returns whether the Choice recorded has a single or error marking.
-*/
-bool TSLChoice::hasMarker() const {
-    return isMarker;
-}
-
-/**
-* Returns whether the Choice recorded has a single or error marking in a conditional statement.
-*/
-bool TSLChoice::hasConditionalMarker() const {
-    return containsConditionalMarker;
-}
-
-/**
-* Sets the Choice's Expression as a string.
-*/
-void TSLChoice::setChoiceExpression(std::string newChoiceExpression) {
-    choiceExpression = newChoiceExpression;
-}
-
-/**
-* Gets the Choice's Expression as a string.
-*/
-std::string TSLChoice::getChoiceExpression() const {
-    return choiceExpression;
-}
-
-/**
-* Sets whether the Choice recorded has a single or error marking.
-*/
-void TSLChoice::toggleIfMarker(bool hasMarker) {
-    isMarker = hasMarker;
-}
-
-/**
-* Sets whether the Choice recorded has a conditional single or error marking.
-*/
-void TSLChoice::toggleIfConditionalMarkers(bool hasConditionalMarkers) {
-    containsConditionalMarker = hasConditionalMarkers;
 }
 
 Edges::Edges() {}

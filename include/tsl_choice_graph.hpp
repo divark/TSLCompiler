@@ -8,32 +8,6 @@
 #include "tsl_collector.hpp"
 #include "tsl_testcase.hpp"
 
-class TSLChoice {
-    private:
-        size_t categoryIdx;
-        size_t choiceIdx;
-
-        bool isMarker;
-        bool containsConditionalMarker;
-
-        std::string choiceExpression;
-    public:
-        TSLChoice();
-        TSLChoice(size_t, size_t);
-
-        size_t getCategoryIdx() const;
-        size_t getChoiceIdx() const;
-
-        bool hasMarker() const;
-        bool hasConditionalMarker() const;
-
-        void setChoiceExpression(std::string);
-        std::string getChoiceExpression() const;
-
-        void toggleIfMarker(bool);
-        void toggleIfConditionalMarkers(bool);
-};
-
 class Node {
     private:
         size_t id;
