@@ -6,68 +6,43 @@
 #include <unordered_map>
 
 #include "expressions.hpp"
+#include "tsl_grammar.hpp"
 
-struct TSLCollector {
-    std::vector<std::string> categories;
-    std::vector<std::string> choices;
-    // All variables below are Constraints for Choices
-    std::vector<bool> singleMarkings;
-    std::vector<bool> errorMarkings;
-    std::vector<std::string> properties;
+class TSLCollector {
+    private:
+        std::vector<Category> categories;
+        std::unordered_map<std::string, int> propertyDefinedInCategory;
 
-    std::unordered_map<std::string, int> propertyDefinedInCategory;
+        /// Normally, a Choice should have just one expression, but because
+        /// we are processing Expressions one at a time, we could have many
+        /// while the Parser is running. The goal is that each Choice consolidates
+        /// into just one Expression, and having more than one indicates an error.
+        std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
 
-    /// These mimic an Adjacency List approach to a Graph
-    /// representation, instead using a vector. This is intentional since
-    /// the graph will never have nodes or edges deleted during runtime.
-    ///
-    /// In addition, it's a graph of indexes based on the contents
-    /// of the nodes, where each node's contents are stored in the
-    /// vectors above. This saves memory over a hashtable approach
-    /// where a key is based on its string, and has the potential to
-    /// utilize temporal locality if dealing with the graph alone.
-    std::vector<std::vector<int>> categoryChoicesGraph;
-    std::vector<std::vector<int>> choiceProperties;
+    public:
+        Category& getCategory(size_t);
 
-    /// Properties and Markings can be defined from an if-else statement,
-    /// so we have to differentiate between this and when a property or marking
-    /// is defined without an if statement.
-    std::vector<std::vector<int>> choiceIfProperties;
-    std::vector<std::vector<int>> choiceElseProperties;
-    std::vector<bool> singleIfMarkings;
-    std::vector<bool> singleElseMarkings;
-    std::vector<bool> errorIfMarkings;
-    std::vector<bool> errorElseMarkings;
+        int recordExpression(std::shared_ptr<Expression>);
 
-    std::vector<bool> choiceHasElseStatement;
+        int recordSimpleExpression(std::string);
+        int recordUnaryExpression(ExpType);
+        int recordBinaryExpression(ExpType);
+        std::shared_ptr<Expression> getChoiceExpression(unsigned int) const;
+        bool isExpressionUndefined(std::shared_ptr<Expression>) const;
 
-    /// Normally, a Choice should have just one expression, but because
-    /// we are processing Expressions one at a time, we could have many
-    /// while the Parser is running. The goal is that each Choice consolidates
-    /// into just one Expression, and having more than one indicates an error.
-    std::vector<std::vector<std::shared_ptr<Expression>>> choiceExpressions;
+        int recordCategory(std::string);
+        int recordChoice(std::string);
 
-    int recordExpression(std::shared_ptr<Expression>);
+        int recordProperty(std::string);
+        int convertPropertiesToIfProperties();
+        int convertPropertiesToElseProperties();
 
-    int recordSimpleExpression(std::string);
-    int recordUnaryExpression(ExpType);
-    int recordBinaryExpression(ExpType);
-    std::shared_ptr<Expression> getChoiceExpression(unsigned int) const;
-    bool isExpressionUndefined(std::shared_ptr<Expression>) const;
+        int markChoiceAsSingle();
+        int markChoiceAsError();
 
-    int recordCategory(std::string);
-    int recordChoice(std::string);
-
-    int recordProperty(std::string);
-    int convertPropertiesToIfProperties();
-    int convertPropertiesToElseProperties();
-
-    int markChoiceAsSingle();
-    int markChoiceAsError();
-
-    int markChoiceHasElse();
-    bool hasStandardExpression(unsigned int);
-    bool hasElseExpression(unsigned int);
+        int markChoiceHasElse();
+        bool hasStandardExpression(unsigned int);
+        bool hasElseExpression(unsigned int);
 };
 
 std::string getPropertyWithoutComma(const std::string&);

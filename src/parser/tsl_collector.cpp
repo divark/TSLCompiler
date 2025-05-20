@@ -1,39 +1,30 @@
 #include "tsl_collector.hpp"
+#include "tsl_grammar.hpp"
 
 /**
  * Returns an index to the recently stored Category.
  */
 int TSLCollector::recordCategory(std::string categoryContents) {
-    categories.push_back(categoryContents);
-    categoryChoicesGraph.push_back(std::vector<int>());
+    categories.push_back(Category(categoryContents));
 
     return categories.size() - 1;
+}
+
+/**
+* Returns a reference to the specified category
+*/
+Category& TSLCollector::getCategory(size_t categoryNum) {
+    return categories[categoryNum];
 }
 
 /**
  * Returns an index to the recently stored Choice for the most recently recorded Category.
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
-    choices.push_back(choiceContents);
+    auto currentCategory = getCategory(categories.size() - 1);
+    currentCategory.addChoice(Choice(choiceContents));
 
-    singleMarkings.push_back(false);
-    singleIfMarkings.push_back(false);
-    singleElseMarkings.push_back(false);
-    errorMarkings.push_back(false);
-    errorIfMarkings.push_back(false);
-    errorElseMarkings.push_back(false);
-
-    choiceHasElseStatement.push_back(false);
-
-    choiceProperties.push_back(std::vector<int>());
-    choiceIfProperties.push_back(std::vector<int>());
-    choiceElseProperties.push_back(std::vector<int>());
-
-    choiceExpressions.push_back(std::vector<std::shared_ptr<Expression>>());
-
-    int choiceIdx = choices.size() - 1;
-    int currentCategoryIdx = categories.size() - 1;
-    categoryChoicesGraph[currentCategoryIdx].push_back(choiceIdx);
+    int choiceIdx = currentCategory.getNumChoices() - 1;
     return choiceIdx;
 }
 
@@ -41,13 +32,13 @@ int TSLCollector::recordChoice(std::string choiceContents) {
  * Returns an index to the recently stored Property for the most recently recorded Choice.
  */
 int TSLCollector::recordProperty(std::string propertyContents) {
-    auto propertyWithoutComma = getPropertyWithoutComma(propertyContents);
-    properties.push_back(propertyWithoutComma);
+    auto currentCategory = getCategory(categories.size() - 1);
+    auto recentChoice = currentCategory.getRecentChoice();
 
-    int propertiesIdx = properties.size() - 1;
-    int choiceIdx = choices.size() - 1;
-    choiceProperties[choiceIdx].push_back(propertiesIdx);
-    propertyDefinedInCategory[propertyWithoutComma] = categories.size() - 1;
+    auto propertyWithoutComma = getPropertyWithoutComma(propertyContents);
+    recentChoice.addProperty(Property(propertyWithoutComma));
+
+    auto propertiesIdx = recentChoice.getNumProperties() - 1;
 
     return propertiesIdx;
 }
@@ -56,10 +47,12 @@ int TSLCollector::recordProperty(std::string propertyContents) {
  * Returns the Choice used (as an index) to apply a Single Marking.
  */
 int TSLCollector::markChoiceAsSingle() {
-    int choiceIdx = choices.size() - 1;
+    auto category = getCategory(categories.size() - 1);
 
-    singleMarkings[choiceIdx] = true;
+    auto recentlyAddedChoice = category.getRecentChoice();
+    recentlyAddedChoice.setMarker(Marker::Single);
 
+    auto choiceIdx = category.getNumChoices() - 1;
     return choiceIdx;
 }
 
@@ -67,10 +60,12 @@ int TSLCollector::markChoiceAsSingle() {
  * Returns the Choice used (as an index) to apply an Error Marking.
  */
 int TSLCollector::markChoiceAsError() {
-    int choiceIdx = choices.size() - 1;
+    auto category = getCategory(categories.size() - 1);
 
-    errorMarkings[choiceIdx] = true;
+    auto recentlyAddedChoice = category.getRecentChoice();
+    recentlyAddedChoice.setMarker(Marker::Error);
 
+    auto choiceIdx = category.getNumChoices() - 1;
     return choiceIdx;
 }
 
@@ -85,10 +80,11 @@ std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choic
  * Records a newly formed Expression for some Choice.
 */
 int TSLCollector::recordExpression(std::shared_ptr<Expression> expression) {
-    int currentChoiceIdx = choices.size() - 1;
-    choiceExpressions[currentChoiceIdx].push_back(expression);
+    auto recentCategory = getCategory(categories.size() - 1);
+    auto recentlyAddedChoice = recentCategory.getRecentChoice();
+    recentlyAddedChoice.setExpression(expression);
 
-    return choiceExpressions[currentChoiceIdx].size() - 1;
+    return 0;
 }
 
 /**

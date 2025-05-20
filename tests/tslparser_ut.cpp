@@ -40,20 +40,19 @@ int main(int argc, const char** argv) {
                       expect_eq(expectedChoiceLabel, actualChoiceLabel);
                   };
 
-                  steps.then("Choice {choiceNum} from Category {categoryNum} should contain a {expectedMarkerType} marking.") = [&](size_t choiceNum, size_t categoryNum, std::string typeOfMarking) {
+                  steps.then("Choice {choiceNum} from Category {categoryNum} should contain a {expectedMarkerType} marking.") = [&](size_t choiceNum, size_t categoryNum, std::string expectedMarkerType) {
                       auto category = parser.getCollector().getCategory(categoryNum - 1);
                       auto choice = category.getChoice(choiceNum - 1);
 
-                      std::string actualMarkerType = choice.getMarker().as_string();
+                      std::string actualMarkerType = choice.getMarker();
                       expect_eq(expectedMarkerType, actualMarkerType);
                   };
 
-                  steps.then("Choice {choiceNum} from Category {categoryNum} should contain '{expectedPropertyLabel}' as Property {propertyNum}.") = [&](size_t choiceNum, size_t categoryNum, std::string expectedPropertyContents, size_t propertyNum) {
+                  steps.then("Choice {choiceNum} from Category {categoryNum} should contain '{expectedPropertyLabel}' as Property {propertyNum}.") = [&](size_t choiceNum, size_t categoryNum, std::string expectedPropertyLabel, size_t propertyNum) {
                       auto category = parser.getCollector().getCategory(categoryNum - 1);
                       auto choice = category.getChoice(choiceNum - 1);
-                      auto choiceProperties = choice.getProperties();
 
-                      std::string actualPropertyLabel = choiceProperties[propertyNum - 1];
+                      std::string actualPropertyLabel = choice.getProperty(propertyNum - 1).asString();
                       expect_eq(expectedPropertyLabel, actualPropertyLabel);
                   };
 
@@ -62,7 +61,7 @@ int main(int argc, const char** argv) {
                       auto choice = category.getChoice(choiceNum - 1);
                       auto choiceExpression = choice.getExpression();
 
-                      std::string actualExpression = choiceExpression.as_string();
+                      std::string actualExpression = choiceExpression.value()->asString();
                       expect_eq(expectedExpression, actualExpression);
                   };
               };

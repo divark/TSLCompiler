@@ -11,5 +11,6 @@ parser_sources = files(
   'error_reporting.cpp',
   'expressions.cpp',
   'tsl_collector.cpp',
+  'tsl_grammar.cpp',
   'tsl_parser.cpp',
 ) + bison_generated_sources
