@@ -55,6 +55,10 @@ size_t Choice::getNumProperties() const {
 }
 
 std::optional<std::string> Choice::getMarker() {
+    if (getNumProperties() == 0) {
+        return {};
+    }
+
     auto foundMarker = getRecentProperty().asMarker();
     if (!foundMarker) {
         return {};
