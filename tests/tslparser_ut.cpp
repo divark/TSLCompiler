@@ -44,7 +44,7 @@ int main(int argc, const char** argv) {
                       auto category = parser.getCollector().getCategory(categoryNum - 1);
                       auto choice = category.getChoice(choiceNum - 1);
 
-                      std::string actualMarkerType = choice.getMarker();
+                      std::string actualMarkerType = choice.getMarker().value();
                       expect_eq(expectedMarkerType, actualMarkerType);
                   };
 

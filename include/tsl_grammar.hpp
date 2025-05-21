@@ -39,14 +39,16 @@ class Choice {
         std::vector<Property> normalProperties;
 
         std::optional<std::shared_ptr<Expression>> expression;
-        std::vector<Property> ifProperties;
-        std::vector<Property> elseProperties;
+        std::optional<std::vector<Property>> ifProperties;
+        std::optional<std::vector<Property>> elseProperties;
     public:
         Choice();
         Choice(std::string);
 
         std::string getLabel() const;
-        std::string getMarker();
+        std::optional<std::string> getMarker();
+        bool hasNormalMarker();
+        bool hasConditionalMarker();
         Property& getProperty(size_t);
         Property& getRecentProperty();
         size_t getNumProperties() const;
@@ -55,6 +57,9 @@ class Choice {
         void addProperty(Property);
         void setMarker(Marker);
         void setExpression(std::shared_ptr<Expression>);
+        void movePropertiesToIfProperties();
+        void movePropertiesToElseProperties();
+        void markHavingElse();
 };
 
 class Property {

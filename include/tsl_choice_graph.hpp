@@ -8,14 +8,26 @@
 #include "tsl_collector.hpp"
 #include "tsl_testcase.hpp"
 
+class TSLNode {
+    private:
+        std::string categoryLabel;
+        Choice categoryChoice;
+    public:
+        TSLNode();
+        TSLNode(std::string, Choice);
+
+        std::string getCategoryLabel() const;
+        Choice& getChoice();
+};
+
 class Node {
     private:
         size_t id;
-        TSLChoice data;
+        TSLNode data;
     public:
-        Node(TSLChoice);
+        Node(TSLNode);
 
-        const TSLChoice& getData() const;
+        TSLNode& getData();
         size_t getID() const;
         void setID(size_t);
 };
@@ -34,8 +46,8 @@ class TSLGraph;
 
 class Listener {
     public:
-        virtual bool preorderCheckIn(const TSLGraph&, const Node&) = 0;
-        virtual bool postorderCheckIn(const TSLGraph&, const Node&) = 0;
+        virtual bool preorderCheckIn(const TSLGraph&, Node&) = 0;
+        virtual bool postorderCheckIn(const TSLGraph&, Node&) = 0;
 };
 
 class TestCaseListener : public Listener {
@@ -46,12 +58,12 @@ class TestCaseListener : public Listener {
         size_t numTestCases = 1;
 
         void addTestCase(bool);
-        void addTestChoice(const Node&);
+        void addTestChoice(Node&);
     public:
         TestCaseListener(TSLCollector&);
 
-        bool preorderCheckIn(const TSLGraph&, const Node&);
-        bool postorderCheckIn(const TSLGraph&, const Node&);
+        bool preorderCheckIn(const TSLGraph&, Node&);
+        bool postorderCheckIn(const TSLGraph&, Node&);
 
         std::vector<TSLTestCase> getTestCases();
 };
@@ -68,8 +80,8 @@ class SymbolTableListener: public Listener {
     public:
         SymbolTableListener(TSLCollector&);
 
-        bool preorderCheckIn(const TSLGraph&, const Node&);
-        bool postorderCheckIn(const TSLGraph&, const Node&);
+        bool preorderCheckIn(const TSLGraph&, Node&);
+        bool postorderCheckIn(const TSLGraph&, Node&);
 };
 
 class TSLGraph {
@@ -81,26 +93,27 @@ class TSLGraph {
         std::vector<std::shared_ptr<Listener>> preorderListeners;
         std::vector<std::shared_ptr<Listener>> postorderListeners;
 
-        bool preorderCheckin(const Node&);
-        bool postorderCheckin(const Node&);
+        bool preorderCheckin(Node&);
+        bool postorderCheckin(Node&);
     public:
         TSLGraph();
-        TSLGraph(const TSLCollector&);
+        TSLGraph(TSLCollector&);
 
         void addPreorderListener(std::shared_ptr<Listener>);
         void addPostorderListener(std::shared_ptr<Listener>);
 
-        const std::vector<Node>& getNodes() const;
+        std::vector<Node>& getNodes();
         const std::vector<Node> getEdges(const Node&) const;
         const std::vector<Node>& getVisitedNodes() const;
 
-        void visitDFS(const Node&);
+        void visitDFS(Node&);
 };
 
 // These are the adapters that gets us Nodes from a TSLCollector, just
 // to keep things modular.
-std::vector<Node> getNodesFromCollector(const TSLCollector&);
-Edges getEdgesFromTSLNodes(std::vector<Node>&, const TSLCollector&);
+std::vector<Node> getNodesFromCollector(TSLCollector&);
+Edges getEdgesFromTSLNodes(std::vector<Node>&, TSLCollector&);
 
 std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>&);
-std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>&, size_t);
+std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>&);
+std::vector<Node> filterToNodesWithCategory(const std::vector<Node>&, Category&);

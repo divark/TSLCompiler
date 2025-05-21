@@ -1,30 +1,41 @@
 #include "tsl_choice_graph.hpp"
 #include "tsl_collector.hpp"
 #include "tsl_testcase.hpp"
+
 #include <memory>
+
+TSLNode::TSLNode() {
+    categoryLabel = "";
+    categoryChoice = Choice();
+}
+
+TSLNode::TSLNode(std::string newCategoryLabel, Choice newChoice) {
+    categoryLabel = newCategoryLabel;
+    categoryChoice = newChoice;
+}
+
+std::string TSLNode::getCategoryLabel() const {
+    return categoryLabel;
+}
+
+Choice& TSLNode::getChoice() {
+    return categoryChoice;
+}
 
 /**
  * Returns a collection of Nodes holding all Choices found in their respective Categories.
  */
-std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
+std::vector<Node> getNodesFromCollector(TSLCollector& recordedVariables) {
     std::vector<Node> nodes;
 
-    for (auto categoryIdx = 0; categoryIdx < recordedVariables.categories.size(); categoryIdx++) {
-        auto categoryChoices = recordedVariables.categoryChoicesGraph[categoryIdx];
-        for (auto choiceIdx : categoryChoices) {
-            auto nodeData = TSLChoice(categoryIdx, choiceIdx);
-            // TODO: Refactor the following lines into something like:
-            // auto markerType = parseMarkerType(recordedVariables, choiceIdx);
-            // nodeData.setMarkerType(markerType);
-            auto hasMarker = recordedVariables.singleMarkings[choiceIdx] || recordedVariables.errorMarkings[choiceIdx];
-            nodeData.toggleIfMarker(hasMarker);
-
-            auto hasConditionalMarker = recordedVariables.singleIfMarkings[choiceIdx] || recordedVariables.errorIfMarkings[choiceIdx];
-            nodeData.toggleIfConditionalMarkers(hasConditionalMarker);
-
-            if (hasConditionalMarker) {
-                nodeData.setChoiceExpression(recordedVariables.getChoiceExpression(choiceIdx)->asString());
-            }
+    auto numCategories = recordedVariables.getNumCategories();
+    for (auto categoryIdx = 0; categoryIdx < numCategories; categoryIdx++) {
+        auto currentCategory = recordedVariables.getCategory(categoryIdx);
+        auto numChoices = currentCategory.getNumChoices();
+        for (auto choiceIdx = 0; choiceIdx < numChoices; choiceIdx++) {
+            auto categoryLabel = currentCategory.getLabel();
+            auto categoryChoice = currentCategory.getChoice(choiceIdx);
+            auto nodeData = TSLNode(categoryLabel, categoryChoice);
 
             auto node = Node(nodeData);
             nodes.push_back(node);
@@ -38,7 +49,7 @@ std::vector<Node> getNodesFromCollector(const TSLCollector& recordedVariables) {
  * Returns a directed graph, where the first set of nodes for some category connects
  * to the second, and the second to the third, and so on.
  */
-Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, const TSLCollector& recordedVariables) {
+Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, TSLCollector& recordedVariables) {
     std::vector<std::vector<size_t>> edges;
 
     for (auto i = 0; i < nodes.size(); i++) {
@@ -46,11 +57,15 @@ Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, const TSLCollector& recorde
         edges.push_back(std::vector<size_t>());
     }
 
-    for (auto categoryIdx = 0; categoryIdx < recordedVariables.categories.size() - 1; categoryIdx++) {
-        auto nextCategoryIdx = categoryIdx + 1;
+    auto numCategories = recordedVariables.getNumCategories();
+    for (auto categoryIdx = 0; categoryIdx < numCategories - 1; categoryIdx++) {
+        auto firstCategory = recordedVariables.getCategory(categoryIdx);
+        auto nextCategory = recordedVariables.getCategory(categoryIdx + 1);
 
-        auto firstCategoryNodes = filterToNodesWithCategoryIdx(nodes, categoryIdx);
-        auto secondCategoryNodes = filterToNodesWithCategoryIdx(nodes, nextCategoryIdx);
+        auto firstCategoryNodes = filterToNodesWithCategory(nodes, firstCategory);
+        firstCategoryNodes = filterToNodesWithoutMarkers(firstCategoryNodes);
+        auto secondCategoryNodes = filterToNodesWithCategory(nodes, nextCategory);
+        secondCategoryNodes = filterToNodesWithoutMarkers(secondCategoryNodes);
 
         for (auto firstCategoryNode : firstCategoryNodes) {
             for (auto secondCategoryNode: secondCategoryNodes) {
@@ -70,8 +85,29 @@ std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
 
     for (auto node : nodes) {
         auto nodeData = node.getData();
+        auto nodeChoice = nodeData.getChoice();
 
-        if (!nodeData.hasMarker()) {
+        if (!nodeChoice.hasNormalMarker()) {
+            continue;
+        }
+
+        foundNodes.push_back(node);
+    }
+
+    return foundNodes;
+}
+
+/**
+ * Returns a collection of Nodes that do not contain some Marker.
+ */
+std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>& nodes) {
+    std::vector<Node> foundNodes;
+
+    for (auto node : nodes) {
+        auto nodeData = node.getData();
+        auto nodeChoice = nodeData.getChoice();
+
+        if (nodeChoice.hasNormalMarker()) {
             continue;
         }
 
@@ -85,18 +121,15 @@ std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
  * Returns a collection of Nodes that match the desired Category index.
  * NOTE: This excludes any nodes with markers by default.
  */
-std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>& nodes, size_t desiredCategoryIdx) {
+std::vector<Node> filterToNodesWithCategory(const std::vector<Node>& nodes, Category& desiredCategory) {
     std::vector<Node> foundNodes;
 
+    auto desiredCategoryLabel = desiredCategory.getLabel();
     for (auto node : nodes) {
         auto nodeData = node.getData();
-        auto nodeCategoryIdx = nodeData.getCategoryIdx();
+        auto nodeCategoryLabel = nodeData.getCategoryLabel();
 
-        if (nodeCategoryIdx != desiredCategoryIdx) {
-            continue;
-        }
-
-        if (nodeData.hasMarker()) {
+        if (nodeCategoryLabel != desiredCategoryLabel) {
             continue;
         }
 
@@ -106,7 +139,7 @@ std::vector<Node> filterToNodesWithCategoryIdx(const std::vector<Node>& nodes, s
     return foundNodes;
 }
 
-Node::Node(TSLChoice nodeData) {
+Node::Node(TSLNode nodeData) {
     id = 0;
     data = nodeData;
 }
@@ -128,7 +161,7 @@ void Node::setID(size_t newID) {
 /**
  * Returns the contents of what is held in the current Node.
  */
-const TSLChoice& Node::getData() const {
+TSLNode& Node::getData() {
     return data;
 }
 
@@ -150,18 +183,16 @@ TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variab
 /**
 * Adds a chosen Choice to a currently populated test case.
 */
-void TestCaseListener::addTestChoice(const Node& currentNode) {
+void TestCaseListener::addTestChoice(Node& currentNode) {
     size_t currentTestCase = foundTestCases.size() - 1;
 
-    auto chosenCategoryIdx = currentNode.getData().getCategoryIdx();
-    auto chosenChoiceIdx = currentNode.getData().getChoiceIdx();
+    auto chosenCategory = currentNode.getData().getCategoryLabel();
+    auto chosenChoice = currentNode.getData().getChoice();
+    auto chosenChoiceLabel = chosenChoice.getLabel();
+    foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoiceLabel);
 
-    auto chosenCategory = tslVariables.categories[chosenCategoryIdx];
-    auto chosenChoice = tslVariables.choices[chosenChoiceIdx];
-    foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoice);
-
-    if (currentNode.getData().hasConditionalMarker()) {
-        auto choiceDependency = currentNode.getData().getChoiceExpression();
+    if (chosenChoice.hasConditionalMarker()) {
+        auto choiceDependency = chosenChoice.getExpression().value()->asString();
         foundTestCases[currentTestCase].setChoiceDependency(chosenCategory, choiceDependency, true);
     }
 }
@@ -181,14 +212,15 @@ void TestCaseListener::addTestCase(bool isMarkerCase) {
 /**
 * Creates a TSLTestCase on checking in.
 */
-bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, const Node& currentNode) {
-    bool hasConditionalMarkers = currentNode.getData().hasConditionalMarker();
+bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, Node& currentNode) {
+    auto currentChoice = currentNode.getData().getChoice();
+    bool hasConditionalMarkers = currentChoice.hasConditionalMarker();
     bool canProceed = !currentGraph.getEdges(currentNode).empty() && !hasConditionalMarkers;
     if (canProceed) {
         return canProceed;
     }
 
-    auto isMarkerCase = currentNode.getData().hasMarker() || hasConditionalMarkers;
+    auto isMarkerCase = currentChoice.hasNormalMarker() || hasConditionalMarkers;
     addTestCase(isMarkerCase);
 
     auto visitedNodes = currentGraph.getVisitedNodes();
@@ -199,7 +231,7 @@ bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, const Node&
     return canProceed;
 }
 
-bool TestCaseListener::postorderCheckIn(const TSLGraph& currentGraph, const Node& currentNode) {
+bool TestCaseListener::postorderCheckIn(const TSLGraph& currentGraph, Node& currentNode) {
     bool canProceed = true;
 
     return canProceed;
@@ -237,21 +269,23 @@ void SymbolTableListener::removeLatestProperties() {
 
 * Returns true if no issues were found upon checking in, or false otherwise.
 */
-bool SymbolTableListener::preorderCheckIn(const TSLGraph& graph, const Node& currentNode) {
+bool SymbolTableListener::preorderCheckIn(const TSLGraph& graph, Node& currentNode) {
     bool canProceed = true;
 
-    bool choiceHasExpression = tslVariables.hasStandardExpression(currentNode.getData().getChoiceIdx());
+    auto currentChoice = currentNode.getData().getChoice();
+    auto choiceExpression = currentChoice.getExpression();
+    bool choiceHasExpression = choiceExpression.has_value();
 
-    bool conditionalsSatisfied = !choiceHasExpression || tslVariables.getChoiceExpression(currentNode.getData().getChoiceIdx())->evaluate(symbolTable);
+    bool conditionalsSatisfied = !choiceHasExpression || choiceExpression.value()->evaluate(symbolTable);
     if (!conditionalsSatisfied) {
         canProceed = false;
         return canProceed;
     }
 
-    auto normalProperties = tslVariables.choiceProperties[currentNode.getData().getChoiceIdx()];
-    for (const auto propertyIdx : normalProperties) {
-        auto foundProperty = tslVariables.properties[propertyIdx];
-        latestPropertiesRecorded.push_back(foundProperty);
+    auto numNormalProperties = currentChoice.getNumProperties();
+    for (auto propertyIdx = 0; propertyIdx < numNormalProperties; propertyIdx++) {
+        auto foundProperty = currentChoice.getProperty(propertyIdx);
+        latestPropertiesRecorded.push_back(foundProperty.asString());
     }
 
     addLatestProperties();
@@ -265,7 +299,7 @@ bool SymbolTableListener::preorderCheckIn(const TSLGraph& graph, const Node& cur
 
 * Returns true if no issues were found upon checking in, or false otherwise.
 */
-bool SymbolTableListener::postorderCheckIn(const TSLGraph& graph, const Node& currentNode) {
+bool SymbolTableListener::postorderCheckIn(const TSLGraph& graph, Node& currentNode) {
     bool canProceed = true;
 
     removeLatestProperties();
@@ -278,7 +312,7 @@ TSLGraph::TSLGraph() {}
 * Constructs a permutation-based directed graph derived from
 * variables found in the TSLCollector.
 */
-TSLGraph::TSLGraph(const TSLCollector& tslVariables) {
+TSLGraph::TSLGraph(TSLCollector& tslVariables) {
     this->nodes = getNodesFromCollector(tslVariables);
     this->edges = getEdgesFromTSLNodes(this->nodes, tslVariables);
 }
@@ -286,7 +320,7 @@ TSLGraph::TSLGraph(const TSLCollector& tslVariables) {
 /**
 * Returns a list of nodes currently recorded in the graph.
 */
-const std::vector<Node>& TSLGraph::getNodes() const {
+std::vector<Node>& TSLGraph::getNodes() {
     return this->nodes;
 }
 
@@ -314,7 +348,7 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 /**
 * Checks in with listeners subscribed to preorder events.
 */
-bool TSLGraph::preorderCheckin(const Node& currentNode) {
+bool TSLGraph::preorderCheckin(Node& currentNode) {
     bool canProceed = false;
     for (const auto &preorderListener : preorderListeners) {
         canProceed = preorderListener->preorderCheckIn(*this, currentNode);
@@ -336,7 +370,7 @@ void TSLGraph::addPreorderListener(std::shared_ptr<Listener> preorderListener) {
 /**
 * Checks in with listeners subscribed to postorder events.
 */
-bool TSLGraph::postorderCheckin(const Node& currentNode) {
+bool TSLGraph::postorderCheckin(Node& currentNode) {
     bool canProceed = false;
     for (const auto &postorderListener : postorderListeners) {
         canProceed = postorderListener->postorderCheckIn(*this, currentNode);
@@ -358,7 +392,7 @@ void TSLGraph::addPostorderListener(std::shared_ptr<Listener> postorderListener)
 /**
 * Visits the TSLGraph in a DFS fashion.
 */
-void TSLGraph::visitDFS(const Node& currentNode) {
+void TSLGraph::visitDFS(Node& currentNode) {
     visitedNodes.push_back(currentNode);
 
     bool preorderChecksOut = this->preorderCheckin(currentNode);

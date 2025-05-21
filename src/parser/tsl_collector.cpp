@@ -18,11 +18,20 @@ Category& TSLCollector::getCategory(size_t categoryNum) {
 }
 
 /**
+* Returns the number of Categories recorded so far.
+*/
+size_t TSLCollector::getNumCategories() const {
+    return categories.size();
+}
+
+/**
  * Returns an index to the recently stored Choice for the most recently recorded Category.
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
     auto currentCategory = getCategory(categories.size() - 1);
     currentCategory.addChoice(Choice(choiceContents));
+
+    choiceExpressions.clear();
 
     int choiceIdx = currentCategory.getNumChoices() - 1;
     return choiceIdx;
@@ -32,14 +41,16 @@ int TSLCollector::recordChoice(std::string choiceContents) {
  * Returns an index to the recently stored Property for the most recently recorded Choice.
  */
 int TSLCollector::recordProperty(std::string propertyContents) {
-    auto currentCategory = getCategory(categories.size() - 1);
+    auto categoryIdx = categories.size() - 1;
+    auto currentCategory = getCategory(categoryIdx);
     auto recentChoice = currentCategory.getRecentChoice();
 
     auto propertyWithoutComma = getPropertyWithoutComma(propertyContents);
     recentChoice.addProperty(Property(propertyWithoutComma));
 
-    auto propertiesIdx = recentChoice.getNumProperties() - 1;
+    propertyDefinedInCategory[propertyWithoutComma] = categoryIdx;
 
+    auto propertiesIdx = recentChoice.getNumProperties() - 1;
     return propertiesIdx;
 }
 
@@ -70,19 +81,14 @@ int TSLCollector::markChoiceAsError() {
 }
 
 /**
- * Returns the Expression found for some Choice.
- */
-std::shared_ptr<Expression> TSLCollector::getChoiceExpression(unsigned int choiceIdx) const {
-    return choiceExpressions[choiceIdx][0];
-}
-
-/**
  * Records a newly formed Expression for some Choice.
 */
 int TSLCollector::recordExpression(std::shared_ptr<Expression> expression) {
     auto recentCategory = getCategory(categories.size() - 1);
     auto recentlyAddedChoice = recentCategory.getRecentChoice();
     recentlyAddedChoice.setExpression(expression);
+
+    choiceExpressions.push_back(expression);
 
     return 0;
 }
@@ -103,10 +109,8 @@ int TSLCollector::recordSimpleExpression(std::string propertyContents) {
  * Preconditions: The most recent Choice has at least one Expression.
  */
 int TSLCollector::recordUnaryExpression(ExpType unaryType) {
-    // We want the most recent Expression recorded (2nd call to back()), meaning we have to
-    // get the most recent Choice's Expression (1st call to back()).
-    auto lastExpression = choiceExpressions.back().back();
-    choiceExpressions.back().pop_back();
+    auto lastExpression = choiceExpressions.back();
+    choiceExpressions.pop_back();
     auto unaryExpression = std::make_shared<Expression>(unaryType, lastExpression);
 
     return recordExpression(unaryExpression);
@@ -118,11 +122,11 @@ int TSLCollector::recordUnaryExpression(ExpType unaryType) {
 * Preconditions: The most recent Choice has exactly two Expressions.
 */
 int TSLCollector::recordBinaryExpression(ExpType binaryType) {
-    auto firstExpression = choiceExpressions.back().front();
-    auto lastExpression = choiceExpressions.back().back();
+    auto firstExpression = choiceExpressions.front();
+    auto lastExpression = choiceExpressions.back();
 
     for (int i = 0; i < 2; i++) {
-        choiceExpressions.back().pop_back();
+        choiceExpressions.pop_back();
     }
     auto binaryExpression = std::make_shared<Expression>(binaryType, firstExpression, lastExpression);
 
@@ -145,16 +149,11 @@ bool TSLCollector::isExpressionUndefined(std::shared_ptr<Expression> expression)
  * defined from an If Statement.
  */
 int TSLCollector::convertPropertiesToIfProperties() {
-    auto currentChoiceIdx = choices.size() - 1;
+    auto currentCategory = getCategory(categories.size() - 1);
+    auto currentChoice = currentCategory.getRecentChoice();
+    currentChoice.movePropertiesToIfProperties();
 
-    singleIfMarkings[currentChoiceIdx] = singleMarkings[currentChoiceIdx];
-    singleMarkings[currentChoiceIdx] = false;
-    errorIfMarkings[currentChoiceIdx] = errorMarkings[currentChoiceIdx];
-    errorMarkings[currentChoiceIdx] = false;
-
-    choiceIfProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
-    choiceProperties[currentChoiceIdx] = std::vector<int>();
-
+    auto currentChoiceIdx = 0;
     return currentChoiceIdx;
 }
 
@@ -163,33 +162,32 @@ int TSLCollector::convertPropertiesToIfProperties() {
  * defined from an Else Statement.
  */
 int TSLCollector::convertPropertiesToElseProperties() {
-    auto currentChoiceIdx = choices.size() - 1;
+    auto currentCategory = getCategory(categories.size() - 1);
+    auto currentChoice = currentCategory.getRecentChoice();
+    currentChoice.movePropertiesToElseProperties();
 
-    singleElseMarkings[currentChoiceIdx] = singleMarkings[currentChoiceIdx];
-    singleMarkings[currentChoiceIdx] = false;
-    errorElseMarkings[currentChoiceIdx] = errorMarkings[currentChoiceIdx];
-    errorMarkings[currentChoiceIdx] = false;
-
-    choiceElseProperties[currentChoiceIdx] = choiceProperties[currentChoiceIdx];
-    choiceProperties[currentChoiceIdx] = std::vector<int>();
-
+    auto currentChoiceIdx = 0;
     return currentChoiceIdx;
 }
 
 /**
- * Returns whether a Choice has been flagged having an Else
- * statement.
- */
-bool TSLCollector::hasElseExpression(unsigned int choiceIdx) {
-    return choiceHasElseStatement[choiceIdx];
+* Returns whether a certain Property is already defined in the collector.
+*/
+bool TSLCollector::hasPropertyDefined(std::string propertyToCheck) const {
+    bool hasPropertyDefined = propertyDefinedInCategory.contains(propertyToCheck);
+    return hasPropertyDefined;
 }
 
 /**
-* Returns whether a Choice has been flagged as having an If
-* statement, essentially.
+* Returns an index to the Category mapped to a Property, or none otherwise.
 */
-bool TSLCollector::hasStandardExpression(unsigned int choiceIdx) {
-    return !choiceExpressions[choiceIdx].empty();
+std::optional<size_t> TSLCollector::getPropertyCategoryIndex(std::string propertyToFind) const {
+    if (!propertyDefinedInCategory.contains(propertyToFind)) {
+        return {};
+    }
+
+    size_t foundIndex = propertyDefinedInCategory.at(propertyToFind);
+    return std::make_optional<size_t>(foundIndex);
 }
 
 /**
@@ -197,10 +195,11 @@ bool TSLCollector::hasStandardExpression(unsigned int choiceIdx) {
  * now been flagged to have an Else Statement.
  */
 int TSLCollector::markChoiceHasElse() {
-    auto currentChoiceIdx = choices.size() - 1;
+    auto currentCategory = getCategory(categories.size() - 1);
+    auto currentChoice = currentCategory.getRecentChoice();
+    currentChoice.markHavingElse();
 
-    choiceHasElseStatement[currentChoiceIdx] = true;
-
+    auto currentChoiceIdx = 0;
     return currentChoiceIdx;
 }
 

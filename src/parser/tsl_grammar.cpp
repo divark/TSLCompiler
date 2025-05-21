@@ -54,13 +54,39 @@ size_t Choice::getNumProperties() const {
    return normalProperties.size();
 }
 
-std::string Choice::getMarker() {
+std::optional<std::string> Choice::getMarker() {
     auto foundMarker = getRecentProperty().asMarker();
-    if (foundMarker == Marker::Single) {
-        return "single";
+    if (!foundMarker) {
+        return {};
     }
 
-    return "error";
+    if (foundMarker.value() == Marker::Single) {
+        return std::make_optional<std::string>("single");
+    }
+
+    return std::make_optional<std::string>("error");
+}
+
+bool Choice::hasNormalMarker() {
+    auto foundMarker = getMarker();
+    return foundMarker.has_value();
+}
+
+bool Choice::hasConditionalMarker() {
+    bool hasIfMarker = false;
+    if (ifProperties) {
+        auto lastProperty = ifProperties.value().back().asMarker();
+        hasIfMarker = lastProperty.has_value();
+    }
+
+    bool hasElseMarker = false;
+    if (elseProperties) {
+        auto lastProperty = elseProperties.value().back().asMarker();
+        hasElseMarker = lastProperty.has_value();
+    }
+
+    bool hasConditionalMarker = hasIfMarker || hasElseMarker;
+    return hasConditionalMarker;
 }
 
 std::optional<std::shared_ptr<Expression>> Choice::getExpression() {
@@ -78,6 +104,25 @@ void Choice::setMarker(Marker newMarker) {
 
 void Choice::setExpression(std::shared_ptr<Expression> newExpression) {
     expression = std::make_optional<std::shared_ptr<Expression>>(newExpression);
+}
+
+void Choice::movePropertiesToIfProperties() {
+    std::vector<Property> newIfProperties = normalProperties;
+    normalProperties.clear();
+
+    ifProperties = std::make_optional<std::vector<Property>>(newIfProperties);
+}
+
+void Choice::movePropertiesToElseProperties() {
+    std::vector<Property> newElseProperties = normalProperties;
+    normalProperties.clear();
+
+    elseProperties = std::make_optional<std::vector<Property>>(newElseProperties);
+}
+
+void Choice::markHavingElse() {
+    std::vector<Property> newElseProperties;
+    elseProperties = std::make_optional<std::vector<Property>>(newElseProperties);
 }
 
 Property::Property() {

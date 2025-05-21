@@ -85,7 +85,8 @@ void reportError(const std::string& errorMessage, const yy::location& location) 
 */
 void checkIfCurrentPropertyRedefined(const std::string property, const TSLCollector &collector, const yy::location &locationInCode) {
     std::string propertyWithoutComma = getPropertyWithoutComma(property);
-    if (collector.propertyDefinedInCategory.contains(propertyWithoutComma)) {
+    bool propertyAlreadyDefined = collector.hasPropertyDefined(propertyWithoutComma);
+    if (propertyAlreadyDefined) {
         auto errorSummaryMsg = fmt::format("Error: Property {} was already defined elsewhere.", propertyWithoutComma);
         reportError(errorSummaryMsg, locationInCode);
     }
@@ -96,10 +97,10 @@ void checkIfCurrentPropertyRedefined(const std::string property, const TSLCollec
 * is undefined.
 */
 void checkIfCurrentPropertyUndefined(const std::string property, const TSLCollector &collector, const yy::location &locationInCode) {
-    auto currentCategoryIdx = collector.categories.size() - 1;
-    auto foundPropertyLocation = collector.propertyDefinedInCategory.find(property);
-    auto propertyNotFound = foundPropertyLocation == collector.propertyDefinedInCategory.end();
-    auto propertyInExpressionIsUndefined = propertyNotFound || foundPropertyLocation->second >= currentCategoryIdx;
+    auto currentCategoryIdx = collector.getNumCategories() - 1;
+    auto foundPropertyLocation = collector.getPropertyCategoryIndex(property);
+    auto propertyNotFound = !foundPropertyLocation;
+    auto propertyInExpressionIsUndefined = propertyNotFound || foundPropertyLocation.value() >= currentCategoryIdx;
     if (propertyInExpressionIsUndefined) {
         std::string errorSummaryMsg = fmt::format("Error: Property {} not defined in any prior Categories.", property);
         reportError(errorSummaryMsg, locationInCode);
