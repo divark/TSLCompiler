@@ -70,6 +70,7 @@ Feature: The Parser handles valid TSL input.
         When the Parser collects the variables from the TSL input,
         Then Choice 1 from Category 3 should contain the 'choice1 || choice2' Expression.
 
+    # PENDING: The following Scenarios have to be implemented below:
     Scenario: Properties from an If Expression are found in the Collector from a valid TSL file.
         Given a TSL file called choice_with_property_in_if.txt,
         When the Parser collects the variables from the TSL input,

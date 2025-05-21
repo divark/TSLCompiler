@@ -91,4 +91,4 @@ Feature: The Lexer recognizes valid TSL input.
         Given a TSL file called choice_with_else_alone.txt,
         When the Lexer consumes the input,
         When the Lexer reads up to 'Constraint End' 2,
-        Then the Lexer should have retrieved the Choice's Else Statement.
+        Then the Lexer should have retrieved '[else]'.

@@ -28,7 +28,7 @@ size_t TSLCollector::getNumCategories() const {
  * Returns an index to the recently stored Choice for the most recently recorded Category.
  */
 int TSLCollector::recordChoice(std::string choiceContents) {
-    auto currentCategory = getCategory(categories.size() - 1);
+    auto& currentCategory = getCategory(categories.size() - 1);
     currentCategory.addChoice(Choice(choiceContents));
 
     choiceExpressions.clear();
@@ -42,8 +42,8 @@ int TSLCollector::recordChoice(std::string choiceContents) {
  */
 int TSLCollector::recordProperty(std::string propertyContents) {
     auto categoryIdx = categories.size() - 1;
-    auto currentCategory = getCategory(categoryIdx);
-    auto recentChoice = currentCategory.getRecentChoice();
+    auto& currentCategory = getCategory(categoryIdx);
+    auto& recentChoice = currentCategory.getRecentChoice();
 
     auto propertyWithoutComma = getPropertyWithoutComma(propertyContents);
     recentChoice.addProperty(Property(propertyWithoutComma));
@@ -58,9 +58,9 @@ int TSLCollector::recordProperty(std::string propertyContents) {
  * Returns the Choice used (as an index) to apply a Single Marking.
  */
 int TSLCollector::markChoiceAsSingle() {
-    auto category = getCategory(categories.size() - 1);
+    auto& category = getCategory(categories.size() - 1);
 
-    auto recentlyAddedChoice = category.getRecentChoice();
+    auto& recentlyAddedChoice = category.getRecentChoice();
     recentlyAddedChoice.setMarker(Marker::Single);
 
     auto choiceIdx = category.getNumChoices() - 1;
@@ -71,9 +71,9 @@ int TSLCollector::markChoiceAsSingle() {
  * Returns the Choice used (as an index) to apply an Error Marking.
  */
 int TSLCollector::markChoiceAsError() {
-    auto category = getCategory(categories.size() - 1);
+    auto& category = getCategory(categories.size() - 1);
 
-    auto recentlyAddedChoice = category.getRecentChoice();
+    auto& recentlyAddedChoice = category.getRecentChoice();
     recentlyAddedChoice.setMarker(Marker::Error);
 
     auto choiceIdx = category.getNumChoices() - 1;
@@ -84,8 +84,8 @@ int TSLCollector::markChoiceAsError() {
  * Records a newly formed Expression for some Choice.
 */
 int TSLCollector::recordExpression(std::shared_ptr<Expression> expression) {
-    auto recentCategory = getCategory(categories.size() - 1);
-    auto recentlyAddedChoice = recentCategory.getRecentChoice();
+    auto& recentCategory = getCategory(categories.size() - 1);
+    auto& recentlyAddedChoice = recentCategory.getRecentChoice();
     recentlyAddedChoice.setExpression(expression);
 
     choiceExpressions.push_back(expression);
@@ -149,8 +149,8 @@ bool TSLCollector::isExpressionUndefined(std::shared_ptr<Expression> expression)
  * defined from an If Statement.
  */
 int TSLCollector::convertPropertiesToIfProperties() {
-    auto currentCategory = getCategory(categories.size() - 1);
-    auto currentChoice = currentCategory.getRecentChoice();
+    auto& currentCategory = getCategory(categories.size() - 1);
+    auto& currentChoice = currentCategory.getRecentChoice();
     currentChoice.movePropertiesToIfProperties();
 
     auto currentChoiceIdx = 0;
@@ -162,8 +162,8 @@ int TSLCollector::convertPropertiesToIfProperties() {
  * defined from an Else Statement.
  */
 int TSLCollector::convertPropertiesToElseProperties() {
-    auto currentCategory = getCategory(categories.size() - 1);
-    auto currentChoice = currentCategory.getRecentChoice();
+    auto& currentCategory = getCategory(categories.size() - 1);
+    auto& currentChoice = currentCategory.getRecentChoice();
     currentChoice.movePropertiesToElseProperties();
 
     auto currentChoiceIdx = 0;
@@ -195,8 +195,8 @@ std::optional<size_t> TSLCollector::getPropertyCategoryIndex(std::string propert
  * now been flagged to have an Else Statement.
  */
 int TSLCollector::markChoiceHasElse() {
-    auto currentCategory = getCategory(categories.size() - 1);
-    auto currentChoice = currentCategory.getRecentChoice();
+    auto& currentCategory = getCategory(categories.size() - 1);
+    auto& currentChoice = currentCategory.getRecentChoice();
     currentChoice.markHavingElse();
 
     auto currentChoiceIdx = 0;

@@ -47,7 +47,7 @@ Property& Choice::getProperty(size_t propertyNum) {
 
 Property& Choice::getRecentProperty() {
     auto numProperties = normalProperties.size() - 1;
-    return getProperty(numProperties - 1);
+    return getProperty(numProperties);
 }
 
 size_t Choice::getNumProperties() const {
