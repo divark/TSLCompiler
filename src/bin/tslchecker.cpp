@@ -26,5 +26,8 @@ int main(int argc, char* argv[]) {
     } catch (yy::parser::syntax_error exception) {
         std::cerr << exception.what() << std::endl;
         return 1;
+    } catch (std::string exception) {
+        std::cerr << exception << std::endl;
+        return 1;
     }
 }
