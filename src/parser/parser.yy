@@ -69,14 +69,14 @@ choice:     choice_label constraints
       |     choice_label
       ;
 constraints: label
-          | if_statement else_statement { $$ = collector.markChoiceHasElse(); }
+          | if_statement else_statement
           | if_statement
           ;
 if_statement: CONSTRAINT_START IF expression CONSTRAINT_END label { $$ = collector.convertPropertiesToIfProperties(); }
             | CONSTRAINT_START IF expression CONSTRAINT_END
             ;
 else_statement: ELSE label { $$ = collector.convertPropertiesToElseProperties(); }
-              | ELSE
+              | ELSE       { $$ = collector.markChoiceHasElse(); }
               ;
 expression: expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }

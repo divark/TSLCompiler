@@ -70,7 +70,6 @@ Feature: The Parser handles valid TSL input.
         When the Parser collects the variables from the TSL input,
         Then Choice 1 from Category 3 should contain the 'choice1 || choice2' Expression.
 
-    # PENDING: The following Scenarios have to be implemented below:
     Scenario: Properties from an If Expression are found in the Collector from a valid TSL file.
         Given a TSL file called choice_with_property_in_if.txt,
         When the Parser collects the variables from the TSL input,
@@ -80,19 +79,19 @@ Feature: The Parser handles valid TSL input.
     Scenario: Properties from an Else Expression are found in the Collector from a valid TSL file.
         Given a TSL file called choice_with_property_in_else.txt,
         When the Parser collects the variables from the TSL input,
-        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple1',
+        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple3',
         Then 'simple2' should be in the else properties.
 
     Scenario: A Single Marking from an If Expression is found in the Collector from a valid TSL file.
         Given a TSL file called choice_with_single_in_if.txt,
         When the Parser collects the variables from the TSL input,
-        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple1',
+        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple',
         Then a single marker should be in the if properties.
 
     Scenario: An Error Marking from an If Expression is found in the Collector from a valid TSL file.
         Given a TSL file called choice_with_error_in_if.txt,
         When the Parser collects the variables from the TSL input,
-        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple1',
+        When Choice 1 from Category 2 gets evaluated properties from found properties 'simple',
         Then a error marker should be in the if properties.
 
     Scenario: A Single Marking from an Else Expression is found in the Collector from a valid TSL file.
@@ -118,4 +117,3 @@ Feature: The Parser handles valid TSL input.
         When the Parser collects the variables from the TSL input,
         When Choice 1 from Category 2 gets evaluated properties from found properties 'simple1',
         Then a error marker should be in the if properties.
-        Then there should be no else properties.

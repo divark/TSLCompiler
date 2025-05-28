@@ -50,6 +50,32 @@ Property& Choice::getRecentProperty() {
     return getProperty(numProperties);
 }
 
+std::optional<EvaluatedProperties> Choice::getEvaluatedProperties(const std::unordered_set<std::string>& variablesDefined) {
+    auto choiceExpression = getExpression();
+    if (!choiceExpression) {
+        return {};
+    }
+
+    std::vector<Property> foundProperties;
+    EvaluationType evalType = EvaluationType::If;
+    auto expressionSatisfied = choiceExpression.value()->evaluate(variablesDefined);
+
+    if (!expressionSatisfied) {
+        if (!elseProperties) {
+            return {};
+        } else {
+            evalType = EvaluationType::Else;
+            foundProperties = elseProperties.value();
+        }
+    } else {
+        evalType = EvaluationType::If;
+        foundProperties = ifProperties.value();
+    }
+
+    auto evaluatedProperties = EvaluatedProperties(evalType, foundProperties);
+    return evaluatedProperties;
+}
+
 size_t Choice::getNumProperties() const {
    return normalProperties.size();
 }
@@ -127,6 +153,45 @@ void Choice::movePropertiesToElseProperties() {
 void Choice::markHavingElse() {
     std::vector<Property> newElseProperties;
     elseProperties = std::make_optional<std::vector<Property>>(newElseProperties);
+}
+
+EvaluatedProperties::EvaluatedProperties(EvaluationType evalType, std::vector<Property> evaluatedProperties) {
+    evaluationType = evalType;
+    properties = evaluatedProperties;
+}
+
+EvaluationType EvaluatedProperties::getType() {
+    return evaluationType;
+}
+
+bool EvaluatedProperties::containsProperty(const std::string& propertyToFind) {
+    bool foundProperty = false;
+    for (auto& property : properties) {
+        if (property.asString() == propertyToFind) {
+            foundProperty = true;
+            break;
+        }
+    }
+
+    return foundProperty;
+}
+
+bool EvaluatedProperties::containsMarker(Marker& markerToFind) {
+    if (properties.size() != 1) {
+        return false;
+    }
+
+    auto markerProperty = properties[0].asMarker();
+    if (!markerProperty) {
+        return false;
+    }
+
+    auto markerType = markerProperty.value();
+    return markerType == markerToFind;
+}
+
+bool EvaluatedProperties::is_empty() const {
+    return properties.empty();
 }
 
 Property::Property() {

@@ -1,6 +1,5 @@
 #include <boost/ut.hpp>
 #include <fstream>
-#include <memory>
 
 #include "tsl_parser.hpp"
 

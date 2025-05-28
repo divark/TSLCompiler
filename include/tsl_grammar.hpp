@@ -3,6 +3,7 @@
 #include "expressions.hpp"
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 #include <optional>
 
@@ -32,6 +33,25 @@ enum Marker {
     Error,
 };
 
+enum EvaluationType {
+    If,
+    Else,
+};
+
+class EvaluatedProperties {
+    private:
+        EvaluationType evaluationType;
+        std::vector<Property> properties;
+    public:
+        EvaluatedProperties(EvaluationType, std::vector<Property>);
+
+        EvaluationType getType();
+        bool containsProperty(const std::string&);
+        bool containsMarker(Marker&);
+
+        bool is_empty() const;
+};
+
 class Choice {
     private:
         std::string label;
@@ -51,6 +71,7 @@ class Choice {
         bool hasConditionalMarker();
         Property& getProperty(size_t);
         Property& getRecentProperty();
+        std::optional<EvaluatedProperties> getEvaluatedProperties(const std::unordered_set<std::string>&);
         size_t getNumProperties() const;
         std::optional<std::shared_ptr<Expression>> getExpression();
 
