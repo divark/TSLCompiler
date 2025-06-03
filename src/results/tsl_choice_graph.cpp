@@ -1,5 +1,6 @@
 #include "tsl_choice_graph.hpp"
 #include "tsl_collector.hpp"
+#include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
 #include <cassert>
 
@@ -269,7 +270,7 @@ bool TSLGraph::postorderCheckin(Node& currentNode) {
     auto recentNode = visitedNodes[recentNodeVisitedIdx];
     auto recentNodeID = recentNode.getID();
 
-    if (nodeProperties.contains(recentNodeID)) {
+    if (!nodeProperties.contains(recentNodeID)) {
         return canProceed;
     }
 
@@ -306,16 +307,35 @@ void TSLGraph::addProperty(Property& propertyToAdd) {
 }
 
 /**
-* Generates a test case if there are no markers present.
+* Returns a Test Case built by the recently visited TSLNodes
+* populated by visitDFS.
 */
-void TSLGraph::generateNormalTestCase() {
+TSLTestCase TSLGraph::makeTestCase() {
     TSLTestCase testCase;
 
     for (auto& recentNode : visitedNodes) {
         auto categoryLabel = recentNode.getData().getCategoryLabel();
-        auto choiceLabel = recentNode.getData().getChoice().getLabel();
+        auto& choice = recentNode.getData().getChoice();
+        auto choiceLabel = choice.getLabel();
         testCase.addCategoryChoice(categoryLabel, choiceLabel);
+
+        auto hasEvaluatedProperties = choice.getEvaluatedProperties(seenPropertiesOverall);
+        if (!hasEvaluatedProperties) {
+            continue;
+        }
+
+        auto isIfStatement = hasEvaluatedProperties.value().getType() == EvaluationType::If;
+        testCase.setChoiceDependency(categoryLabel, choice.getExpression().value()->asString(), isIfStatement);
     }
+
+    return testCase;
+}
+
+/**
+* Generates a test case if there are no markers present.
+*/
+void TSLGraph::generateNormalTestCase() {
+    auto testCase = makeTestCase();
 
     generatedTestCases.push_back(testCase);
 }
@@ -324,14 +344,7 @@ void TSLGraph::generateNormalTestCase() {
 * Generates a test case flagged as an edge case if markers are present.
 */
 void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
-    TSLTestCase testCase;
-
-    for (auto& recentNode : visitedNodes) {
-        auto categoryLabel = recentNode.getData().getCategoryLabel();
-        auto& choice = recentNode.getData().getChoice();
-        auto choiceLabel = choice.getLabel();
-        testCase.addCategoryChoice(categoryLabel, choiceLabel);
-    }
+    auto testCase = makeTestCase();
 
     testCase.toggleIsMarker(true);
     generatedTestCases.push_back(testCase);

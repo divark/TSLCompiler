@@ -57,6 +57,7 @@ class TSLGraph {
         bool postorderCheckin(Node&);
 
         void addProperty(Property&);
+        TSLTestCase makeTestCase();
         void generateNormalTestCase();
         void generateMarkerTestCase(Marker&);
     public:

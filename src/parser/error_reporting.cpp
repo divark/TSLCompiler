@@ -5,8 +5,15 @@
 #include <fstream>
 #include <sstream>
 
-#include "parser.hpp"
 #include "tsl_collector.hpp"
+
+TSLException::TSLException(std::string errorMessage) {
+    errorReported = errorMessage;
+}
+
+const std::string& TSLException::getErrorMessage() const {
+    return errorReported;
+}
 
 FileReader::FileReader(std::string fileName) {
     std::ifstream inputContents(fileName);
@@ -76,7 +83,7 @@ void reportError(const std::string& errorMessage, const yy::location& location) 
 
     std::string errorPointingToMsg = getPointingMsg(location);
     errorMessageSummary << errorPointingToMsg;
-    throw yy::parser::syntax_error(location, errorMessageSummary.str());
+    throw TSLException(errorMessageSummary.str());
 }
 
 /**

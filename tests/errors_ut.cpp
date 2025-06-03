@@ -1,6 +1,7 @@
 #include <boost/ut.hpp>
 #include <fstream>
 
+#include "error_reporting.hpp"
 #include "tsl_parser.hpp"
 
 namespace fs = std::filesystem;
@@ -82,10 +83,8 @@ int main(int argc, const char** argv) {
                     TSLParser parser(tslInput);
                     try {
                         parser.run();
-                    } catch (yy::parser::syntax_error syntaxException) {
-                        stderrListener.setCurrentErrorMsg(syntaxException.what());
-                    } catch (std::string errorMessage) {
-                        stderrListener.setCurrentErrorMsg(errorMessage);
+                    } catch (TSLException syntaxException) {
+                        stderrListener.setCurrentErrorMsg(syntaxException.getErrorMessage());
                     }
 
                     steps.then("line {lineNumber} of the error message should mention '{errorFound}'.") = [&](size_t lineNumber, std::string errorFound) {

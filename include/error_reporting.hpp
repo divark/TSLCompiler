@@ -5,7 +5,15 @@
 
 #include <vector>
 #include <string>
-#include <cstdint>
+
+class TSLException {
+    private:
+        std::string errorReported;
+    public:
+        TSLException(std::string);
+
+        const std::string& getErrorMessage() const;
+};
 
 class FileReader {
     private:

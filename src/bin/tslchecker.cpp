@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 
+#include "error_reporting.hpp"
 #include "tsl_parser.hpp"
 
 int main(int argc, char* argv[]) {
@@ -23,11 +24,8 @@ int main(int argc, char* argv[]) {
         }
 
         return parserStatus;
-    } catch (yy::parser::syntax_error exception) {
-        std::cerr << exception.what() << std::endl;
-        return 1;
-    } catch (std::string exception) {
-        std::cerr << exception << std::endl;
+    } catch (TSLException exception) {
+        std::cerr << exception.getErrorMessage() << std::endl;
         return 1;
     }
 }
