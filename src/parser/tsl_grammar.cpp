@@ -73,7 +73,9 @@ std::optional<EvaluatedProperties> Choice::getEvaluatedProperties(const std::uno
         }
     } else {
         evalType = EvaluationType::If;
-        foundProperties = ifProperties.value();
+        if (ifProperties) {
+            foundProperties = ifProperties.value();
+        }
     }
 
     auto evaluatedProperties = EvaluatedProperties(evalType, foundProperties);
