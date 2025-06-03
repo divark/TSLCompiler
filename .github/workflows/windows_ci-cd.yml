@@ -102,13 +102,15 @@ jobs:
       - name: Compile the project
         run: meson compile -C build
 
-      - name: Upload TSLChecker binary
+      - name: Upload TSLChecker binary if this is not a release.
         uses: actions/upload-artifact@v4
+        if: github.ref_type != 'tag'
         with:
           path: build/tslchecker.exe
           name: tslchecker-windows-latest
 
       - name: Prepare artifacts for release if it exists.
+        if: github.ref_type == 'tag'
         run: cp build/tslchecker.exe tslchecker-windows-latest.exe
 
       - name: Upload TSLChecker binary to release if it exists.
