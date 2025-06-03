@@ -2,6 +2,9 @@ on: [push]
 
 name: Continuous Integration / Continuous Deployment (Unix-based)
 
+permissions:
+  contents: write
+
 jobs:
   check:
     name: Verify code behaves as intended
@@ -102,6 +105,9 @@ jobs:
         with:
           path: build/tslchecker
           name: tslchecker-${{ matrix.os }}
+
+      - name: Prepare artifacts for release if it exists.
+        run: cp build/tslchecker tslchecker-${{ matrix.os }}
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2

@@ -2,6 +2,9 @@ on: [push]
 
 name: Continuous Integration / Continuous Deployment (Windows)
 
+permissions:
+  contents: write
+
 jobs:
   check:
     name: Verify code behaves as intended
@@ -105,8 +108,11 @@ jobs:
           path: build/tslchecker.exe
           name: tslchecker-windows-latest
 
+      - name: Prepare artifacts for release if it exists.
+        run: cp build/tslchecker.exe tslchecker-windows-latest.exe
+
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslchecker-windows-latest
+          files: tslchecker-windows-latest.exe
