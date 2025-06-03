@@ -45,6 +45,10 @@ Property& Choice::getProperty(size_t propertyNum) {
     return normalProperties[propertyNum];
 }
 
+std::vector<Property>& Choice::getProperties() {
+    return normalProperties;
+}
+
 Property& Choice::getRecentProperty() {
     auto numProperties = normalProperties.size() - 1;
     return getProperty(numProperties);
@@ -164,6 +168,10 @@ EvaluationType EvaluatedProperties::getType() {
     return evaluationType;
 }
 
+std::vector<Property>& EvaluatedProperties::getProperties() {
+    return properties;
+}
+
 bool EvaluatedProperties::containsProperty(const std::string& propertyToFind) {
     bool foundProperty = false;
     for (auto& property : properties) {
@@ -203,6 +211,7 @@ Property::Property(Marker newMarker) {
 }
 
 Property::Property(std::string variableDefined) {
+    marker = Marker::None;
     this->variableDefined = variableDefined;
 }
 

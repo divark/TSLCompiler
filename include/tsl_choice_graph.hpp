@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <cstddef>
@@ -42,69 +42,32 @@ class Edges {
         const std::vector<size_t>& getNodeEdges(const Node&) const;
 };
 
-class TSLGraph;
-
-class Listener {
-    public:
-        virtual bool preorderCheckIn(const TSLGraph&, Node&) = 0;
-        virtual bool postorderCheckIn(const TSLGraph&, Node&) = 0;
-};
-
-class TestCaseListener : public Listener {
-    private:
-        TSLCollector& tslVariables;
-        std::vector<TSLTestCase> foundTestCases;
-
-        size_t numTestCases = 1;
-
-        void addTestCase(bool);
-        void addTestChoice(Node&);
-    public:
-        TestCaseListener(TSLCollector&);
-
-        bool preorderCheckIn(const TSLGraph&, Node&);
-        bool postorderCheckIn(const TSLGraph&, Node&);
-
-        std::vector<TSLTestCase> getTestCases();
-};
-
-class SymbolTableListener: public Listener {
-    private:
-        std::vector<std::string> latestPropertiesRecorded;
-
-        TSLCollector& tslVariables;
-        std::unordered_set<std::string> symbolTable;
-
-        void addLatestProperties();
-        void removeLatestProperties();
-    public:
-        SymbolTableListener(TSLCollector&);
-
-        bool preorderCheckIn(const TSLGraph&, Node&);
-        bool postorderCheckIn(const TSLGraph&, Node&);
-};
-
 class TSLGraph {
     private:
         std::vector<Node> nodes;
         std::vector<Node> visitedNodes;
         Edges edges;
 
-        std::vector<std::shared_ptr<Listener>> preorderListeners;
-        std::vector<std::shared_ptr<Listener>> postorderListeners;
+        std::vector<TSLTestCase> generatedTestCases;
+
+        std::unordered_map<size_t, std::vector<std::string>> nodeProperties;
+        std::unordered_set<std::string> seenPropertiesOverall;
 
         bool preorderCheckin(Node&);
         bool postorderCheckin(Node&);
+
+        void addProperty(Property&);
+        void generateNormalTestCase();
+        void generateMarkerTestCase(Marker&);
     public:
         TSLGraph();
         TSLGraph(TSLCollector&);
 
-        void addPreorderListener(std::shared_ptr<Listener>);
-        void addPostorderListener(std::shared_ptr<Listener>);
-
         std::vector<Node>& getNodes();
         const std::vector<Node> getEdges(const Node&) const;
         const std::vector<Node>& getVisitedNodes() const;
+
+        std::vector<TSLTestCase>& getGeneratedTestCases();
 
         void visitDFS(Node&);
 };

@@ -1,8 +1,7 @@
 #include "tsl_choice_graph.hpp"
 #include "tsl_collector.hpp"
 #include "tsl_testcase.hpp"
-
-#include <memory>
+#include <cassert>
 
 TSLNode::TSLNode() {
     categoryLabel = "";
@@ -178,134 +177,6 @@ const std::vector<size_t>& Edges::getNodeEdges(const Node& node) const {
     return edges[node.getID()];
 }
 
-TestCaseListener::TestCaseListener(TSLCollector& variables): tslVariables(variables) {}
-
-/**
-* Adds a chosen Choice to a currently populated test case.
-*/
-void TestCaseListener::addTestChoice(Node& currentNode) {
-    size_t currentTestCase = foundTestCases.size() - 1;
-
-    auto chosenCategory = currentNode.getData().getCategoryLabel();
-    auto chosenChoice = currentNode.getData().getChoice();
-    auto chosenChoiceLabel = chosenChoice.getLabel();
-    foundTestCases[currentTestCase].addCategoryChoice(chosenCategory, chosenChoiceLabel);
-
-    if (chosenChoice.hasConditionalMarker()) {
-        auto choiceDependency = chosenChoice.getExpression().value()->asString();
-        foundTestCases[currentTestCase].setChoiceDependency(chosenCategory, choiceDependency, true);
-    }
-}
-
-/**
-* Inserts a test case populated by variables found in a node.
-*/
-void TestCaseListener::addTestCase(bool isMarkerCase) {
-    auto testCase = TSLTestCase();
-    testCase.toggleIsMarker(isMarkerCase);
-    testCase.setTestCaseNumber(this->numTestCases);
-    numTestCases++;
-
-    foundTestCases.push_back(testCase);
-}
-
-/**
-* Creates a TSLTestCase on checking in.
-*/
-bool TestCaseListener::preorderCheckIn(const TSLGraph& currentGraph, Node& currentNode) {
-    auto currentChoice = currentNode.getData().getChoice();
-    bool hasConditionalMarkers = currentChoice.hasConditionalMarker();
-    bool canProceed = !currentGraph.getEdges(currentNode).empty() && !hasConditionalMarkers;
-    if (canProceed) {
-        return canProceed;
-    }
-
-    auto isMarkerCase = currentChoice.hasNormalMarker() || hasConditionalMarkers;
-    addTestCase(isMarkerCase);
-
-    auto visitedNodes = currentGraph.getVisitedNodes();
-    for (auto node : visitedNodes) {
-        addTestChoice(node);
-    }
-
-    return canProceed;
-}
-
-bool TestCaseListener::postorderCheckIn(const TSLGraph& currentGraph, Node& currentNode) {
-    bool canProceed = true;
-
-    return canProceed;
-}
-
-std::vector<TSLTestCase> TestCaseListener::getTestCases() {
-    return foundTestCases;
-}
-
-SymbolTableListener::SymbolTableListener(TSLCollector& collectorVariables): tslVariables(collectorVariables) {}
-
-/**
-* Adds the latest properties into the symbol table.
-*/
-void SymbolTableListener::addLatestProperties() {
-    for (auto property : latestPropertiesRecorded) {
-        symbolTable.insert(property);
-    }
-}
-
-/**
-* Removes, then clears the latest properties in the symbol table.
-*/
-void SymbolTableListener::removeLatestProperties() {
-    for (auto property : latestPropertiesRecorded) {
-        symbolTable.erase(property);
-    }
-
-    latestPropertiesRecorded.clear();
-}
-
-/**
-* Registers properties for the current node if any were found if checked in
-* preorder, otherwise removes them.
-
-* Returns true if no issues were found upon checking in, or false otherwise.
-*/
-bool SymbolTableListener::preorderCheckIn(const TSLGraph& graph, Node& currentNode) {
-    bool canProceed = true;
-
-    auto currentChoice = currentNode.getData().getChoice();
-    auto choiceExpression = currentChoice.getExpression();
-    bool choiceHasExpression = choiceExpression.has_value();
-
-    bool conditionalsSatisfied = !choiceHasExpression || choiceExpression.value()->evaluate(symbolTable);
-    if (!conditionalsSatisfied) {
-        canProceed = false;
-        return canProceed;
-    }
-
-    auto numNormalProperties = currentChoice.getNumProperties();
-    for (auto propertyIdx = 0; propertyIdx < numNormalProperties; propertyIdx++) {
-        auto foundProperty = currentChoice.getProperty(propertyIdx);
-        latestPropertiesRecorded.push_back(foundProperty.asString());
-    }
-
-    addLatestProperties();
-
-    return canProceed;
-}
-
-/**
-* Registers properties for the current node if any were found if checked in
-* preorder, otherwise removes them.
-
-* Returns true if no issues were found upon checking in, or false otherwise.
-*/
-bool SymbolTableListener::postorderCheckIn(const TSLGraph& graph, Node& currentNode) {
-    bool canProceed = true;
-
-    removeLatestProperties();
-    return canProceed;
-}
-
 TSLGraph::TSLGraph() {}
 
 /**
@@ -346,47 +217,124 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 }
 
 /**
-* Checks in with listeners subscribed to preorder events.
+* Returns the list of generated test cases after running visitDFS.
 */
-bool TSLGraph::preorderCheckin(Node& currentNode) {
-    bool canProceed = false;
-    for (const auto &preorderListener : preorderListeners) {
-        canProceed = preorderListener->preorderCheckIn(*this, currentNode);
-        if (!canProceed) {
-            return canProceed;
-        }
-    }
-
-    return canProceed;
+std::vector<TSLTestCase>& TSLGraph::getGeneratedTestCases() {
+    return generatedTestCases;
 }
 
 /**
-* Subscribes a listener to preorder traversal events.
+* Checks in with listeners subscribed to preorder events.
 */
-void TSLGraph::addPreorderListener(std::shared_ptr<Listener> preorderListener) {
-    this->preorderListeners.push_back(preorderListener);
+bool TSLGraph::preorderCheckin(Node& currentNode) {
+    bool canProceed = true;
+
+    auto currentChoice = currentNode.getData().getChoice();
+    std::vector<Property> choiceProperties;
+    if (currentChoice.getExpression()) {
+        auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
+        if (!evaluatedChoiceProperties) {
+            return false;
+        }
+
+        choiceProperties = evaluatedChoiceProperties.value().getProperties();
+    } else {
+        choiceProperties = currentChoice.getProperties();
+    }
+
+    for (auto property : choiceProperties) {
+        auto markerFound = property.asMarker();
+        if (markerFound) {
+            generateMarkerTestCase(markerFound.value());
+            return false;
+        }
+
+        addProperty(property);
+    }
+
+    return canProceed;
 }
 
 /**
 * Checks in with listeners subscribed to postorder events.
 */
 bool TSLGraph::postorderCheckin(Node& currentNode) {
-    bool canProceed = false;
-    for (const auto &postorderListener : postorderListeners) {
-        canProceed = postorderListener->postorderCheckIn(*this, currentNode);
-        if (!canProceed) {
-            return canProceed;
-        }
+    bool canProceed = true;
+
+    if (visitedNodes.empty()) {
+        return canProceed;
     }
+
+    auto recentNodeVisitedIdx = visitedNodes.size() - 1;
+    auto recentNode = visitedNodes[recentNodeVisitedIdx];
+    auto recentNodeID = recentNode.getID();
+
+    if (nodeProperties.contains(recentNodeID)) {
+        return canProceed;
+    }
+
+    auto recentChoiceProperties = nodeProperties[recentNodeID];
+    for (auto recentProperty : recentChoiceProperties) {
+        seenPropertiesOverall.erase(recentProperty);
+    }
+
+    nodeProperties.erase(recentNodeID);
 
     return canProceed;
 }
 
 /**
-* Subscribes a listener to preorder traversal events.
+* Adds the Choice's property into the record of overall seen properties
+* up until this point.
 */
-void TSLGraph::addPostorderListener(std::shared_ptr<Listener> postorderListener) {
-    this->postorderListeners.push_back(postorderListener);
+void TSLGraph::addProperty(Property& propertyToAdd) {
+    if (propertyToAdd.asMarker()) {
+        return;
+    }
+
+    seenPropertiesOverall.insert(propertyToAdd.asString());
+
+    auto recentNodeVisitedIdx = visitedNodes.size() - 1;
+    auto recentNode = visitedNodes[recentNodeVisitedIdx];
+    auto recentNodeID = recentNode.getID();
+    if (!nodeProperties.contains(recentNodeID)) {
+        std::vector<std::string> propertiesFound;
+        nodeProperties.insert({recentNodeID, propertiesFound});
+    }
+
+    nodeProperties[recentNodeID].push_back(propertyToAdd.asString());
+}
+
+/**
+* Generates a test case if there are no markers present.
+*/
+void TSLGraph::generateNormalTestCase() {
+    TSLTestCase testCase;
+
+    for (auto& recentNode : visitedNodes) {
+        auto categoryLabel = recentNode.getData().getCategoryLabel();
+        auto choiceLabel = recentNode.getData().getChoice().getLabel();
+        testCase.addCategoryChoice(categoryLabel, choiceLabel);
+    }
+
+    generatedTestCases.push_back(testCase);
+}
+
+/**
+* Generates a test case flagged as an edge case if markers are present.
+*/
+void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
+    TSLTestCase testCase;
+
+    for (auto& recentNode : visitedNodes) {
+        auto categoryLabel = recentNode.getData().getCategoryLabel();
+        auto& choice = recentNode.getData().getChoice();
+        auto choiceLabel = choice.getLabel();
+        testCase.addCategoryChoice(categoryLabel, choiceLabel);
+    }
+
+    testCase.toggleIsMarker(true);
+    generatedTestCases.push_back(testCase);
 }
 
 /**
@@ -402,11 +350,14 @@ void TSLGraph::visitDFS(Node& currentNode) {
     }
 
     auto nodeEdges = this->getEdges(currentNode);
+    if (nodeEdges.empty()) {
+        generateNormalTestCase();
+    }
+
     for (auto edgeNode : nodeEdges) {
         visitDFS(edgeNode);
     }
 
-    visitedNodes.pop_back();
-
     this->postorderCheckin(currentNode);
+    visitedNodes.pop_back();
 }

@@ -46,9 +46,10 @@ class EvaluatedProperties {
         EvaluatedProperties(EvaluationType, std::vector<Property>);
 
         EvaluationType getType();
+        std::vector<Property>& getProperties();
+
         bool containsProperty(const std::string&);
         bool containsMarker(Marker&);
-
         bool is_empty() const;
 };
 
@@ -70,6 +71,7 @@ class Choice {
         bool hasNormalMarker();
         bool hasConditionalMarker();
         Property& getProperty(size_t);
+        std::vector<Property>& getProperties();
         Property& getRecentProperty();
         std::optional<EvaluatedProperties> getEvaluatedProperties(const std::unordered_set<std::string>&);
         size_t getNumProperties() const;
