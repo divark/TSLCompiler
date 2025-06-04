@@ -2,7 +2,6 @@
 #include "tsl_collector.hpp"
 #include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
-#include <cassert>
 
 TSLNode::TSLNode() {
     categoryLabel = "";
@@ -119,7 +118,6 @@ std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>& nodes) {
 
 /**
  * Returns a collection of Nodes that match the desired Category index.
- * NOTE: This excludes any nodes with markers by default.
  */
 std::vector<Node> filterToNodesWithCategory(const std::vector<Node>& nodes, Category& desiredCategory) {
     std::vector<Node> foundNodes;
@@ -234,6 +232,8 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
     std::vector<Property> choiceProperties;
     if (currentChoice.getExpression()) {
         auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
+        // No properties returning means that the expression was not satisfied, indicating that
+        // there was not an else statement either.
         if (!evaluatedChoiceProperties) {
             return false;
         }
@@ -245,6 +245,9 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
 
     for (auto property : choiceProperties) {
         auto markerFound = property.asMarker();
+        // Any Choice containing a Marker is considered a dead-end,
+        // since we want the minimal number of choices leading up to
+        // it that causes the edge case.
         if (markerFound) {
             generateMarkerTestCase(markerFound.value());
             return false;
