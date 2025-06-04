@@ -55,7 +55,7 @@ void TSLTestCase::setChoiceDependency(const std::string& chosenCategory, std::st
     if (isIf) {
         newChoiceDependency = "follows [if " + choiceDependency + "]";
     } else {
-        newChoiceDependency = "follows [else] after [if " + choiceDependency + "]";
+        newChoiceDependency = "follows [else] from [if " + choiceDependency + "]";
     }
 
     choiceDependencies[categoryChoice] = newChoiceDependency;
