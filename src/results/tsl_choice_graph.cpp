@@ -228,6 +228,10 @@ std::vector<TSLTestCase>& TSLGraph::getGeneratedTestCases() {
 bool TSLGraph::preorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
+    if (isNonApplicable(currentNode)) {
+        return canProceed;
+    }
+
     auto currentChoice = currentNode.getData().getChoice();
     std::vector<Property> choiceProperties;
     if (currentChoice.getExpression()) {
@@ -254,6 +258,11 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
         }
 
         addProperty(property);
+    }
+
+    bool nextChoicesAreAllNotApplicable = checkIfNextCategoryNotApplicable(currentNode);
+    if (nextChoicesAreAllNotApplicable) {
+        addNonApplicables(currentNode);
     }
 
     return canProceed;
@@ -283,6 +292,8 @@ bool TSLGraph::postorderCheckin(Node& currentNode) {
     }
 
     nodeProperties.erase(recentNodeID);
+
+    removeNonApplicables(currentNode);
 
     return canProceed;
 }
@@ -320,6 +331,10 @@ TSLTestCase TSLGraph::makeTestCase() {
         auto categoryLabel = recentNode.getData().getCategoryLabel();
         auto& choice = recentNode.getData().getChoice();
         auto choiceLabel = choice.getLabel();
+        if (isNonApplicable(recentNode)) {
+            choiceLabel = "N/A";
+        }
+
         testCase.addCategoryChoice(categoryLabel, choiceLabel);
 
         auto hasEvaluatedProperties = choice.getEvaluatedProperties(seenPropertiesOverall);
@@ -351,6 +366,73 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
 
     testCase.toggleIsMarker(true);
     generatedTestCases.push_back(testCase);
+}
+
+/**
+ * Adds all edges connected to the current node in the set of non applicables.
+ */
+void TSLGraph::addNonApplicables(Node& currentNode) {
+    auto nodeEdges = getEdges(currentNode);
+
+    std::vector<size_t> nodeFoundNonApplicables;
+    for (auto& nextNode : nodeEdges) {
+        nodeFoundNonApplicables.push_back(nextNode.getID());
+        nonApplicablesSeen.insert(nextNode.getID());
+    }
+
+    nodesDiscoveredNonApplicables.insert({currentNode.getID(), nodeFoundNonApplicables});
+}
+
+/**
+ * Removes the recent set of non applicable edges for the current node.
+ */
+void TSLGraph::removeNonApplicables(Node& currentNode) {
+    if (!nodesDiscoveredNonApplicables.contains(currentNode.getID())) {
+        return;
+    }
+
+    auto& nodeFoundNonApplicables = nodesDiscoveredNonApplicables[currentNode.getID()];
+    for (auto& nextNodeID : nodeFoundNonApplicables) {
+        nonApplicablesSeen.erase(nextNodeID);
+    }
+
+    nodesDiscoveredNonApplicables.erase(currentNode.getID());
+}
+
+/**
+ * Checks whether the current node was flagged as Non Applicable.
+ */
+bool TSLGraph::isNonApplicable(Node& currentNode) {
+    return nonApplicablesSeen.contains(currentNode.getID());
+}
+
+/**
+ * Returns whether all edges going to the next Category are
+ * unreachable. Unreachable for some edge means that a next Choice
+ * has an expression that is not satisfied.
+ */
+bool TSLGraph::checkIfNextCategoryNotApplicable(Node& currentNode) {
+    auto nodeEdges = getEdges(currentNode);
+    if (nodeEdges.empty()) {
+        return false;
+    }
+
+    bool allEdgesNotSatisfied = true;
+    for (auto& nextNode : nodeEdges) {
+        auto nextNodeExpression = nextNode.getData().getChoice().getExpression();
+        if (!nextNodeExpression) {
+            allEdgesNotSatisfied = false;
+            break;
+        }
+
+        bool nextNodeSatisfied = nextNodeExpression.value()->evaluate(seenPropertiesOverall);
+        if (nextNodeSatisfied) {
+            allEdgesNotSatisfied = false;
+            break;
+        }
+    }
+
+    return allEdgesNotSatisfied;
 }
 
 /**
