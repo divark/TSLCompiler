@@ -228,13 +228,11 @@ std::vector<TSLTestCase>& TSLGraph::getGeneratedTestCases() {
 bool TSLGraph::preorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
-    if (isNonApplicable(currentNode)) {
-        return canProceed;
-    }
+    bool currentNodeNonApplicable = isNonApplicable(currentNode);
 
     auto currentChoice = currentNode.getData().getChoice();
     std::vector<Property> choiceProperties;
-    if (currentChoice.getExpression()) {
+    if (currentChoice.getExpression() && !currentNodeNonApplicable) {
         auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
         // No properties returning means that the expression was not satisfied, indicating that
         // there was not an else statement either.
@@ -243,7 +241,7 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
         }
 
         choiceProperties = evaluatedChoiceProperties.value().getProperties();
-    } else {
+    } else if (!currentNodeNonApplicable) {
         choiceProperties = currentChoice.getProperties();
     }
 
@@ -274,6 +272,8 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
 bool TSLGraph::postorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
+    removeNonApplicables(currentNode);
+
     if (visitedNodes.empty()) {
         return canProceed;
     }
@@ -293,7 +293,6 @@ bool TSLGraph::postorderCheckin(Node& currentNode) {
 
     nodeProperties.erase(recentNodeID);
 
-    removeNonApplicables(currentNode);
 
     return canProceed;
 }
