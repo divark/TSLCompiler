@@ -84,3 +84,20 @@ test(
   verbose: true,
   workdir: working_directory,
 )
+
+# Testing whether arguments are parsed correctly.
+compiler_arguments_feature = files('feature-files/compiler-arguments.feature')
+compiler_arguments_sources = files('compiler-arguments.cpp')
+compiler_arguments_executable = executable(
+  'compiler_arguments-test',
+  sources: compiler_arguments_sources + app_sources,
+  dependencies: [test_ut_dep, format_dependency],
+  include_directories: inc,
+)
+test(
+  'compiler_arguments',
+  compiler_arguments_executable,
+  args: compiler_arguments_feature,
+  verbose: true,
+  workdir: working_directory,
+)

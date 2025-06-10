@@ -14,3 +14,18 @@ class TSLCompiler {
         TSLCollector& getCollector();
         std::vector<TSLTestCase>& getTestCases();
 };
+
+enum CompilerArgumentType {
+    CountFrames,
+};
+
+class TSLCompilerArgument {
+    private:
+        CompilerArgumentType argumentType;
+    public:
+        TSLCompilerArgument(CompilerArgumentType);
+
+        std::string getName() const;
+};
+
+std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string>&);

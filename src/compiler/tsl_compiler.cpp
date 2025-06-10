@@ -53,3 +53,28 @@ int TSLCompiler::compile() {
 
     return programStatus;
 }
+
+TSLCompilerArgument::TSLCompilerArgument(CompilerArgumentType argumentType) {
+    this->argumentType = argumentType;
+}
+
+std::string TSLCompilerArgument::getName() const {
+    switch (this->argumentType) {
+        case CompilerArgumentType::CountFrames:
+            return "count frames";
+        default:
+            return "unrecognized argument";
+    }
+}
+
+std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
+    std::vector<TSLCompilerArgument> argumentsParsed;
+    for (int i = 1; i < argumentsFromArgv.size(); i++) {
+        auto& argumentFound = argumentsFromArgv[i];
+        if (argumentFound == "-c") {
+           argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::CountFrames));
+        }
+    }
+
+    return argumentsParsed;
+}
