@@ -30,13 +30,23 @@ int main(int argc, const char** argv) {
           steps.given("the arguments '{rawArguments}',") = [&](std::string rawArguments) {
               std::vector<std::string> programArguments = splitIntoArgvStyle(rawArguments);
 
-              steps.when("we parse the arguments,") = [&] {
-                  std::vector<TSLCompilerArgument> parsedArguments = parseArguments(programArguments);
+              steps.when("the arguments are parsed,") = [&] {
+                  std::vector<TSLCompilerArgument> parsedArguments;
+                  std::string argumentErrorMessage = "";
+                  try {
+                      parsedArguments = parseArguments(programArguments);
+                  } catch(const ArgumentException& argumentError) {
+                      argumentErrorMessage = argumentError.what();
+                  }
 
                   steps.then("the '{argumentName}' argument is returned as argument {argumentNum}.") = [&](std::string argumentName, size_t argumentNum) {
                       auto& argument = parsedArguments[argumentNum - 1];
                       std::string actualArgumentName = argument.getName();
                       expect_eq(argumentName, actualArgumentName);
+                  };
+
+                  steps.then("the error message returned should read '{expectedErrorMessage}'.") = [&](std::string expectedErrorMessage) {
+                      expect_eq(expectedErrorMessage, argumentErrorMessage);
                   };
               };
           };

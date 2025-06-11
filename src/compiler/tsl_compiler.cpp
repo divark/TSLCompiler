@@ -1,6 +1,8 @@
 #include "tsl_compiler.hpp"
+#include "fmt/format.h"
 #include "tsl_choice_graph.hpp"
 #include "tsl_testcase.hpp"
+#include <filesystem>
 #include <memory>
 
 /**
@@ -54,14 +56,33 @@ int TSLCompiler::compile() {
     return programStatus;
 }
 
+ArgumentException::ArgumentException(const std::string& cause) {
+    this->cause = cause;
+}
+
+const std::string& ArgumentException::what() const {
+    return cause;
+}
+
 TSLCompilerArgument::TSLCompilerArgument(CompilerArgumentType argumentType) {
     this->argumentType = argumentType;
+}
+
+TSLCompilerArgument::TSLCompilerArgument(CompilerArgumentType argumentType, const std::filesystem::path& filePath) {
+    this->argumentType = argumentType;
+    this->filePath = filePath;
 }
 
 std::string TSLCompilerArgument::getName() const {
     switch (this->argumentType) {
         case CompilerArgumentType::CountFrames:
             return "count frames";
+        case CompilerArgumentType::ToStandardOutput:
+            return "output to standard output";
+        case CompilerArgumentType::OutputFile:
+            return fmt::format("output to {}", filePath.string());
+        case CompilerArgumentType::InputFile:
+            return fmt::format("input from {}", filePath.string());
         default:
             return "unrecognized argument";
     }
@@ -69,12 +90,32 @@ std::string TSLCompilerArgument::getName() const {
 
 std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
     std::vector<TSLCompilerArgument> argumentsParsed;
-    for (int i = 1; i < argumentsFromArgv.size(); i++) {
+    size_t numArgumentsToInvestigate = argumentsFromArgv.size() - 1;
+    for (int i = 1; i < numArgumentsToInvestigate; i++) {
         auto& argumentFound = argumentsFromArgv[i];
         if (argumentFound == "-c") {
            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::CountFrames));
+        } else if (argumentFound == "-s") {
+            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::ToStandardOutput));
+        } else if (argumentFound == "-o") {
+            if (i + 1 == numArgumentsToInvestigate) {
+                throw ArgumentException("-o needs an output file argument.");
+            }
+
+            std::filesystem::path outputFilePath(argumentsFromArgv[i + 1]);
+            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath));
+            i++;
+        } else {
+            throw ArgumentException(fmt::format("Invalid argument: {}", argumentFound));
         }
     }
+
+    std::filesystem::path inputFilePath(argumentsFromArgv[argumentsFromArgv.size() - 1]);
+    if (!std::filesystem::exists(inputFilePath)) {
+        throw ArgumentException(fmt::format("The input file {} does not exist.", inputFilePath.string()));
+    }
+
+    argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::InputFile, inputFilePath));
 
     return argumentsParsed;
 }

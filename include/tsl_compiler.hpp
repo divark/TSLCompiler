@@ -17,13 +17,27 @@ class TSLCompiler {
 
 enum CompilerArgumentType {
     CountFrames,
+    ToStandardOutput,
+    OutputFile,
+    InputFile,
+};
+
+class ArgumentException {
+    private:
+        std::string cause;
+    public:
+        ArgumentException(const std::string&);
+
+        const std::string& what() const;
 };
 
 class TSLCompilerArgument {
     private:
         CompilerArgumentType argumentType;
+        std::filesystem::path filePath;
     public:
         TSLCompilerArgument(CompilerArgumentType);
+        TSLCompilerArgument(CompilerArgumentType, const std::filesystem::path&);
 
         std::string getName() const;
 };
