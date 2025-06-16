@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tsl_grammar.hpp"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -8,7 +10,7 @@
 class TSLTestCase {
     private:
         size_t testCaseNumber;
-        bool isMarkerCase = false;
+        std::optional<Marker> markerCase;
         std::vector<std::string> chosenCategories;
         std::map<std::string, std::string> categoryChoices;
         std::unordered_map<std::string, std::string> choiceDependencies;
@@ -23,7 +25,9 @@ class TSLTestCase {
 
         std::string getChoiceDependency(const std::string&);
         void setChoiceDependency(const std::string&, std::string, bool);
+        bool hasChoiceDependency(const std::string&);
 
         bool hasMarker() const;
-        void toggleIsMarker(bool);
+        void setMarker(Marker);
+        Marker getMarker() const;
 };

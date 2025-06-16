@@ -52,6 +52,9 @@ int TSLCompiler::compile() {
     }
 
     generatedTestCases = tslGraph.getGeneratedTestCases();
+    for (int i = 1; i <= generatedTestCases.size(); i++) {
+        generatedTestCases[i - 1].setTestCaseNumber(i);
+    }
 
     return programStatus;
 }
@@ -86,6 +89,14 @@ std::string TSLCompilerArgument::getName() const {
         default:
             return "unrecognized argument";
     }
+}
+
+CompilerArgumentType TSLCompilerArgument::getType() const {
+    return argumentType;
+}
+
+std::filesystem::path TSLCompilerArgument::getValue() const {
+    return filePath;
 }
 
 std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {

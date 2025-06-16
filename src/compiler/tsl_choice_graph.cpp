@@ -363,7 +363,7 @@ void TSLGraph::generateNormalTestCase() {
 void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
     auto testCase = makeTestCase();
 
-    testCase.toggleIsMarker(true);
+    testCase.setMarker(markerFound);
     generatedTestCases.push_back(testCase);
 }
 

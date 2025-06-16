@@ -97,8 +97,10 @@ jobs:
       - name: Compile the project
         run: meson compile -C build
 
-      - name: Strip unnecessary bits from TSLChecker
-        run: strip build/tslchecker
+      - name: Strip unnecessary bits from the executables
+        run: |
+          strip build/tslchecker
+          strip build/tslcompiler
 
       - name: Upload TSLChecker binary if this is not a release.
         uses: actions/upload-artifact@v4
@@ -107,12 +109,27 @@ jobs:
           path: build/tslchecker
           name: tslchecker-${{ matrix.os }}
 
+      - name: Upload TSLCompiler binary if this is not a release.
+        uses: actions/upload-artifact@v4
+        if: github.ref_type != 'tag'
+        with:
+          path: build/tslcompiler
+          name: tslcompiler-${{ matrix.os }}
+
       - name: Prepare artifacts for release if it exists.
         if: github.ref_type == 'tag'
-        run: cp build/tslchecker tslchecker-${{ matrix.os }}
+        run: |
+          cp build/tslchecker tslchecker-${{ matrix.os }}
+          cp build/tslcompiler tslcompiler-${{ matrix.os }}
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
           files: tslchecker-${{ matrix.os }}
+
+      - name: Upload TSLCompiler binary to release if it exists.
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: tslcompiler-${{ matrix.os }}

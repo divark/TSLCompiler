@@ -22,3 +22,10 @@ executable(
   include_directories: inc,
   dependencies: format_dependency,
 )
+
+executable(
+  'tslcompiler',
+  tslcompiler_sources + lexer_sources + parser_sources + compiler_sources,
+  include_directories: inc,
+  dependencies: format_dependency,
+)

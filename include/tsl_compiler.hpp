@@ -40,6 +40,8 @@ class TSLCompilerArgument {
         TSLCompilerArgument(CompilerArgumentType, const std::filesystem::path&);
 
         std::string getName() const;
+        CompilerArgumentType getType() const;
+        std::filesystem::path getValue() const;
 };
 
 std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string>&);

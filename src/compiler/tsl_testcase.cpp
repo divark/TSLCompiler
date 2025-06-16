@@ -47,6 +47,14 @@ std::string TSLTestCase::getChoiceDependency(const std::string& chosenCategory) 
 }
 
 /**
+ * Returns whether a Choice in some chosen Category has a dependency or not.
+ */
+bool TSLTestCase::hasChoiceDependency(const std::string& chosenCategory) {
+    auto categoryChoice = categoryChoices[chosenCategory];
+    return choiceDependencies.contains(categoryChoice);
+}
+
+/**
 * Sets the expression for some Choice in the chosen Category.
 */
 void TSLTestCase::setChoiceDependency(const std::string& chosenCategory, std::string choiceDependency, bool isIf) {
@@ -66,13 +74,13 @@ void TSLTestCase::setChoiceDependency(const std::string& chosenCategory, std::st
 * single or error marking, or false otherwise.
 */
 bool TSLTestCase::hasMarker() const {
-    return isMarkerCase;
+    return markerCase.has_value();
 }
 
-/**
-* Sets whether the test case has a Choice containing
-* a single or error marking.
-*/
-void TSLTestCase::toggleIsMarker(bool isMarkerCase) {
-    this->isMarkerCase = isMarkerCase;
+Marker TSLTestCase::getMarker() const {
+    return markerCase.value();
+}
+
+void TSLTestCase::setMarker(Marker newMarker) {
+    markerCase = {newMarker};
 }
