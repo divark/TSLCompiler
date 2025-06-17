@@ -52,6 +52,13 @@ int main(int argc, const char** argv) {
                       expect_eq(expectedChoiceDependency, actualChoiceDependency);
                   };
 
+                  steps.then("test case {testCaseNum} should not have a choice dependency for category {categoryNum}.") = [&](size_t testCaseNum, size_t categoryNum) {
+                      auto testCase = compiler.getTestCases()[testCaseNum - 1];
+                      auto chosenCategory = testCase.getCategories()[categoryNum - 1];
+                      auto hasChoiceDependency = testCase.hasChoiceDependency(chosenCategory);
+                      expect_eq(false, hasChoiceDependency);
+                  };
+
                   steps.then("test case {testCaseNum} should be flagged as having a marker.") = [&](size_t testCaseNum) {
                       auto testCase = compiler.getTestCases()[testCaseNum - 1];
                       bool testCaseHasMarker = testCase.hasMarker();

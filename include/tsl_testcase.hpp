@@ -13,7 +13,7 @@ class TSLTestCase {
         std::optional<Marker> markerCase;
         std::vector<std::string> chosenCategories;
         std::map<std::string, std::string> categoryChoices;
-        std::unordered_map<std::string, std::string> choiceDependencies;
+        std::unordered_map<std::string, std::unordered_map<std::string, std::string>> categoryChoiceDependencies;
     public:
         size_t getTestCaseNumber();
         void setTestCaseNumber(size_t);

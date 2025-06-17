@@ -43,15 +43,14 @@ void TSLTestCase::addCategoryChoice(const std::string& chosenCategory, const std
 */
 std::string TSLTestCase::getChoiceDependency(const std::string& chosenCategory) {
     auto categoryChoice = categoryChoices[chosenCategory];
-    return choiceDependencies[categoryChoice];
+    return categoryChoiceDependencies[chosenCategory][categoryChoice];
 }
 
 /**
  * Returns whether a Choice in some chosen Category has a dependency or not.
  */
 bool TSLTestCase::hasChoiceDependency(const std::string& chosenCategory) {
-    auto categoryChoice = categoryChoices[chosenCategory];
-    return choiceDependencies.contains(categoryChoice);
+    return categoryChoiceDependencies.contains(chosenCategory);
 }
 
 /**
@@ -66,7 +65,7 @@ void TSLTestCase::setChoiceDependency(const std::string& chosenCategory, std::st
         newChoiceDependency = "follows [else] from [if " + choiceDependency + "]";
     }
 
-    choiceDependencies[categoryChoice] = newChoiceDependency;
+    categoryChoiceDependencies[chosenCategory][categoryChoice] = newChoiceDependency;
 }
 
 /**

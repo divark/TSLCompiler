@@ -1,0 +1,8 @@
+Simple Category 1:
+  present.
+
+Simple Category 2:
+  present.                       [property abc]
+
+Simple Category 3:
+  present.                       [if abc] [property def]

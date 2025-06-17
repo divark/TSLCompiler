@@ -121,3 +121,11 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 2 should have 'Simple Choice 3.' chosen in category 2.
         Then test case 2 should have 'Simple Category 3:' as category 3.
         Then test case 2 should have 'Simple Choice 4.' chosen in category 3.
+
+    Scenario: A Choice dependency should only be present for a Choice with a conditional.
+        Given a TSL file called chained_choices_with_if.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 1 test cases.
+        Then test case 1 should not have a choice dependency for category 1.
+        Then test case 1 should not have a choice dependency for category 2.
+        Then test case 1 should have 'follows [if abc]' as a dependency for the chosen choice in category 3.
