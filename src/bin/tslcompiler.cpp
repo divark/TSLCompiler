@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -70,9 +71,16 @@ bool promptedNoToPrintCases(const std::optional<std::filesystem::path> &outputPa
     while (true) {
         std::cout << "Write test frames to " << desiredOutput << " (y/n)? ";
         std::cin >> response;
+        // Uppercase letter response are allowed, but we should not
+        // have to complicate the if statement below.
+        //
+        // Referenced from:
+        // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case
+        std::transform(response.begin(), response.end(), response.begin(), [](unsigned char c) { return std::tolower(c); });
 
         if (response != "y" && response != "n") {
             std::cout << "Invalid response. Try again." << std::endl;
+            continue;
         }
 
         break;
