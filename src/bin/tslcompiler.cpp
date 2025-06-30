@@ -132,6 +132,10 @@ void printTestCases(std::vector<TSLTestCase> &testCases, const std::optional<std
             printTestCase(testCase, std::cout);
         }
     }
+
+    if (outputLocation) {
+        std::cout << testCases.size() << " test frames generated and written to " << outputLocation.value() << std::endl;
+    }
 }
 
 int main(int argc, char* argv[]) {

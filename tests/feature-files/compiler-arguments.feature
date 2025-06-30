@@ -14,10 +14,15 @@ Feature: All TSLgenerator arguments are honored.
         When the arguments are parsed,
         Then the 'output to one_category_one_choice.txt.tsl' argument is returned as argument 1.
 
+    Scenario: Givng no '-o' argument returns the input file with a .tsl at the end.
+        Given the arguments 'test-files/one_category_one_choice.txt',
+        When the arguments are parsed,
+        Then the 'output to test-files/one_category_one_choice.txt.tsl' argument is returned as argument 1.
+
     Scenario: The input file argument is specified.
         Given the arguments 'test-files/one_category_one_choice.txt',
         When the arguments are parsed,
-        Then the 'input from test-files/one_category_one_choice.txt' argument is returned as argument 1.
+        Then the 'input from test-files/one_category_one_choice.txt' argument is returned as argument 2.
 
     Scenario: '-c' and '-s' are specified.
         Given the arguments '-c -s test-files/one_category_one_choice.txt',

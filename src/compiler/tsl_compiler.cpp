@@ -102,12 +102,15 @@ std::filesystem::path TSLCompilerArgument::getValue() const {
 std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
     std::vector<TSLCompilerArgument> argumentsParsed;
     size_t numArgumentsToInvestigate = argumentsFromArgv.size() - 1;
+
+    bool outputArgumentFound = false;
     for (int i = 1; i < numArgumentsToInvestigate; i++) {
         auto& argumentFound = argumentsFromArgv[i];
         if (argumentFound == "-c") {
            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::CountFrames));
         } else if (argumentFound == "-s") {
             argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::ToStandardOutput));
+            outputArgumentFound = true;
         } else if (argumentFound == "-o") {
             if (i + 1 == numArgumentsToInvestigate) {
                 throw ArgumentException("-o needs an output file argument.");
@@ -116,6 +119,7 @@ std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &
             std::filesystem::path outputFilePath(argumentsFromArgv[i + 1]);
             argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath));
             i++;
+            outputArgumentFound = true;
         } else {
             throw ArgumentException(fmt::format("Invalid argument: {}", argumentFound));
         }
@@ -124,6 +128,12 @@ std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &
     std::filesystem::path inputFilePath(argumentsFromArgv[argumentsFromArgv.size() - 1]);
     if (!std::filesystem::exists(inputFilePath)) {
         throw ArgumentException(fmt::format("The input file {} does not exist.", inputFilePath.string()));
+    }
+
+    if (!outputArgumentFound) {
+        std::filesystem::path outputFilePath = inputFilePath;
+        outputFilePath.concat(".tsl");
+        argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath));
     }
 
     argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::InputFile, inputFilePath));
