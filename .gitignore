@@ -5,5 +5,5 @@
 !/subprojects/ut.wrap
 
 .vscode
+.zed
 .cache
-

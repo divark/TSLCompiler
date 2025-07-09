@@ -60,7 +60,7 @@ class TSLGraph {
         bool postorderCheckin(Node&);
 
         void addProperty(Property&);
-        TSLTestCase makeTestCase();
+        TSLTestCase makeTestCase(std::vector<Node>&);
         void generateNormalTestCase();
         void generateMarkerTestCase(Marker&);
         void addNonApplicables(Node&);

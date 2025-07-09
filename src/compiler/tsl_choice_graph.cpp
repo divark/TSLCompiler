@@ -86,7 +86,8 @@ std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
         auto nodeData = node.getData();
         auto nodeChoice = nodeData.getChoice();
 
-        if (!nodeChoice.hasNormalMarker()) {
+        bool hasMarkers = nodeChoice.hasNormalMarker();
+        if (!hasMarkers) {
             continue;
         }
 
@@ -106,7 +107,8 @@ std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>& nodes) {
         auto nodeData = node.getData();
         auto nodeChoice = nodeData.getChoice();
 
-        if (nodeChoice.hasNormalMarker()) {
+        bool hasMarkers = nodeChoice.hasNormalMarker();
+        if (hasMarkers) {
             continue;
         }
 
@@ -323,10 +325,10 @@ void TSLGraph::addProperty(Property& propertyToAdd) {
 * Returns a Test Case built by the recently visited TSLNodes
 * populated by visitDFS.
 */
-TSLTestCase TSLGraph::makeTestCase() {
+TSLTestCase TSLGraph::makeTestCase(std::vector<Node>& choiceNodesVisited) {
     TSLTestCase testCase;
 
-    for (auto& recentNode : visitedNodes) {
+    for (auto& recentNode : choiceNodesVisited) {
         auto categoryLabel = recentNode.getData().getCategoryLabel();
         auto& choice = recentNode.getData().getChoice();
         auto choiceLabel = choice.getLabel();
@@ -352,7 +354,7 @@ TSLTestCase TSLGraph::makeTestCase() {
 * Generates a test case if there are no markers present.
 */
 void TSLGraph::generateNormalTestCase() {
-    auto testCase = makeTestCase();
+    auto testCase = makeTestCase(visitedNodes);
 
     generatedTestCases.push_back(testCase);
 }
@@ -361,7 +363,8 @@ void TSLGraph::generateNormalTestCase() {
 * Generates a test case flagged as an edge case if markers are present.
 */
 void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
-    auto testCase = makeTestCase();
+    std::vector<Node> markerNode = { visitedNodes.back() };
+    auto testCase = makeTestCase(markerNode);
 
     testCase.setMarker(markerFound);
     generatedTestCases.push_back(testCase);
