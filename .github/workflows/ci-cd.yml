@@ -26,7 +26,7 @@ jobs:
             sudo ./llvm.sh 19
             echo "CXX=clang++-19" >> $GITHUB_ENV
             echo "CXXFLAGS=--sysroot=/usr/x86_64-linux-musl" >> $GITHUB_ENV
-            echo "CPP_LDD=musl-ldd" >> $GITHUB_ENV
+            echo "CXX_LDD=musl-ldd" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex
             # on macOS, bison and flex are already provided, but we want
@@ -73,7 +73,7 @@ jobs:
             sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev musl-dev musl-tools
             echo "CXX=clang++-19" >> $GITHUB_ENV
             echo "CXXFLAGS=--sysroot=/usr/x86_64-linux-musl" >> $GITHUB_ENV
-            echo "CPP_LDD=musl-ldd" >> $GITHUB_ENV
+            echo "CXX_LDD=musl-ldd" >> $GITHUB_ENV
             echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex
