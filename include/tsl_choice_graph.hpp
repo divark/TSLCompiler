@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -49,6 +50,7 @@ class TSLGraph {
         Edges edges;
 
         std::vector<TSLTestCase> generatedTestCases;
+        std::vector<TSLTestCase> markerTestCases;
 
         std::unordered_map<size_t, std::vector<std::string>> nodeProperties;
         std::unordered_set<std::string> seenPropertiesOverall;
@@ -76,7 +78,7 @@ class TSLGraph {
         const std::vector<Node> getEdges(const Node&) const;
         const std::vector<Node>& getVisitedNodes() const;
 
-        std::vector<TSLTestCase>& getGeneratedTestCases();
+        std::vector<std::reference_wrapper<TSLTestCase>> getGeneratedTestCases();
 
         void visitDFS(Node&);
 };

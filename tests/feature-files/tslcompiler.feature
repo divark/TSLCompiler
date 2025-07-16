@@ -127,3 +127,19 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 1 should not have a choice dependency for category 1.
         Then test case 1 should not have a choice dependency for category 2.
         Then test case 1 should have 'follows [if abc]' as a dependency for the chosen choice in category 3.
+
+    Scenario: All marker test cases should show up first.
+        Given a TSL file called markers_found_in_order.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 3 test cases.
+        Then test case 1 should have 1 categories.
+        Then test case 1 should have 'Simple Category 1:' as category 1.
+        Then test case 1 should have 'Simple Choice 1.' chosen in category 1.
+        Then test case 2 should have 1 categories.
+        Then test case 2 should have 'Simple Category 2:' as category 1.
+        Then test case 2 should have 'Simple Choice 4.' chosen in category 1.
+        Then test case 3 should have 2 categories.
+        Then test case 3 should have 'Simple Category 1:' as category 1.
+        Then test case 3 should have 'Simple Choice 2.' chosen in category 1.
+        Then test case 3 should have 'Simple Category 2:' as category 2.
+        Then test case 3 should have 'Simple Choice 3.' chosen in category 2.

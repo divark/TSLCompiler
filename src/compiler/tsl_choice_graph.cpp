@@ -2,6 +2,7 @@
 #include "tsl_collector.hpp"
 #include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
+#include <functional>
 
 TSLNode::TSLNode() {
     categoryLabel = "";
@@ -220,8 +221,18 @@ const std::vector<Node>& TSLGraph::getVisitedNodes() const {
 /**
 * Returns the list of generated test cases after running visitDFS.
 */
-std::vector<TSLTestCase>& TSLGraph::getGeneratedTestCases() {
-    return generatedTestCases;
+std::vector<std::reference_wrapper<TSLTestCase>> TSLGraph::getGeneratedTestCases() {
+    std::vector<std::reference_wrapper<TSLTestCase>> foundTestCases;
+
+    for (auto& markerTestCase : markerTestCases) {
+        foundTestCases.push_back(markerTestCase);
+    }
+
+    for (auto& testCase : generatedTestCases) {
+        foundTestCases.push_back(testCase);
+    }
+
+    return foundTestCases;
 }
 
 /**
@@ -367,7 +378,7 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
     auto testCase = makeTestCase(markerNode);
 
     testCase.setMarker(markerFound);
-    generatedTestCases.push_back(testCase);
+    markerTestCases.push_back(testCase);
 }
 
 /**

@@ -51,7 +51,11 @@ int TSLCompiler::compile() {
         tslGraph.visitDFS(categoryNode);
     }
 
-    generatedTestCases = tslGraph.getGeneratedTestCases();
+    auto foundTestCases = tslGraph.getGeneratedTestCases();
+    for (auto& foundTestCase : foundTestCases) {
+        generatedTestCases.push_back(foundTestCase.get());
+    }
+
     for (int i = 1; i <= generatedTestCases.size(); i++) {
         generatedTestCases[i - 1].setTestCaseNumber(i);
     }
