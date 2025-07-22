@@ -7,6 +7,7 @@
 #include <cstddef>
 
 #include "tsl_collector.hpp"
+#include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
 
 class TSLNode {
@@ -58,6 +59,8 @@ class TSLGraph {
         std::unordered_map<size_t, std::vector<size_t>> nodesDiscoveredNonApplicables;
         std::unordered_set<size_t> nonApplicablesSeen;
 
+        std::unordered_map<size_t, std::unordered_set<Marker>> markerNodesSeen;
+
         bool preorderCheckin(Node&);
         bool postorderCheckin(Node&);
 
@@ -70,6 +73,9 @@ class TSLGraph {
 
         bool isNonApplicable(Node&);
         bool checkIfNextCategoryNotApplicable(Node&);
+
+        bool checkIfMarkerAlreadyVisited(Node&, Marker&);
+        void markChoiceWithMarkerAsVisited(Node&, Marker&);
     public:
         TSLGraph();
         TSLGraph(TSLCollector&);

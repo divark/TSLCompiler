@@ -264,6 +264,14 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
         // since we want the minimal number of choices leading up to
         // it that causes the edge case.
         if (markerFound) {
+            // We also don't want to visit Choices again if it leads to the
+            // same Marker, mimicking what the TSLgenerator does.
+            bool markerAlreadyVisited = checkIfMarkerAlreadyVisited(currentNode, markerFound.value());
+            if (markerAlreadyVisited) {
+                return false;
+            }
+
+            markChoiceWithMarkerAsVisited(currentNode, markerFound.value());
             generateMarkerTestCase(markerFound.value());
             return false;
         }
@@ -446,6 +454,28 @@ bool TSLGraph::checkIfNextCategoryNotApplicable(Node& currentNode) {
     }
 
     return allEdgesNotSatisfied;
+}
+
+/**
+ * Returns true if some Choice from the current Node has been checked in
+ * before with its specific marker, or false if not.
+ */
+bool TSLGraph::checkIfMarkerAlreadyVisited(Node& currentChoiceNode, Marker& currentChoiceMarker) {
+    auto currentChoiceID = currentChoiceNode.getID();
+    return markerNodesSeen.contains(currentChoiceID) && markerNodesSeen[currentChoiceID].contains(currentChoiceMarker);
+}
+
+/**
+ * Checks in a Choice's (from the Node) Marker.
+ */
+void TSLGraph::markChoiceWithMarkerAsVisited(Node& currentChoiceNode, Marker& currentChoiceMarker) {
+    auto currentChoiceID = currentChoiceNode.getID();
+    if (!markerNodesSeen.contains(currentChoiceID)) {
+        std::unordered_set<Marker> markersSeen;
+        markerNodesSeen.insert({currentChoiceID, markersSeen});
+    }
+
+    markerNodesSeen[currentChoiceID].insert(currentChoiceMarker);
 }
 
 /**
