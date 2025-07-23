@@ -120,16 +120,18 @@ jobs:
         if: github.ref_type == 'tag'
         run: |
           cp build/tslchecker tslchecker-${{ matrix.os }}
+          tar -cvzf tslchecker-${{ matrix.os }}.tar.gz
           cp build/tslcompiler tslcompiler-${{ matrix.os }}
+          tar -cvzf tslcompiler-${{ matrix.os }}.tar.gz
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslchecker-${{ matrix.os }}
+          files: tslchecker-${{ matrix.os }}.tar.gz
 
       - name: Upload TSLCompiler binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslcompiler-${{ matrix.os }}
+          files: tslcompiler-${{ matrix.os }}.tar.gz

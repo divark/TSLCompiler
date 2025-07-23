@@ -120,16 +120,18 @@ jobs:
         if: github.ref_type == 'tag'
         run: |
           cp build/tslchecker.exe tslchecker-windows-latest.exe
+          tar -cvaf tslchecker-windows-latest.zip tslchecker-windows-latest.exe
           cp build/tslcompiler.exe tslcompiler-windows-latest.exe
+          tar -cvaf tslcompiler-windows-latest.zip tslcompiler-windows-latest.exe
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslchecker-windows-latest.exe
+          files: tslchecker-windows-latest.zip
 
       - name: Upload TSLCompiler binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslcompiler-windows-latest.exe
+          files: tslcompiler-windows-latest.zip
