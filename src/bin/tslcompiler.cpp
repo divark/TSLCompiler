@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
         printTestCases(testCases, outputLocation);
     } catch (const ArgumentException& argumentError) {
         std::cerr << argumentError.what() << std::endl;
-        std::cerr << "Usage: " << argv[0] << " [ -cs ] [ -o output_file ] input_file" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [ -c ] [ -s ] [ -o output_file ] input_file" << std::endl;
         return 1;
     } catch (const TSLException& compilerError) {
         std::cerr << compilerError.getErrorMessage() << std::endl;
