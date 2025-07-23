@@ -89,6 +89,16 @@ bool promptedNoToPrintCases(const std::optional<std::filesystem::path> &outputPa
     return response == "n";
 }
 
+size_t getLongestCategoryCount(const std::vector<std::string> &categories) {
+    size_t longestCategoryFound = 0;
+
+    for (const auto& category : categories) {
+        longestCategoryFound = std::max(category.length(), longestCategoryFound);
+    }
+
+    return longestCategoryFound;
+}
+
 void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
     std::stringstream formattedTestCase;
     formattedTestCase << fmt::format("Test Case {}", testCase.getTestCaseNumber());
@@ -105,10 +115,20 @@ void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
     formattedTestCase << std::endl;
 
     auto categories = testCase.getCategories();
+    // This is used for left-aligning the output, since it's easier to the eyes.
+    size_t longestCategoryCount = getLongestCategoryCount(categories);
     for (const auto& category : categories) {
-        auto choice = testCase.getCategoryChoice(category);
+        // We want to exclude the ':' at the end of the Category, since we add
+        // our own later on.
+        std::string categoryWithoutColon(category);
+        categoryWithoutColon.pop_back();
 
-        formattedTestCase << fmt::format("\t{}\t{}", category, choice);
+        auto choice = testCase.getCategoryChoice(category);
+        // Likewise, we want to remove the '.' to mimic how the TSLgenerator
+        // does its Choice output.
+        choice.pop_back();
+
+        formattedTestCase << fmt::format("\t{:<{}} : {}", categoryWithoutColon, longestCategoryCount, choice);
         if (testCase.hasChoiceDependency(category)) {
             formattedTestCase << fmt::format("\t({})", testCase.getChoiceDependency(category));
         }
