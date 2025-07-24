@@ -119,8 +119,10 @@ jobs:
       - name: Prepare artifacts for release if it exists.
         if: github.ref_type == 'tag'
         run: |
-          tar -cvzf tslchecker-${{ matrix.os }}.tar.gz build/tslchecker
-          tar -cvzf tslcompiler-${{ matrix.os }}.tar.gz build/tslcompiler
+          cp build/tslchecker tslchecker
+          tar -cvzf tslchecker-${{ matrix.os }}.tar.gz tslchecker
+          cp build/tslcompiler tslcompiler
+          tar -cvzf tslcompiler-${{ matrix.os }}.tar.gz tslcompiler
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2

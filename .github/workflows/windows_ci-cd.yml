@@ -119,8 +119,10 @@ jobs:
       - name: Prepare artifacts for release if it exists.
         if: github.ref_type == 'tag'
         run: |
-          tar -cvaf tslchecker-windows-latest.zip build/tslchecker.exe
-          tar -cvaf tslcompiler-windows-latest.zip build/tslcompiler.exe
+          cp build/tslchecker.exe tslchecker.exe
+          tar -cvaf tslchecker-windows-latest.zip tslchecker.exe
+          cp build/tslcompiler.exe tslcompiler.exe
+          tar -cvaf tslcompiler-windows-latest.zip tslcompiler.exe
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
