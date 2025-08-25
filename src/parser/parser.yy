@@ -37,13 +37,13 @@
 
 %token IF
 %token ELSE
-%precedence LOGICAL_NOT
 %token LOGICAL_GROUP_START
 %token LOGICAL_GROUP_END
 /* Since all Grammar rules are written in a left-associative style,
 all Binary-based operations should have left-precedence. */
 %left LOGICAL_AND
 %left LOGICAL_OR
+%right LOGICAL_NOT
 
 %token MARKING_SINGLE
 %token MARKING_ERROR

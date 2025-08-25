@@ -55,16 +55,24 @@ std::string Expression::asString() {
 * symbol table, or false otherwise.
 */
 bool Expression::evaluate(const std::unordered_set<std::string>& properties) {
+    bool returnedEvaluation = false;
     switch (expressionType) {
         case ExpType::Negated:
-            return !leftExpression->evaluate(properties);
+            returnedEvaluation = !leftExpression->evaluate(properties);
+            break;
         case ExpType::Grouped:
-            return leftExpression->evaluate(properties);
+            returnedEvaluation = leftExpression->evaluate(properties);
+            break;
         case ExpType::And:
-            return leftExpression->evaluate(properties) && rightExpression->evaluate(properties);
+            returnedEvaluation =  leftExpression->evaluate(properties) && rightExpression->evaluate(properties);
+            break;
         case ExpType::Or:
-            return leftExpression->evaluate(properties) || rightExpression->evaluate(properties);
+            returnedEvaluation = leftExpression->evaluate(properties) || rightExpression->evaluate(properties);
+            break;
         default:
-            return properties.contains(property);
+            returnedEvaluation = properties.contains(property);
+            break;
     }
+
+    return returnedEvaluation;
 }
