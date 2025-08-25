@@ -126,7 +126,11 @@ void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
         auto choice = testCase.getCategoryChoice(category);
         // Likewise, we want to remove the '.' to mimic how the TSLgenerator
         // does its Choice output.
-        choice.pop_back();
+        //
+        // Except if it's a N/A.
+        if (choice.back() == '.') {
+            choice.pop_back();
+        }
 
         formattedTestCase << fmt::format("\t{:<{}} : {}", categoryWithoutColon, longestCategoryCount, choice);
         if (testCase.hasChoiceDependency(category)) {
