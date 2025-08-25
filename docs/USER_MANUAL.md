@@ -9,10 +9,10 @@ The TSLCompiler is ran with the following syntax:
 
 Where
 - `-c` is an optional parameter that prints the number of test frames generated.
-- `-s` is an optional parameter that prints all generated test cases to the Standard Output. 
+- `-s` is an optional parameter that prints all generated test cases to the Standard Output.
     - **NOTE: If `-s` is used, the `-o` flag will be ignored.**
 - `-o output_file` is an optional parameter that creates a file at with the given `output_file` name.
-    - `output_file` can also be a path, such as `~/Downloads/catpart.txt.tsl`. 
+    - `output_file` can also be a path, such as `~/Downloads/catpart.txt.tsl`.
     - **NOTE: If `-o` is not specified, the name of the output file will be `input_file.tsl`**
 - `input_file` is the name of the TSL file to be read. **This parameter must be at the end, no matter what.**
 
@@ -116,13 +116,13 @@ Examples:
 ```
 [if A]
 [if !B]
-[if A or B]
-[if A and B]
-[if !(A and B)]
-[if A and B or C]
-[if A and (B or C) and D]
-[if A or !B and !C]
-[if !(!A or B) and C or D]
+[if A || B]
+[if A && B]
+[if !(A && B)]
+[if A && B || C]
+[if A && (B || C) && D]
+[if A || !B && !C]
+[if !(!A || B) && C || D]
 ```
 
 ## Examples of How Choices Are Selected
@@ -137,7 +137,7 @@ Examples:
     - Reads:  if Hmmmmm is true make a single frame with this choice.
 
 4.  `some choice. [if Radical] [property Cool] [else] [error]`
-    - Reads:  
+    - Reads:
     ```
     if Radical is true set Cool to true and
         combine this choice with others,
@@ -145,7 +145,7 @@ Examples:
     ```
 
 5.  `some choice. [if NoWay] [single] [else]`
-    - Reads:  
+    - Reads:
     ```
     if NoWay is true make a single frame with
         this choice,
