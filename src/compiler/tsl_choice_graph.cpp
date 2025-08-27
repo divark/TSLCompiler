@@ -241,18 +241,20 @@ std::vector<std::reference_wrapper<TSLTestCase>> TSLGraph::getGeneratedTestCases
 bool TSLGraph::preorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
+    bool currentNodeNonApplicable = isNonApplicable(currentNode);
+
     auto currentChoice = currentNode.getData().getChoice();
     std::vector<Property> choiceProperties;
-    if (currentChoice.getExpression()) {
+    if (currentChoice.getExpression() && !currentNodeNonApplicable) {
         auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
         // No properties returning means that the expression was not satisfied, indicating that
         // there was not an else statement either.
         if (!evaluatedChoiceProperties) {
-            addNonApplicable(currentNode);
+            return false;
         } else {
             choiceProperties = evaluatedChoiceProperties.value().getProperties();
         }
-    } else {
+    } else if (!currentNodeNonApplicable) {
         choiceProperties = currentChoice.getProperties();
     }
 
@@ -275,6 +277,13 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
         }
 
         addProperty(property);
+    }
+
+    bool nextChoicesAreAllNA = checkIfNextCategoryNotApplicable(currentNode);
+    if (nextChoicesAreAllNA) {
+        for (auto& nextNode : getEdges(currentNode)) {
+            addNonApplicable(nextNode);
+        }
     }
 
     return canProceed;
@@ -429,7 +438,7 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
 /**
  * Adds the current node in the set of non applicables.
  */
-void TSLGraph::addNonApplicable(Node& currentNode) {
+void TSLGraph::addNonApplicable(const Node& currentNode) {
     nonApplicablesSeen.insert(currentNode.getID());
 }
 

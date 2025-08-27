@@ -4,6 +4,8 @@
 /subprojects/*
 !/subprojects/ut.wrap
 
+.DS_Store
+
 .vscode
 .zed
 .cache

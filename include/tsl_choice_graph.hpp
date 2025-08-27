@@ -67,7 +67,7 @@ class TSLGraph {
         TSLTestCase makeTestCase(std::vector<Node>&);
         void generateNormalTestCase();
         void generateMarkerTestCase(Marker&);
-        void addNonApplicable(Node&);
+        void addNonApplicable(const Node&);
         void removeNonApplicable(Node&);
 
         bool isNonApplicable(Node&);
