@@ -30,6 +30,12 @@ Finally, to remain fairly close to the original C implementation of the TSLgener
 3. Confirm that all tests are passing as intended.
 
 # Running
+## TSLCompiler
+1. Open the `build` directory from the `Building` step.
+2. Run `meson compile`.
+3. Verify that there is now an executable in there called `tslcompiler` if you're on Linux or macOS, `tslcompiler.exe` if you're on Windows.
+4. Run `./tslcompiler path/to/input/file`.
+  - For more information on available arguments, consult the [Manual.](docs/USER_MANUAL.md)
 ## TSLChecker
 1. Open the `build` directory from the `Building` step.
 2. Run `meson compile`.
