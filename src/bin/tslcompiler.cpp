@@ -89,14 +89,14 @@ bool promptedNoToPrintCases(const std::optional<std::filesystem::path> &outputPa
     return response == "n";
 }
 
-size_t getLongestCategoryCount(const std::vector<std::string> &categories) {
-    size_t longestCategoryFound = 0;
+size_t getLongestLength(const std::vector<std::string> &strings) {
+    size_t longestStringFound = 0;
 
-    for (const auto& category : categories) {
-        longestCategoryFound = std::max(category.length(), longestCategoryFound);
+    for (const auto& someString : strings) {
+        longestStringFound = std::max(someString.length(), longestStringFound);
     }
 
-    return longestCategoryFound;
+    return longestStringFound;
 }
 
 void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
@@ -116,7 +116,17 @@ void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
 
     auto categories = testCase.getCategories();
     // This is used for left-aligning the output, since it's easier to the eyes.
-    size_t longestCategoryCount = getLongestCategoryCount(categories);
+    size_t longestCategoryCount = getLongestLength(categories);
+
+    // Likewise, this is used to ensure that all choice dependencies are aligned
+    // relative to the longest choice in the Category, making it easier to the eyes.
+    std::vector<std::string> choices;
+    for (const auto& category : categories) {
+        std::string currentChoice = testCase.getCategoryChoice(category);
+        choices.push_back(currentChoice);
+    }
+
+    size_t longestChoiceCount = getLongestLength(choices);
     for (const auto& category : categories) {
         // We want to exclude the ':' at the end of the Category, since we add
         // our own later on.
@@ -132,7 +142,7 @@ void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
             choice.pop_back();
         }
 
-        formattedTestCase << fmt::format("\t{:<{}} : {}", categoryWithoutColon, longestCategoryCount, choice);
+        formattedTestCase << fmt::format("\t{:<{}} : {:{}}", categoryWithoutColon, longestCategoryCount, choice, longestChoiceCount);
         if (testCase.hasChoiceDependency(category)) {
             formattedTestCase << fmt::format("\t({})", testCase.getChoiceDependency(category));
         }
