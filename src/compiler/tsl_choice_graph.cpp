@@ -241,20 +241,18 @@ std::vector<std::reference_wrapper<TSLTestCase>> TSLGraph::getGeneratedTestCases
 bool TSLGraph::preorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
-    bool currentNodeNonApplicable = isNonApplicable(currentNode);
-
     auto currentChoice = currentNode.getData().getChoice();
     std::vector<Property> choiceProperties;
-    if (currentChoice.getExpression() && !currentNodeNonApplicable) {
+    if (currentChoice.getExpression()) {
         auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
         // No properties returning means that the expression was not satisfied, indicating that
         // there was not an else statement either.
         if (!evaluatedChoiceProperties) {
-            return false;
+            addNonApplicable(currentNode);
+        } else {
+            choiceProperties = evaluatedChoiceProperties.value().getProperties();
         }
-
-        choiceProperties = evaluatedChoiceProperties.value().getProperties();
-    } else if (!currentNodeNonApplicable) {
+    } else {
         choiceProperties = currentChoice.getProperties();
     }
 
@@ -279,11 +277,6 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
         addProperty(property);
     }
 
-    bool nextChoicesAreAllNotApplicable = checkIfNextCategoryNotApplicable(currentNode);
-    if (nextChoicesAreAllNotApplicable) {
-        addNonApplicables(currentNode);
-    }
-
     return canProceed;
 }
 
@@ -293,7 +286,7 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
 bool TSLGraph::postorderCheckin(Node& currentNode) {
     bool canProceed = true;
 
-    removeNonApplicables(currentNode);
+    removeNonApplicable(currentNode);
 
     if (visitedNodes.empty()) {
         return canProceed;
@@ -370,54 +363,85 @@ TSLTestCase TSLGraph::makeTestCase(std::vector<Node>& choiceNodesVisited) {
 }
 
 /**
+ * Returns a key represented as a string of node IDs concatenated
+ * together.
+ */
+std::string TSLGraph::generateNodesKey(std::vector<Node>& nodes) {
+    std::string nodesKey = "";
+    for (auto& node : nodes) {
+        auto foundNodeID = node.getID();
+        // Even if a N/A was found on different Choices in the same Category,
+        // we want to exclude a test case that looks the same.
+        if (isNonApplicable(node)) {
+            foundNodeID = -1;
+        }
+
+        nodesKey.push_back(foundNodeID);
+    }
+
+    return nodesKey;
+}
+
+/**
+ * Returns a boolean indicating whether the given nodes
+ * were already used to make a test case.
+ */
+bool TSLGraph::checkIfNodesAlreadyTestCase(std::vector<Node>& nodes) {
+    std::string nodesKey = generateNodesKey(nodes);
+    return testCaseKeys.contains(nodesKey);
+}
+
+/**
 * Generates a test case if there are no markers present.
 */
 void TSLGraph::generateNormalTestCase() {
-    auto testCase = makeTestCase(visitedNodes);
+    bool visitedNodesAlreadyTestCase = checkIfNodesAlreadyTestCase(visitedNodes);
+    if (visitedNodesAlreadyTestCase) {
+        return;
+    }
 
+    auto testCase = makeTestCase(visitedNodes);
     generatedTestCases.push_back(testCase);
+
+    std::string visitedNodesKey = generateNodesKey(visitedNodes);
+    testCaseKeys.insert(visitedNodesKey);
 }
 
 /**
 * Generates a test case flagged as an edge case if markers are present.
 */
 void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
+    bool visitedNodesAlreadyTestCase = checkIfNodesAlreadyTestCase(visitedNodes);
+    if (visitedNodesAlreadyTestCase) {
+        return;
+    }
+
     std::vector<Node> markerNode = { visitedNodes.back() };
     auto testCase = makeTestCase(markerNode);
 
     testCase.setMarker(markerFound);
     markerTestCases.push_back(testCase);
+
+    std::string visitedNodesKey = generateNodesKey(markerNode);
+    testCaseKeys.insert(visitedNodesKey);
 }
 
 /**
- * Adds all edges connected to the current node in the set of non applicables.
+ * Adds the current node in the set of non applicables.
  */
-void TSLGraph::addNonApplicables(Node& currentNode) {
-    auto nodeEdges = getEdges(currentNode);
-
-    std::vector<size_t> nodeFoundNonApplicables;
-    for (auto& nextNode : nodeEdges) {
-        nodeFoundNonApplicables.push_back(nextNode.getID());
-        nonApplicablesSeen.insert(nextNode.getID());
-    }
-
-    nodesDiscoveredNonApplicables.insert({currentNode.getID(), nodeFoundNonApplicables});
+void TSLGraph::addNonApplicable(Node& currentNode) {
+    nonApplicablesSeen.insert(currentNode.getID());
 }
 
 /**
- * Removes the recent set of non applicable edges for the current node.
+ * Removes the current node marked as Non Applicable if its within the set.
  */
-void TSLGraph::removeNonApplicables(Node& currentNode) {
-    if (!nodesDiscoveredNonApplicables.contains(currentNode.getID())) {
+void TSLGraph::removeNonApplicable(Node& currentNode) {
+    if (!isNonApplicable(currentNode)) {
         return;
     }
 
-    auto& nodeFoundNonApplicables = nodesDiscoveredNonApplicables[currentNode.getID()];
-    for (auto& nextNodeID : nodeFoundNonApplicables) {
-        nonApplicablesSeen.erase(nextNodeID);
-    }
-
-    nodesDiscoveredNonApplicables.erase(currentNode.getID());
+    nonApplicablesSeen.erase(currentNode.getID());
 }
 
 /**

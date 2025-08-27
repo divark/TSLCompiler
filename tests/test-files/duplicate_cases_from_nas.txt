@@ -1,0 +1,8 @@
+Category 1:
+    Choice 1.   [property Simple]
+
+Category 2:
+    Choice 1.   [if !Simple]
+    Choice 2.   [if !Simple]
+    Choice 3.   [if !Simple]
+    Choice 4.   [if Simple]

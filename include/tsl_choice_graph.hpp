@@ -56,7 +56,6 @@ class TSLGraph {
         std::unordered_map<size_t, std::vector<std::string>> nodeProperties;
         std::unordered_set<std::string> seenPropertiesOverall;
 
-        std::unordered_map<size_t, std::vector<size_t>> nodesDiscoveredNonApplicables;
         std::unordered_set<size_t> nonApplicablesSeen;
 
         std::unordered_map<size_t, std::unordered_set<Marker>> markerNodesSeen;
@@ -68,14 +67,18 @@ class TSLGraph {
         TSLTestCase makeTestCase(std::vector<Node>&);
         void generateNormalTestCase();
         void generateMarkerTestCase(Marker&);
-        void addNonApplicables(Node&);
-        void removeNonApplicables(Node&);
+        void addNonApplicable(Node&);
+        void removeNonApplicable(Node&);
 
         bool isNonApplicable(Node&);
         bool checkIfNextCategoryNotApplicable(Node&);
 
         bool checkIfMarkerAlreadyVisited(Node&, Marker&);
         void markChoiceWithMarkerAsVisited(Node&, Marker&);
+
+        std::unordered_set<std::string> testCaseKeys;
+        std::string generateNodesKey(std::vector<Node>&);
+        bool checkIfNodesAlreadyTestCase(std::vector<Node>&);
     public:
         TSLGraph();
         TSLGraph(TSLCollector&);
