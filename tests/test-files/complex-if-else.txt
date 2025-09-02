@@ -1,0 +1,6 @@
+Simple Category 1:
+    Simple Choice 1.
+    Simple Choice 2.    [property simple]
+
+Simple Category 2:
+    Simple Choice 2.    [if simple][else]

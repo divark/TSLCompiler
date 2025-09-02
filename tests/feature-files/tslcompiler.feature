@@ -173,3 +173,18 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 1 should have 'Choice 1.' chosen in category 1.
         Then test case 1 should have 'Category 2:' as category 2.
         Then test case 1 should have 'Choice 4.' chosen in category 2.
+
+    Scenario: An If and Else from some Choice should be visited.
+        Given a TSL file called complex-if-else.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 2 test cases.
+        Then test case 1 should have 'Simple Category 1:' as category 1.
+        Then test case 1 should have 'Simple Choice 1.' chosen in category 1.
+        Then test case 1 should have 'Simple Category 2:' as category 2.
+        Then test case 1 should have 'N/A' chosen in category 2.
+        Then test case 1 should have 'follows [else] from [if simple]' as a dependency for the chosen choice in category 2.
+        Then test case 2 should have 'Simple Category 1:' as category 1.
+        Then test case 2 should have 'Simple Choice 2.' chosen in category 1.
+        Then test case 2 should have 'Simple Category 2:' as category 2.
+        Then test case 2 should have 'Simple Choice 2.' chosen in category 2.
+        Then test case 2 should have 'follows [if simple]' as a dependency for the chosen choice in category 2.
