@@ -11,10 +11,10 @@ Where
 - `-c` is an optional parameter that prints the number of test frames generated.
 - `-s` is an optional parameter that prints all generated test cases to the Standard Output.
     - **NOTE: If `-s` is used, the `-o` flag will be ignored.**
-- `-o output_file` is an optional parameter that creates a file at with the given `output_file` name.
+- `-o output_file` is an optional parameter that creates a file at the given `output_file` name.
     - `output_file` can also be a path, such as `~/Downloads/catpart.txt.tsl`.
     - **NOTE: If `-o` is not specified, the name of the output file will be `input_file.tsl`**
-- `input_file` is the name of the TSL file to be read. **This parameter must be at the end, no matter what.**
+- `input_file` is the location of the TSL file to be read. **This parameter must be at the end, no matter what.**
 
 ## Comments
 The '#' character marks a comment until the next newline.
@@ -60,8 +60,7 @@ Sets the properties <name1>, <name2>, ... <namek> to
 true.  They can later be referenced in an selector
 expression.  Property names are case sensitive.
 
-Each choice can have several property lists, but not more
-than 10 properties total.
+Each choice can have several property lists.
 
 e.g.
 ```
