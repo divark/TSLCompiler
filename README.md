@@ -21,8 +21,22 @@ Finally, to remain fairly close to the original C implementation of the TSLgener
 
 ## Steps
 1. Clone this repository.
-2. Make a build directory called `build` for meson.
-3. Run `meson setup build`, where `build` is the name of the build directory.
+2. (Recommended) Install the fmt library with `meson wrap install fmt`
+
+### macOS
+3. Install the latest versions of meson, flex and bison.
+    - With brew: `brew install meson bison flex` 
+4. Run `meson setup --native-file macos-build.ini build`, where `build` is the name of the build directory.
+
+### Ubuntu
+3. Install the latest versions of cmake, flex and bison.
+    - With apt: `sudo apt install libbison-dev bison flex cmake libfl-dev` 
+4. Install the latest version of clang++
+    - With apt: `sudo apt install clang`
+    - NOTE: `linux-build.ini` expects clang++-19 for the CI/CD. On your own, so as long as clang supports C++20, you can remove the -19. If your version of clang is too old, use LLVM's [Automatic installation script](https://apt.llvm.org/) and specify version 19.
+5. Install the latest version of meson with `sudo apt install meson`
+    - NOTE: If the version of meson is too old for the project, install it with `pipx install meson`
+6. Run `meson setup --native-file linux-build.ini build`, where `build` is the name of the build directory.
 
 # Verifying
 1. Open the `build` directory from the `Building` step.
