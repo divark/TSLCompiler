@@ -24,18 +24,8 @@ jobs:
             wget https://apt.llvm.org/llvm.sh
             chmod +x llvm.sh
             sudo ./llvm.sh 19
-            echo "CXX=clang++-19" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex
-            # on macOS, bison and flex are already provided, but we want
-            # to use the newer versions provided by Homebrew, so we have
-            # to append them into the path via GitHub's GITHUB_PATH variable.
-            echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-            echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
-            # Likewise, we want to use the latest header files for flex.
-            echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
-            # And besides importing the flex headers, also make a universal binary.
-            echo "CPPFLAGS=-I$(brew --prefix flex)/include -arch arm64 -arch x86_64" >> $GITHUB_ENV
             # Finally, we want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
           fi
@@ -43,10 +33,16 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Setup build directory
-        run: |
-          meson wrap install fmt
-          meson setup build
+      - name: Install subprojects
+        run: meson wrap install fmt
+
+      - name: Setup build directory (macOS)
+        if: runner.os == "macOS"
+        run: meson setup --native-file macos-build.ini build
+
+      - name: Setup build directory (Linux)
+        if: runner.os != "macOS"
+        run: meson setup --native-file linux-build.ini build
 
       - name: Run all tests
         run: meson test -C build
@@ -69,30 +65,25 @@ jobs:
             chmod +x llvm.sh
             sudo ./llvm.sh 19
             sudo apt update && sudo apt install libbison-dev bison flex cmake libfl-dev
-            echo "CXX=clang++-19" >> $GITHUB_ENV
-            echo "LDFLAGS=-static-libstdc++" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             brew upgrade && brew install meson bison flex
-            # on macOS, bison and flex are already provided, but we want
-            # to use the newer versions provided by Homebrew, so we have
-            # to append them into the path via GitHub's GITHUB_PATH variable.
-            echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-            echo "$(brew --prefix flex)/bin" >> $GITHUB_PATH
-            # Likewise, we want to use the latest header files for flex.
-            echo "LDFLAGS=-L$(brew --prefix flex)/lib" >> $GITHUB_ENV
-            # And besides importing the flex headers, also make a universal binary.
-            echo "CPPFLAGS=-I$(brew --prefix flex)/include -arch arm64 -arch x86_64" >> $GITHUB_ENV
-            # Finally, we want to support macOS since Big Sur.
+            # We want to support macOS since Big Sur.
             echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
           fi
 
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Setup build directory
-        run: |
-          meson wrap install fmt
-          meson setup build -Dbuild_for_release=true
+      - name: Install subprojects
+        run: meson wrap install fmt
+
+      - name: Setup build directory (macOS)
+        if: runner.os == "macOS"
+        run: meson setup -Dbuild_for_release=true --native-file macos-build.ini build
+
+      - name: Setup build directory (Linux)
+        if: runner.os != "macOS"
+        run: meson setup -Dbuild_for_release=true --native-file linux-build.ini build
 
       - name: Compile the project
         run: meson compile -C build
