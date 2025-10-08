@@ -37,11 +37,11 @@ jobs:
         run: meson wrap install fmt
 
       - name: Setup build directory (macOS)
-        if: runner.os == "macOS"
+        if: runner.os == 'macOS'
         run: meson setup --native-file macos-build.ini build
 
       - name: Setup build directory (Linux)
-        if: runner.os != "macOS"
+        if: runner.os != 'macOS'
         run: meson setup --native-file linux-build.ini build
 
       - name: Run all tests
@@ -78,11 +78,11 @@ jobs:
         run: meson wrap install fmt
 
       - name: Setup build directory (macOS)
-        if: runner.os == "macOS"
+        if: runner.os == 'macOS'
         run: meson setup -Dbuild_for_release=true --native-file macos-build.ini build
 
       - name: Setup build directory (Linux)
-        if: runner.os != "macOS"
+        if: runner.os != 'macOS'
         run: meson setup -Dbuild_for_release=true --native-file linux-build.ini build
 
       - name: Compile the project
