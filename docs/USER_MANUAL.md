@@ -64,7 +64,6 @@ Each choice can have several property lists.
 
 e.g.
 ```
-# this choice uses the max number of properties
 a choice.     [if ABC] [property 1, 2, 3, 4]
               [else] [property 5, 6, 7, 8, 9, 10]
 ```
