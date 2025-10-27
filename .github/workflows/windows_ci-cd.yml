@@ -77,8 +77,6 @@ jobs:
             mingw-w64-clang-x86_64-openssl
             mingw-w64-clang-x86_64-ca-certificates
             mingw-w64-clang-x86_64-clang
-            # This is used to archive the compiled binaries via the
-            # command line. In a local environment, it's optional.
             mingw-w64-clang-x86_64-7zip
             openssl
             ca-certificates
