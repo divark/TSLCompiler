@@ -77,6 +77,9 @@ jobs:
             mingw-w64-clang-x86_64-openssl
             mingw-w64-clang-x86_64-ca-certificates
             mingw-w64-clang-x86_64-clang
+            # This is used to archive the compiled binaries via the
+            # command line. In a local environment, it's optional.
+            mingw-w64-clang-x86_64-7zip
             openssl
             ca-certificates
             meson
@@ -120,9 +123,9 @@ jobs:
         if: github.ref_type == 'tag'
         run: |
           cp build/tslchecker.exe tslchecker.exe
-          tar -cvaf tslchecker-windows-latest.zip tslchecker.exe
+          7z a -tzip tslchecker-windows-latest.zip tslchecker.exe
           cp build/tslcompiler.exe tslcompiler.exe
-          tar -cvaf tslcompiler-windows-latest.zip tslcompiler.exe
+          7z a -tzip tslcompiler-windows-latest.zip tslcompiler.exe
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
