@@ -113,3 +113,14 @@ void checkIfCurrentPropertyUndefined(const std::string property, const TSLCollec
         reportError(errorSummaryMsg, locationInCode);
     }
 }
+
+/**
+ * Throws an exception if the Category was already defined elsewhere.
+ */
+void checkIfCurrentCategoryRedefined(const std::string category, const TSLCollector &collector, const yy::location &locationInCode) {
+    bool categoryRedefined = collector.hasCategoryDefined(category);
+    if (categoryRedefined) {
+        std::string errorSummaryMsg = fmt::format("Error: Category {} was already defined elsewhere.", category);
+        reportError(errorSummaryMsg, locationInCode);
+    }
+}

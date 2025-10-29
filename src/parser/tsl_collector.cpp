@@ -11,6 +11,19 @@ int TSLCollector::recordCategory(std::string categoryContents) {
 }
 
 /**
+ * Returns whether some Category was already defined.
+ */
+bool TSLCollector::hasCategoryDefined(std::string categoryContents) const {
+    for (const auto& existingCategory : categories) {
+        if (existingCategory.getLabel() == categoryContents) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
 * Returns a reference to the specified category
 */
 Category& TSLCollector::getCategory(size_t categoryNum) {

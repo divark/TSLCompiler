@@ -97,7 +97,7 @@ marking:    MARKING_SINGLE { $$ = collector.markChoiceAsSingle(); }
        |    MARKING_ERROR  { $$ = collector.markChoiceAsError();  }
        ;
 
-category_label:   CATEGORY_CONTENTS { $$ = collector.recordCategory(lexer.getCurrentTokenContents()); }
+category_label:   CATEGORY_CONTENTS { checkIfCurrentCategoryRedefined(lexer.getCurrentTokenContents(), collector, @$); $$ = collector.recordCategory(lexer.getCurrentTokenContents()); }
         ;
 choice_label:     CHOICE_CONTENTS   { $$ = collector.recordChoice(lexer.getCurrentTokenContents()); }
       ;

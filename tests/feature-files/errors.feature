@@ -47,3 +47,10 @@ Feature: An error message should be provided when an issue comes up with the Lex
         Then line 1 of the error message should mention 'Property test2 was already defined elsewhere.'.
         Then line 2 of the error message should mention the given TSL input file at line 3, column 39.
         Then line 3 of the error message should point to the token test2 in line 3 with line 4 below it.
+
+    Scenario: The Parser reports a duplicated Category error when two Categories are named the same.
+        Given a TSL input file called duplicate_categories.txt,
+        When the Parser consumes the input,
+        Then line 1 of the error message should mention 'Category Sample Category 1: was already defined elsewhere.'.
+        Then line 2 of the error message should mention the given TSL input file at line 4, column 18.
+        Then line 3 of the error message should point to the token 1: in line 4 with line 5 below it.

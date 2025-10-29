@@ -32,6 +32,7 @@ class TSLCollector {
         bool isExpressionUndefined(std::shared_ptr<Expression>) const;
 
         int recordCategory(std::string);
+        bool hasCategoryDefined(std::string) const;
         int recordChoice(std::string);
 
         int recordProperty(std::string);

@@ -29,5 +29,7 @@ std::string getPointingMsg(const yy::location&);
 
 void reportError(const std::string&, const yy::location&);
 
+void checkIfCurrentCategoryRedefined(const std::string, const TSLCollector&, const yy::location&);
+
 void checkIfCurrentPropertyRedefined(const std::string, const TSLCollector&, const yy::location&);
 void checkIfCurrentPropertyUndefined(const std::string, const TSLCollector&, const yy::location&);
