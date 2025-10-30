@@ -31,7 +31,7 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 ## Prerequisites
 - A C++ Compiler supporting the C++20 standard (Tested and built with Clang++ on GitHub).
 - The Lexer library Flex.
-- The Parser library Bison version >= 3.2.
+- The Parser library Bison version >= 3.7.
 - The fmt library, which can be installed via `meson wrap install fmt`.
 - [The Meson Build System](https://mesonbuild.com/SimpleStart.html).
 
