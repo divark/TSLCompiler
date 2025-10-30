@@ -11,6 +11,22 @@ In addition, the TSLCompiler is developed using the principles behind Test Drive
 
 Finally, to remain fairly close to the original C implementation of the TSLgenerator, and to reduce memory leaks, this project utilizes C++.
 
+# Running
+It's highly recommended to download and use the [pre-built binaries](https://github.com/divark/TSLCompiler/releases/latest).
+
+If they do not work, go to the [Building](#Building) section for compilation instructions.
+## TSLCompiler
+1. Open the `build` directory from the `Building` step.
+2. Run `meson compile`.
+3. Verify that there is now an executable in there called `tslcompiler` if you're on Linux or macOS, `tslcompiler.exe` if you're on Windows.
+4. Run `./tslcompiler path/to/input/file`.
+  - For more information on available arguments, consult the [Manual.](docs/USER_MANUAL.md)
+## TSLChecker
+1. Open the `build` directory from the `Building` step.
+2. Run `meson compile`.
+3. Verify that there is now an executable in there called `tslchecker` if you're on Linux or macOS, `tslchecker.exe` if you're on Windows.
+4. Run `./tslchecker path/to/input/file`.
+
 # Building
 ## Prerequisites
 - A C++ Compiler supporting the C++20 standard (Tested and built with Clang++ on GitHub).
@@ -42,16 +58,3 @@ Finally, to remain fairly close to the original C implementation of the TSLgener
 1. Open the `build` directory from the `Building` step.
 2. Run `meson test`.
 3. Confirm that all tests are passing as intended.
-
-# Running
-## TSLCompiler
-1. Open the `build` directory from the `Building` step.
-2. Run `meson compile`.
-3. Verify that there is now an executable in there called `tslcompiler` if you're on Linux or macOS, `tslcompiler.exe` if you're on Windows.
-4. Run `./tslcompiler path/to/input/file`.
-  - For more information on available arguments, consult the [Manual.](docs/USER_MANUAL.md)
-## TSLChecker
-1. Open the `build` directory from the `Building` step.
-2. Run `meson compile`.
-3. Verify that there is now an executable in there called `tslchecker` if you're on Linux or macOS, `tslchecker.exe` if you're on Windows.
-4. Run `./tslchecker path/to/input/file`.
