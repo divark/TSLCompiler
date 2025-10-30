@@ -1,4 +1,4 @@
-bison = find_program('bison', version: '>=3.2')
+bison = find_program('bison', version: '>3.6.2')
 bison_input = files('parser.yy')
 bison_generated_sources = custom_target(
   'parser.cpp',
