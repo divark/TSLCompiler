@@ -1,4 +1,8 @@
-bison = find_program('bison', version: '>3.6.2')
+# Why Bison 3.7? For debugging purposes, there's an important flag
+# that helps diagnose issues with the parser.
+#
+# That flag is -Wcounterexamples
+bison = find_program('bison', version: '>=3.7')
 bison_input = files('parser.yy')
 bison_generated_sources = custom_target(
   'parser.cpp',
