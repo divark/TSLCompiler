@@ -11,21 +11,12 @@ In addition, the TSLCompiler is developed using the principles behind Test Drive
 
 Finally, to remain fairly close to the original C implementation of the TSLgenerator, and to reduce memory leaks, this project utilizes C++.
 
-# Running
+# Using
+Consult [the manual](docs/USER_MANUAL.md) on how to run the TSLCompiler.
+
 It's highly recommended to download and use the [pre-built binaries](https://github.com/divark/TSLCompiler/releases/latest).
 
 If they do not work, go to the [Building](#Building) section for compilation instructions.
-## TSLCompiler
-1. Open the `build` directory from the `Building` step.
-2. Run `meson compile`.
-3. Verify that there is now an executable in there called `tslcompiler` if you're on Linux or macOS, `tslcompiler.exe` if you're on Windows.
-4. Run `./tslcompiler path/to/input/file`.
-  - For more information on available arguments, consult the [Manual.](docs/USER_MANUAL.md)
-## TSLChecker
-1. Open the `build` directory from the `Building` step.
-2. Run `meson compile`.
-3. Verify that there is now an executable in there called `tslchecker` if you're on Linux or macOS, `tslchecker.exe` if you're on Windows.
-4. Run `./tslchecker path/to/input/file`.
 
 # Building
 ## Prerequisites
@@ -35,14 +26,14 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 - The fmt library, which can be installed via `meson wrap install fmt`.
 - [The Meson Build System](https://mesonbuild.com/SimpleStart.html).
 
-## Steps
+## Compiling
 1. Clone this repository.
 
 ### Windows (MSYS2)
-1. Install [MSYS2](https://www.msys2.org/)
-2. Open the MSYS2 CLANG64 application.
-3. Install the following packages: `pacman -S bison flex mingw-w64-clang-x86_64-python mingw-w64-clang-x86_64-meson mingw-w64-clang-x86_64-openssl mingw-w64-clang-x86_64-ca-certificates mingw-w64-clang-x86_64-clang openssl ca-certificates meson git`
-4.  Copy the `FlexLexer.h` into the include path for clang64 via `cp /usr/include/FlexLexer.h /clang64/include/`.
+2. Install [MSYS2](https://www.msys2.org/)
+3. Open the MSYS2 CLANG64 application and change to the location of the repository.
+4. Install the following packages: `pacman -S bison flex mingw-w64-clang-x86_64-python mingw-w64-clang-x86_64-meson mingw-w64-clang-x86_64-openssl mingw-w64-clang-x86_64-ca-certificates mingw-w64-clang-x86_64-clang openssl ca-certificates meson git`
+5.  Copy the `FlexLexer.h` into the include path for clang64 via `cp /usr/include/FlexLexer.h /clang64/include/`.
     - NOTE: This is a workaround to detect the Flex library. If someone has a better way of detecting this, help would be greatly appreciated!
 6.  (Recommended) Install the fmt library with `meson wrap install fmt`
 7.  Run `meson setup build`, where `build` is the name of the build directory.
@@ -64,7 +55,14 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 5. (Recommended) Install the fmt library with `meson wrap install fmt`
 6. Run `meson setup --native-file linux-build.ini build`, where `build` is the name of the build directory.
 
-# Verifying
+## Verifying
 1. Open the `build` directory from the `Building` step.
 2. Run `meson test`.
 3. Confirm that all tests are passing as intended.
+
+## Running
+1. Open the `build` directory from the `Building` step.
+2. Run `meson compile`.
+3. Verify that there is now an executable in there called `tslcompiler` if you're on Linux or macOS, `tslcompiler.exe` if you're on Windows.
+4. Run `./tslcompiler path/to/input/file`.
+  - For more information on available arguments, consult the [Manual.](docs/USER_MANUAL.md)
