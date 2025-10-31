@@ -37,21 +37,31 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 
 ## Steps
 1. Clone this repository.
-2. (Recommended) Install the fmt library with `meson wrap install fmt`
+
+### Windows (MSYS2)
+1. Install [MSYS2](https://www.msys2.org/)
+2. Open the MSYS2 CLANG64 application.
+3. Install the following packages: `pacman -S bison flex mingw-w64-clang-x86_64-python mingw-w64-clang-x86_64-meson mingw-w64-clang-x86_64-openssl mingw-w64-clang-x86_64-ca-certificates mingw-w64-clang-x86_64-clang openssl ca-certificates meson git`
+4.  Copy the `FlexLexer.h` into the include path for clang64 via `cp /usr/include/FlexLexer.h /clang64/include/`.
+    - NOTE: This is a workaround to detect the Flex library. If someone has a better way of detecting this, help would be greatly appreciated!
+6.  (Recommended) Install the fmt library with `meson wrap install fmt`
+7.  Run `meson setup build`, where `build` is the name of the build directory.
 
 ### macOS
-3. Install the latest versions of meson, flex and bison.
-    - With brew: `brew install meson bison flex` 
+2. Install the latest versions of meson, flex and bison.
+    - With brew: `brew install meson bison flex`
+3. (Recommended) Install the fmt library with `meson wrap install fmt`
 4. Run `meson setup --native-file macos-build.ini build`, where `build` is the name of the build directory.
 
 ### Ubuntu
-3. Install the latest versions of cmake, flex and bison.
+2. Install the latest versions of cmake, flex and bison.
     - With apt: `sudo apt install libbison-dev bison flex cmake libfl-dev` 
-4. Install the latest version of clang++
+3. Install the latest version of clang++
     - With apt: `sudo apt install clang`
     - NOTE: `linux-build.ini` expects clang++-19 for the CI/CD. On your own, so as long as clang supports C++20, you can remove the -19. If your version of clang is too old, use LLVM's [Automatic installation script](https://apt.llvm.org/) and specify version 19.
-5. Install the latest version of meson with `sudo apt install meson`
+4. Install the latest version of meson with `sudo apt install meson`
     - NOTE: If the version of meson is too old for the project, install it with `pipx install meson`
+5. (Recommended) Install the fmt library with `meson wrap install fmt`
 6. Run `meson setup --native-file linux-build.ini build`, where `build` is the name of the build directory.
 
 # Verifying
