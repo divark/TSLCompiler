@@ -53,14 +53,14 @@ int main(int argc, const char** argv) {
                       steps.then("Node {nodeNum} should contain '{expectedCategory}' as the Category.") = [&](size_t nodeNum, std::string expectedCategory) {
                           auto chosenNode = nodes[nodeNum - 1];
 
-                          auto actualCategory = chosenNode.getData().getCategoryLabel();
+                          auto actualCategory = chosenNode->getData().getCategoryLabel();
                           expect_eq(expectedCategory, actualCategory);
                       };
 
                       steps.then("Node {nodeNum} should contain '{expectedChoice}' as the Choice.") = [&](size_t nodeNum, std::string expectedChoice) {
                           auto chosenNode = nodes[nodeNum - 1];
 
-                          auto actualChoice = chosenNode.getData().getChoice().getLabel();
+                          auto actualChoice = chosenNode->getData().getChoice().getLabel();
                           expect_eq(expectedChoice, actualChoice);
                       };
                   };

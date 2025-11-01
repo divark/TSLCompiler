@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "tsl_collector.hpp"
 #include "tsl_grammar.hpp"
 
@@ -14,13 +16,8 @@ int TSLCollector::recordCategory(std::string categoryContents) {
  * Returns whether some Category was already defined.
  */
 bool TSLCollector::hasCategoryDefined(std::string categoryContents) const {
-    for (const auto& existingCategory : categories) {
-        if (existingCategory.getLabel() == categoryContents) {
-            return true;
-        }
-    }
-
-    return false;
+    bool existingCategoryMatched = std::any_of(categories.cbegin(), categories.cend(), [&](const Category& existingCategory) { return existingCategory.getLabel() == categoryContents; });
+    return existingCategoryMatched;
 }
 
 /**

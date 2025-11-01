@@ -25,8 +25,8 @@ Choice& TSLNode::getChoice() {
 /**
  * Returns a collection of Nodes holding all Choices found in their respective Categories.
  */
-std::vector<Node> getNodesFromCollector(TSLCollector& recordedVariables) {
-    std::vector<Node> nodes;
+std::vector<std::shared_ptr<Node>> getNodesFromCollector(TSLCollector& recordedVariables) {
+    std::vector<std::shared_ptr<Node>> nodes;
 
     auto numCategories = recordedVariables.getNumCategories();
     for (auto categoryIdx = 0; categoryIdx < numCategories; categoryIdx++) {
@@ -37,7 +37,7 @@ std::vector<Node> getNodesFromCollector(TSLCollector& recordedVariables) {
             auto categoryChoice = currentCategory.getChoice(choiceIdx);
             auto nodeData = TSLNode(categoryLabel, categoryChoice);
 
-            auto node = Node(nodeData);
+            auto node = std::make_shared<Node>(nodeData);
             nodes.push_back(node);
         }
     }
@@ -49,11 +49,11 @@ std::vector<Node> getNodesFromCollector(TSLCollector& recordedVariables) {
  * Returns a directed graph, where the first set of nodes for some category connects
  * to the second, and the second to the third, and so on.
  */
-Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, TSLCollector& recordedVariables) {
+Edges getEdgesFromTSLNodes(std::vector<std::shared_ptr<Node>>& nodes, TSLCollector& recordedVariables) {
     std::vector<std::vector<size_t>> edges;
 
     for (auto i = 0; i < nodes.size(); i++) {
-        nodes[i].setID(i);
+        nodes[i]->setID(i);
         edges.push_back(std::vector<size_t>());
     }
 
@@ -69,7 +69,7 @@ Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, TSLCollector& recordedVaria
 
         for (auto firstCategoryNode : firstCategoryNodes) {
             for (auto secondCategoryNode: secondCategoryNodes) {
-                edges[firstCategoryNode.getID()].push_back(secondCategoryNode.getID());
+                edges[firstCategoryNode->getID()].push_back(secondCategoryNode->getID());
             }
         }
     }
@@ -80,11 +80,11 @@ Edges getEdgesFromTSLNodes(std::vector<Node>& nodes, TSLCollector& recordedVaria
 /**
  * Returns a collection of Nodes that contain some Marker.
  */
-std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
-    std::vector<Node> foundNodes;
+std::vector<std::shared_ptr<Node>> filterToNodesWithMarkers(const std::vector<std::shared_ptr<Node>>& nodes) {
+    std::vector<std::shared_ptr<Node>> foundNodes;
 
     for (auto node : nodes) {
-        auto nodeData = node.getData();
+        auto nodeData = node->getData();
         auto nodeChoice = nodeData.getChoice();
 
         bool hasMarkers = nodeChoice.hasNormalMarker();
@@ -101,11 +101,11 @@ std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>& nodes) {
 /**
  * Returns a collection of Nodes that do not contain some Marker.
  */
-std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>& nodes) {
-    std::vector<Node> foundNodes;
+std::vector<std::shared_ptr<Node>> filterToNodesWithoutMarkers(const std::vector<std::shared_ptr<Node>>& nodes) {
+    std::vector<std::shared_ptr<Node>> foundNodes;
 
     for (auto node : nodes) {
-        auto nodeData = node.getData();
+        auto nodeData = node->getData();
         auto nodeChoice = nodeData.getChoice();
 
         bool hasMarkers = nodeChoice.hasNormalMarker();
@@ -122,12 +122,12 @@ std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>& nodes) {
 /**
  * Returns a collection of Nodes that match the desired Category index.
  */
-std::vector<Node> filterToNodesWithCategory(const std::vector<Node>& nodes, Category& desiredCategory) {
-    std::vector<Node> foundNodes;
+std::vector<std::shared_ptr<Node>> filterToNodesWithCategory(const std::vector<std::shared_ptr<Node>>& nodes, Category& desiredCategory) {
+    std::vector<std::shared_ptr<Node>> foundNodes;
 
     auto desiredCategoryLabel = desiredCategory.getLabel();
     for (auto node : nodes) {
-        auto nodeData = node.getData();
+        auto nodeData = node->getData();
         auto nodeCategoryLabel = nodeData.getCategoryLabel();
 
         if (nodeCategoryLabel != desiredCategoryLabel) {
@@ -175,8 +175,8 @@ Edges::Edges(std::vector<std::vector<size_t>> edges) {
 /**
  * Returns a set of edges recorded for some node.
  */
-const std::vector<size_t>& Edges::getNodeEdges(const Node& node) const {
-    return edges[node.getID()];
+const std::vector<size_t>& Edges::getNodeEdges(const std::shared_ptr<Node> node) const {
+    return edges[node->getID()];
 }
 
 TSLGraph::TSLGraph() {}
@@ -193,15 +193,15 @@ TSLGraph::TSLGraph(TSLCollector& tslVariables) {
 /**
 * Returns a list of nodes currently recorded in the graph.
 */
-std::vector<Node>& TSLGraph::getNodes() {
+std::vector<std::shared_ptr<Node>>& TSLGraph::getNodes() {
     return this->nodes;
 }
 
 /**
 * Returns a list of Nodes connected to the current node.
 */
-const std::vector<Node> TSLGraph::getEdges(const Node& currentNode) const {
-    std::vector<Node> foundEdges;
+const std::vector<std::shared_ptr<Node>> TSLGraph::getEdges(const std::shared_ptr<Node> currentNode) const {
+    std::vector<std::shared_ptr<Node>> foundEdges;
 
     auto edgesFound = this->edges.getNodeEdges(currentNode);
     for (auto nodeEdgeID : edgesFound) {
@@ -214,7 +214,7 @@ const std::vector<Node> TSLGraph::getEdges(const Node& currentNode) const {
 /**
 * Returns the list of Nodes visited so far.
 */
-const std::vector<Node>& TSLGraph::getVisitedNodes() const {
+const std::vector<std::shared_ptr<Node>>& TSLGraph::getVisitedNodes() const {
     return this->visitedNodes;
 }
 
@@ -238,12 +238,12 @@ std::vector<std::reference_wrapper<TSLTestCase>> TSLGraph::getGeneratedTestCases
 /**
 * Checks in with listeners subscribed to preorder events.
 */
-bool TSLGraph::preorderCheckin(Node& currentNode) {
+bool TSLGraph::preorderCheckin(std::shared_ptr<Node> currentNode) {
     bool canProceed = true;
 
     bool currentNodeNonApplicable = isNonApplicable(currentNode);
 
-    auto currentChoice = currentNode.getData().getChoice();
+    auto currentChoice = currentNode->getData().getChoice();
     std::vector<Property> choiceProperties;
     if (currentChoice.getExpression() && !currentNodeNonApplicable) {
         auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
@@ -292,7 +292,7 @@ bool TSLGraph::preorderCheckin(Node& currentNode) {
 /**
 * Checks in with listeners subscribed to postorder events.
 */
-bool TSLGraph::postorderCheckin(Node& currentNode) {
+bool TSLGraph::postorderCheckin(std::shared_ptr<Node> currentNode) {
     bool canProceed = true;
 
     removeNonApplicable(currentNode);
@@ -303,7 +303,7 @@ bool TSLGraph::postorderCheckin(Node& currentNode) {
 
     auto recentNodeVisitedIdx = visitedNodes.size() - 1;
     auto recentNode = visitedNodes[recentNodeVisitedIdx];
-    auto recentNodeID = recentNode.getID();
+    auto recentNodeID = recentNode->getID();
 
     if (!nodeProperties.contains(recentNodeID)) {
         return canProceed;
@@ -333,7 +333,7 @@ void TSLGraph::addProperty(Property& propertyToAdd) {
 
     auto recentNodeVisitedIdx = visitedNodes.size() - 1;
     auto recentNode = visitedNodes[recentNodeVisitedIdx];
-    auto recentNodeID = recentNode.getID();
+    auto recentNodeID = recentNode->getID();
     if (!nodeProperties.contains(recentNodeID)) {
         std::vector<std::string> propertiesFound;
         nodeProperties.insert({recentNodeID, propertiesFound});
@@ -346,12 +346,12 @@ void TSLGraph::addProperty(Property& propertyToAdd) {
 * Returns a Test Case built by the recently visited TSLNodes
 * populated by visitDFS.
 */
-TSLTestCase TSLGraph::makeTestCase(std::vector<Node>& choiceNodesVisited) {
+TSLTestCase TSLGraph::makeTestCase(std::vector<std::shared_ptr<Node>>& choiceNodesVisited) {
     TSLTestCase testCase;
 
     for (auto& recentNode : choiceNodesVisited) {
-        auto categoryLabel = recentNode.getData().getCategoryLabel();
-        auto& choice = recentNode.getData().getChoice();
+        auto categoryLabel = recentNode->getData().getCategoryLabel();
+        auto& choice = recentNode->getData().getChoice();
         auto choiceLabel = choice.getLabel();
         if (isNonApplicable(recentNode)) {
             choiceLabel = "N/A";
@@ -375,10 +375,10 @@ TSLTestCase TSLGraph::makeTestCase(std::vector<Node>& choiceNodesVisited) {
  * Returns a key represented as a string of node IDs concatenated
  * together.
  */
-std::string TSLGraph::generateNodesKey(std::vector<Node>& nodes) {
+std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes) {
     std::string nodesKey = "";
     for (auto& node : nodes) {
-        auto foundNodeID = node.getID();
+        auto foundNodeID = node->getID();
         // Even if a N/A was found on different Choices in the same Category,
         // we want to exclude a test case that looks the same.
         if (isNonApplicable(node)) {
@@ -395,7 +395,7 @@ std::string TSLGraph::generateNodesKey(std::vector<Node>& nodes) {
  * Returns a boolean indicating whether the given nodes
  * were already used to make a test case.
  */
-bool TSLGraph::checkIfNodesAlreadyTestCase(std::vector<Node>& nodes) {
+bool TSLGraph::checkIfNodesAlreadyTestCase(std::vector<std::shared_ptr<Node>>& nodes) {
     std::string nodesKey = generateNodesKey(nodes);
     return testCaseKeys.contains(nodesKey);
 }
@@ -425,7 +425,7 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
         return;
     }
 
-    std::vector<Node> markerNode = { visitedNodes.back() };
+    std::vector<std::shared_ptr<Node>> markerNode = { visitedNodes.back() };
     auto testCase = makeTestCase(markerNode);
 
     testCase.setMarker(markerFound);
@@ -438,26 +438,26 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
 /**
  * Adds the current node in the set of non applicables.
  */
-void TSLGraph::addNonApplicable(const Node& currentNode) {
-    nonApplicablesSeen.insert(currentNode.getID());
+void TSLGraph::addNonApplicable(const std::shared_ptr<Node> currentNode) {
+    nonApplicablesSeen.insert(currentNode->getID());
 }
 
 /**
  * Removes the current node marked as Non Applicable if its within the set.
  */
-void TSLGraph::removeNonApplicable(Node& currentNode) {
+void TSLGraph::removeNonApplicable(std::shared_ptr<Node> currentNode) {
     if (!isNonApplicable(currentNode)) {
         return;
     }
 
-    nonApplicablesSeen.erase(currentNode.getID());
+    nonApplicablesSeen.erase(currentNode->getID());
 }
 
 /**
  * Checks whether the current node was flagged as Non Applicable.
  */
-bool TSLGraph::isNonApplicable(Node& currentNode) {
-    return nonApplicablesSeen.contains(currentNode.getID());
+bool TSLGraph::isNonApplicable(std::shared_ptr<Node> currentNode) {
+    return nonApplicablesSeen.contains(currentNode->getID());
 }
 
 /**
@@ -465,7 +465,7 @@ bool TSLGraph::isNonApplicable(Node& currentNode) {
  * unreachable. Unreachable for some edge means that a next Choice
  * has an expression that is not satisfied.
  */
-bool TSLGraph::checkIfNextCategoryNotApplicable(Node& currentNode) {
+bool TSLGraph::checkIfNextCategoryNotApplicable(std::shared_ptr<Node> currentNode) {
     auto nodeEdges = getEdges(currentNode);
     if (nodeEdges.empty()) {
         return false;
@@ -473,7 +473,7 @@ bool TSLGraph::checkIfNextCategoryNotApplicable(Node& currentNode) {
 
     bool allEdgesNotSatisfied = true;
     for (auto& nextNode : nodeEdges) {
-        auto nextNodeExpression = nextNode.getData().getChoice().getExpression();
+        auto nextNodeExpression = nextNode->getData().getChoice().getExpression();
         if (!nextNodeExpression) {
             allEdgesNotSatisfied = false;
             break;
@@ -493,16 +493,16 @@ bool TSLGraph::checkIfNextCategoryNotApplicable(Node& currentNode) {
  * Returns true if some Choice from the current Node has been checked in
  * before with its specific marker, or false if not.
  */
-bool TSLGraph::checkIfMarkerAlreadyVisited(Node& currentChoiceNode, Marker& currentChoiceMarker) {
-    auto currentChoiceID = currentChoiceNode.getID();
+bool TSLGraph::checkIfMarkerAlreadyVisited(std::shared_ptr<Node> currentChoiceNode, Marker& currentChoiceMarker) {
+    auto currentChoiceID = currentChoiceNode->getID();
     return markerNodesSeen.contains(currentChoiceID) && markerNodesSeen[currentChoiceID].contains(currentChoiceMarker);
 }
 
 /**
  * Checks in a Choice's (from the Node) Marker.
  */
-void TSLGraph::markChoiceWithMarkerAsVisited(Node& currentChoiceNode, Marker& currentChoiceMarker) {
-    auto currentChoiceID = currentChoiceNode.getID();
+void TSLGraph::markChoiceWithMarkerAsVisited(std::shared_ptr<Node> currentChoiceNode, Marker& currentChoiceMarker) {
+    auto currentChoiceID = currentChoiceNode->getID();
     if (!markerNodesSeen.contains(currentChoiceID)) {
         std::unordered_set<Marker> markersSeen;
         markerNodesSeen.insert({currentChoiceID, markersSeen});
@@ -514,7 +514,7 @@ void TSLGraph::markChoiceWithMarkerAsVisited(Node& currentChoiceNode, Marker& cu
 /**
 * Visits the TSLGraph in a DFS fashion.
 */
-void TSLGraph::visitDFS(Node& currentNode) {
+void TSLGraph::visitDFS(std::shared_ptr<Node> currentNode) {
     visitedNodes.push_back(currentNode);
 
     bool preorderChecksOut = this->preorderCheckin(currentNode);

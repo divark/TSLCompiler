@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <vector>
 #include <cstddef>
+#include <memory>
 
 #include "tsl_collector.hpp"
 #include "tsl_grammar.hpp"
@@ -41,13 +42,13 @@ class Edges {
         Edges();
         Edges(std::vector<std::vector<size_t>>);
 
-        const std::vector<size_t>& getNodeEdges(const Node&) const;
+        const std::vector<size_t>& getNodeEdges(const std::shared_ptr<Node>) const;
 };
 
 class TSLGraph {
     private:
-        std::vector<Node> nodes;
-        std::vector<Node> visitedNodes;
+        std::vector<std::shared_ptr<Node>> nodes;
+        std::vector<std::shared_ptr<Node>> visitedNodes;
         Edges edges;
 
         std::vector<TSLTestCase> generatedTestCases;
@@ -60,43 +61,43 @@ class TSLGraph {
 
         std::unordered_map<size_t, std::unordered_set<Marker>> markerNodesSeen;
 
-        bool preorderCheckin(Node&);
-        bool postorderCheckin(Node&);
+        bool preorderCheckin(std::shared_ptr<Node>);
+        bool postorderCheckin(std::shared_ptr<Node>);
 
         void addProperty(Property&);
-        TSLTestCase makeTestCase(std::vector<Node>&);
+        TSLTestCase makeTestCase(std::vector<std::shared_ptr<Node>>&);
         void generateNormalTestCase();
         void generateMarkerTestCase(Marker&);
-        void addNonApplicable(const Node&);
-        void removeNonApplicable(Node&);
+        void addNonApplicable(const std::shared_ptr<Node>);
+        void removeNonApplicable(std::shared_ptr<Node>);
 
-        bool isNonApplicable(Node&);
-        bool checkIfNextCategoryNotApplicable(Node&);
+        bool isNonApplicable(std::shared_ptr<Node>);
+        bool checkIfNextCategoryNotApplicable(std::shared_ptr<Node>);
 
-        bool checkIfMarkerAlreadyVisited(Node&, Marker&);
-        void markChoiceWithMarkerAsVisited(Node&, Marker&);
+        bool checkIfMarkerAlreadyVisited(std::shared_ptr<Node>, Marker&);
+        void markChoiceWithMarkerAsVisited(std::shared_ptr<Node>, Marker&);
 
         std::unordered_set<std::string> testCaseKeys;
-        std::string generateNodesKey(std::vector<Node>&);
-        bool checkIfNodesAlreadyTestCase(std::vector<Node>&);
+        std::string generateNodesKey(std::vector<std::shared_ptr<Node>>&);
+        bool checkIfNodesAlreadyTestCase(std::vector<std::shared_ptr<Node>>&);
     public:
         TSLGraph();
         TSLGraph(TSLCollector&);
 
-        std::vector<Node>& getNodes();
-        const std::vector<Node> getEdges(const Node&) const;
-        const std::vector<Node>& getVisitedNodes() const;
+        std::vector<std::shared_ptr<Node>>& getNodes();
+        const std::vector<std::shared_ptr<Node>> getEdges(const std::shared_ptr<Node>) const;
+        const std::vector<std::shared_ptr<Node>>& getVisitedNodes() const;
 
         std::vector<std::reference_wrapper<TSLTestCase>> getGeneratedTestCases();
 
-        void visitDFS(Node&);
+        void visitDFS(std::shared_ptr<Node>);
 };
 
 // These are the adapters that gets us Nodes from a TSLCollector, just
 // to keep things modular.
-std::vector<Node> getNodesFromCollector(TSLCollector&);
-Edges getEdgesFromTSLNodes(std::vector<Node>&, TSLCollector&);
+std::vector<std::shared_ptr<Node>> getNodesFromCollector(TSLCollector&);
+Edges getEdgesFromTSLNodes(std::vector<std::shared_ptr<Node>>&, TSLCollector&);
 
-std::vector<Node> filterToNodesWithMarkers(const std::vector<Node>&);
-std::vector<Node> filterToNodesWithoutMarkers(const std::vector<Node>&);
-std::vector<Node> filterToNodesWithCategory(const std::vector<Node>&, Category&);
+std::vector<std::shared_ptr<Node>> filterToNodesWithMarkers(const std::vector<std::shared_ptr<Node>>&);
+std::vector<std::shared_ptr<Node>> filterToNodesWithoutMarkers(const std::vector<std::shared_ptr<Node>>&);
+std::vector<std::shared_ptr<Node>> filterToNodesWithCategory(const std::vector<std::shared_ptr<Node>>&, Category&);
