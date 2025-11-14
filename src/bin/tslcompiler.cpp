@@ -17,7 +17,7 @@ std::vector<TSLCompilerArgument> getArguments(int numArguments, char* arguments[
 
     std::vector<std::string> foundArguments;
 
-    for (int i = 0; i < numArguments; i++) {
+    for (int i = 1; i < numArguments; i++) {
         std::string argument(arguments[i]);
 
         foundArguments.push_back(argument);
@@ -175,6 +175,11 @@ void printTestCases(std::vector<TSLTestCase> &testCases, const std::optional<std
 int main(int argc, char* argv[]) {
     try {
         auto args = getArguments(argc, argv);
+        // This can only happen if someone specifies the help (-h, --help) flag.
+        if (args.empty()) {
+            return 0;
+        }
+
         auto inputFile = getInput(args);
 
         auto tslcompiler = TSLCompiler(inputFile);
@@ -193,7 +198,7 @@ int main(int argc, char* argv[]) {
         printTestCases(testCases, outputLocation);
     } catch (const ArgumentException& argumentError) {
         std::cerr << argumentError.what() << std::endl;
-        std::cerr << "Usage: " << argv[0] << " [ -c ] [ -s ] [ -o output_file ] input_file" << std::endl;
+        std::cerr << "For info on how to run the program, run: " << argv[0] << " -h" << std::endl;
         return 1;
     } catch (const TSLException& compilerError) {
         std::cerr << compilerError.getErrorMessage() << std::endl;

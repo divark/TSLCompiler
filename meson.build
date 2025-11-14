@@ -9,6 +9,10 @@ project(
 
 fmt = subproject('fmt', default_options: 'default_library=static')
 format_dependency = fmt.get_variable('fmt_dep')
+args = subproject('args')
+args_dependency = args.get_variable('args_dep')
+
+compiler_dependencies = [format_dependency, args_dependency]
 
 inc = include_directories('include')
 
@@ -28,5 +32,5 @@ executable(
   'tslcompiler',
   tslcompiler_sources + lexer_sources + parser_sources + compiler_sources,
   include_directories: inc,
-  dependencies: format_dependency,
+  dependencies: compiler_dependencies,
 )

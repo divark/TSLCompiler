@@ -13,7 +13,7 @@ void expect_eq(auto expected, auto actual) {
 std::vector<std::string> splitIntoArgvStyle(const std::string& rawArguments) {
     std::stringstream argumentReader(rawArguments);
 
-    std::vector<std::string> argumentsFound = {"tslcompiler"};
+    std::vector<std::string> argumentsFound;
     for(std::string readArgument; std::getline(argumentReader, readArgument, ' ');) {
         argumentsFound.push_back(readArgument);
     }
@@ -37,6 +37,7 @@ int main(int argc, const char** argv) {
                       parsedArguments = parseArguments(programArguments);
                   } catch(const ArgumentException& argumentError) {
                       argumentErrorMessage = argumentError.what();
+                      std::cerr << argumentErrorMessage << std::endl;
                   }
 
                   steps.then("the '{argumentName}' argument is returned as argument {argumentNum}.") = [&](std::string argumentName, size_t argumentNum) {

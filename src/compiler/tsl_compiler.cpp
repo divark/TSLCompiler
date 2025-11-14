@@ -2,8 +2,11 @@
 #include "fmt/format.h"
 #include "tsl_choice_graph.hpp"
 #include "tsl_testcase.hpp"
+
+#include <args.hxx>
 #include <filesystem>
 #include <memory>
+#include <regex>
 
 /**
  * Returns a TSLCompiler with the loaded inputFile.
@@ -103,44 +106,76 @@ std::filesystem::path TSLCompilerArgument::getValue() const {
     return filePath;
 }
 
-std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
-    std::vector<TSLCompilerArgument> argumentsParsed;
-    size_t numArgumentsToInvestigate = argumentsFromArgv.size() - 1;
+/// Returns an error message mapped from the args library into
+/// one of our own.
+std::string convertToIdealErrorMsg(const std::string& argsErrorMsg) {
+    std::regex invalidArgRegex(".+ could not be matched: '?([^']+)'?");
+    std::smatch foundInvalidArgument;
 
-    bool outputArgumentFound = false;
-    for (int i = 1; i < numArgumentsToInvestigate; i++) {
-        auto& argumentFound = argumentsFromArgv[i];
-        if (argumentFound == "-c") {
-           argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::CountFrames));
-        } else if (argumentFound == "-s") {
-            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::ToStandardOutput));
-            outputArgumentFound = true;
-        } else if (argumentFound == "-o") {
-            if (i + 1 == numArgumentsToInvestigate) {
-                throw ArgumentException("-o needs an output file argument.");
-            }
-
-            std::filesystem::path outputFilePath(argumentsFromArgv[i + 1]);
-            argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath));
-            i++;
-            outputArgumentFound = true;
-        } else {
-            throw ArgumentException(fmt::format("Invalid argument: {}", argumentFound));
-        }
+    if (std::regex_match(argsErrorMsg, foundInvalidArgument, invalidArgRegex)) {
+        return fmt::format("Invalid argument: {}", foundInvalidArgument[1].str());
     }
 
-    std::filesystem::path inputFilePath(argumentsFromArgv[argumentsFromArgv.size() - 1]);
+    return argsErrorMsg;
+}
+
+std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
+    std::vector<TSLCompilerArgument> argumentsParsed;
+
+    args::ArgumentParser argumentParser("A tool that generates test cases used as reference when writing test code.");
+
+    args::HelpFlag help(argumentParser, "help", "Displays this help menu", {'h', "help"});
+
+    args::Group outputGroup(argumentParser, "Outputs (Choose at most one):", args::Group::Validators::AtMostOne);
+    args::Flag standardOutput(outputGroup, "standard_output", "Prints to the standard output", {'s'});
+    args::ValueFlag<std::filesystem::path> outputFile(outputGroup, "output_file", "Writes to some output file at a given path", {'o'});
+
+    args::Flag countingTestCases(argumentParser, "counting", "Counts the number of generated test frames", {'c'});
+    args::Positional<std::filesystem::path> inputFile(argumentParser, "inputFile", "The TSL file to be read");
+
+    try {
+        argumentParser.ParseArgs(argumentsFromArgv);
+    } catch (args::Help) {
+        std::cout << argumentParser;
+        return argumentsParsed;
+    } catch (args::ParseError e) {
+        std::string parseErrorMsg = convertToIdealErrorMsg(std::string(e.what()));
+        throw ArgumentException(parseErrorMsg);
+    } catch (args::ValidationError e) {
+        throw ArgumentException(e.what());
+    }
+
+    if (!inputFile) {
+        throw ArgumentException("Missing input file argument.");
+    }
+
+    if (countingTestCases) {
+        auto countingCasesArg = TSLCompilerArgument(CompilerArgumentType::CountFrames);
+        argumentsParsed.push_back(countingCasesArg);
+    }
+
+    if (standardOutput) {
+        auto stdoutOutput = TSLCompilerArgument(CompilerArgumentType::ToStandardOutput);
+        argumentsParsed.push_back(stdoutOutput);
+    } else if (outputFile) {
+        std::filesystem::path outputFilePath = args::get(outputFile);
+        auto outputFileArg = TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath);
+        argumentsParsed.push_back(outputFileArg);
+    } else {
+        std::filesystem::path outputFilePath = args::get(inputFile);
+        outputFilePath.concat(".tsl");
+
+        auto outputFileArg = TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath);
+        argumentsParsed.push_back(outputFileArg);
+    }
+
+    std::filesystem::path inputFilePath = args::get(inputFile);
     if (!std::filesystem::exists(inputFilePath)) {
         throw ArgumentException(fmt::format("The input file {} does not exist.", inputFilePath.string()));
     }
 
-    if (!outputArgumentFound) {
-        std::filesystem::path outputFilePath = inputFilePath;
-        outputFilePath.concat(".tsl");
-        argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::OutputFile, outputFilePath));
-    }
-
-    argumentsParsed.push_back(TSLCompilerArgument(CompilerArgumentType::InputFile, inputFilePath));
+    auto inputFileArg = TSLCompilerArgument(CompilerArgumentType::InputFile, inputFilePath);
+    argumentsParsed.push_back(inputFileArg);
 
     return argumentsParsed;
 }

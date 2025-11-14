@@ -1,4 +1,7 @@
 test_ut_dep = dependency('boost.ut')
+
+test_dependencies = [test_ut_dep, format_dependency] + compiler_dependencies
+
 working_directory = meson.current_source_dir()
 
 # Testing just the TSL Lexer.
@@ -7,7 +10,7 @@ lexer_test_sources = files('tsllexer_ut.cpp')
 lexer_test_executable = executable(
   'tsllexer-ut-test',
   sources: lexer_test_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(
@@ -24,7 +27,7 @@ parser_test_sources = files('tslparser_ut.cpp')
 parser_test_executable = executable(
   'tslparser-ut-test',
   sources: parser_test_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(
@@ -41,7 +44,7 @@ compiler_feature_file = files('feature-files/tslcompiler.feature')
 compiler_test_executable = executable(
   'compiler-test',
   sources: compiler_test_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(
@@ -57,7 +60,7 @@ graph_feature_file = files('feature-files/tslchoicegraph.feature')
 graph_test_executable = executable(
   'graph-test',
   sources: graph_test_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(
@@ -74,7 +77,7 @@ error_test_sources = files('errors_ut.cpp')
 error_test_executable = executable(
   'errors-test',
   sources: error_test_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(
@@ -91,7 +94,7 @@ compiler_arguments_sources = files('compiler-arguments.cpp')
 compiler_arguments_executable = executable(
   'compiler_arguments-test',
   sources: compiler_arguments_sources + app_sources,
-  dependencies: [test_ut_dep, format_dependency],
+  dependencies: test_dependencies,
   include_directories: inc,
 )
 test(

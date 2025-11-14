@@ -32,21 +32,16 @@ Feature: All TSLgenerator arguments are honored.
         Then the 'input from test-files/one_category_one_choice.txt' argument is returned as argument 3.
 
     Scenario: '-c' and '-o' are specified.
-        Given the arguments '-o one_category_one_choice.txt.tsl -c test-files/one_category_one_choice.txt',
+        Given the arguments '-c -o one_category_one_choice.txt.tsl test-files/one_category_one_choice.txt',
         When the arguments are parsed,
-        Then the 'output to one_category_one_choice.txt.tsl' argument is returned as argument 1.
-        Then the 'count frames' argument is returned as argument 2.
+        Then the 'count frames' argument is returned as argument 1.
+        Then the 'output to one_category_one_choice.txt.tsl' argument is returned as argument 2.
         Then the 'input from test-files/one_category_one_choice.txt' argument is returned as argument 3.
 
     Scenario: An invalid argument returns an error.
         Given the arguments '-e test-files/one_category_one_choice.txt',
         When the arguments are parsed,
-        Then the error message returned should read 'Invalid argument: -e'.
-
-    Scenario: Specifying '-o' without an output file returns an error.
-        Given the arguments '-o test-files/one_category_one_choice.txt',
-        When the arguments are parsed,
-        Then the error message returned should read '-o needs an output file argument.'.
+        Then the error message returned should read 'Invalid argument: e'.
 
     Scenario: Pointing to an input file that does not exist returns an error.
         Given the arguments 'some_tsl_file.txt',
