@@ -1,0 +1,13 @@
+Sample Category 1:
+    Choice 1.   [property choice1]
+    Choice 2.   [error]
+    Choice 3.   [property choice3]
+
+Sample Category 2:
+    Choice 4.   [if choice1][property choice4]
+    # Choice 3 will not be displayed because of this if statement.
+    Choice 5.   [if !choice1][error]
+
+Sample Category 3:
+    Choice 6.
+    Choice 7.

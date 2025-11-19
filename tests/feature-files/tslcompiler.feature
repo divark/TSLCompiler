@@ -181,10 +181,31 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 1 should have 'Simple Category 1:' as category 1.
         Then test case 1 should have 'Simple Choice 1.' chosen in category 1.
         Then test case 1 should have 'Simple Category 2:' as category 2.
-        Then test case 1 should have 'N/A' chosen in category 2.
+        Then test case 1 should have 'Simple Choice 2.' chosen in category 2.
         Then test case 1 should have 'follows [else] from [if simple]' as a dependency for the chosen choice in category 2.
         Then test case 2 should have 'Simple Category 1:' as category 1.
         Then test case 2 should have 'Simple Choice 2.' chosen in category 1.
         Then test case 2 should have 'Simple Category 2:' as category 2.
         Then test case 2 should have 'Simple Choice 2.' chosen in category 2.
         Then test case 2 should have 'follows [if simple]' as a dependency for the chosen choice in category 2.
+
+    Scenario: A category with an error choice should still look at all other choices.
+        Given a TSL file called category_with_error_splitting_choices.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 4 test cases.
+        Then test case 1 should have 'Sample Category 1:' as category 1.
+        Then test case 1 should have 'Choice 2.' chosen in category 1.
+        Then test case 2 should have 'Sample Category 2:' as category 1.
+        Then test case 2 should have 'Choice 5.' chosen in category 1.
+        Then test case 3 should have 'Sample Category 1:' as category 1.
+        Then test case 3 should have 'Choice 1.' chosen in category 1.
+        Then test case 3 should have 'Sample Category 2:' as category 2.
+        Then test case 3 should have 'Choice 4.' chosen in category 2.
+        Then test case 3 should have 'Sample Category 3:' as category 3.
+        Then test case 3 should have 'Choice 6.' chosen in category 3.
+        Then test case 4 should have 'Sample Category 1:' as category 1.
+        Then test case 4 should have 'Choice 1.' chosen in category 1.
+        Then test case 4 should have 'Sample Category 2:' as category 2.
+        Then test case 4 should have 'Choice 4.' chosen in category 2.
+        Then test case 4 should have 'Sample Category 3:' as category 3.
+        Then test case 4 should have 'Choice 7.' chosen in category 3.

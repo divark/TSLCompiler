@@ -69,6 +69,7 @@ class Choice {
         std::string getLabel() const;
         std::optional<std::string> getMarker();
         bool hasNormalMarker();
+        bool hasIfConditionalMarker();
         bool hasConditionalMarker();
         Property& getProperty(size_t);
         std::vector<Property>& getProperties();

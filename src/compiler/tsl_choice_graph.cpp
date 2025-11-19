@@ -473,16 +473,39 @@ bool TSLGraph::checkIfNextCategoryNotApplicable(std::shared_ptr<Node> currentNod
 
     bool allEdgesNotSatisfied = true;
     for (auto& nextNode : nodeEdges) {
-        auto nextNodeExpression = nextNode->getData().getChoice().getExpression();
+        auto& choice = nextNode->getData().getChoice();
+        auto nextNodeExpression = choice.getExpression();
         if (!nextNodeExpression) {
             allEdgesNotSatisfied = false;
             break;
         }
 
-        bool nextNodeSatisfied = nextNodeExpression.value()->evaluate(seenPropertiesOverall);
+        auto foundChoiceProperties = choice.getEvaluatedProperties(seenPropertiesOverall);
+        bool nextNodeSatisfied = foundChoiceProperties.has_value();
         if (nextNodeSatisfied) {
-            allEdgesNotSatisfied = false;
-            break;
+            auto& choiceProperties = foundChoiceProperties.value().getProperties();
+            // Case 1: There's an if/else statement with nothing following it.
+            // EX: Choice 1.    [if someProperty]
+            if (choiceProperties.empty()) {
+                allEdgesNotSatisfied = false;
+                break;
+            }
+
+            // Case 2: There's an if/else statement with a property.
+            // EX: Choice 1.    [property someProperty]
+            auto nodeMarker = choiceProperties[0].asMarker();
+            if (!nodeMarker) {
+                allEdgesNotSatisfied = false;
+                break;
+            }
+
+            // Case 3: There's an if/else statement with a marker. We need to be sure
+            // we haven't seen this before to proceed. If so, this is N/A.
+            bool choiceMarkerNotVisited = nodeMarker.has_value() && !checkIfMarkerAlreadyVisited(nextNode, nodeMarker.value());
+            if (choiceMarkerNotVisited) {
+                allEdgesNotSatisfied = false;
+                break;
+            }
         }
     }
 

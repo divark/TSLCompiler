@@ -108,13 +108,14 @@ bool Choice::hasNormalMarker() {
     return foundMarker.has_value();
 }
 
-bool Choice::hasConditionalMarker() {
-    bool hasIfMarker = false;
-    if (ifProperties) {
-        auto lastProperty = ifProperties.value().back().asMarker();
-        hasIfMarker = lastProperty.has_value();
-    }
+/// Returns whether a [single] or [error] exists in a if expression for the current
+/// choice.
+bool Choice::hasIfConditionalMarker() {
+    return ifProperties && ifProperties.value().back().asMarker();
+}
 
+bool Choice::hasConditionalMarker() {
+    bool hasIfMarker = hasIfConditionalMarker();
     bool hasElseMarker = false;
     if (elseProperties) {
         auto lastProperty = elseProperties.value().back().asMarker();
