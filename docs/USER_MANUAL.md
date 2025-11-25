@@ -231,7 +231,7 @@ Simple Category 3:
   present.                       [if abc] [property def]
   not present.                   [if abc][error][else][single]
 ```
-The `[else]` is optional, and so are the <error/single> and <property list> for both `[if]` and `[else]`.
+The `[else]` is optional, and so are the `error/single` and property definitions for both `[if]` and `[else]`.
 
 If <expression> evaluates to true then the following three steps are applied to the statements after the `[if]`. Otherwise, the steps are applied to the statements after the `[else]` (if there is one).
 
