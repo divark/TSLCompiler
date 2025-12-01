@@ -209,3 +209,9 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 4 should have 'Choice 4.' chosen in category 2.
         Then test case 4 should have 'Sample Category 3:' as category 3.
         Then test case 4 should have 'Choice 7.' chosen in category 3.
+
+    Scenario: A Category with a long if statement should print the expression correctly.
+        Given a TSL file called category_with_long_if.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 32 test cases.
+        Then test case 2 should have 'follows [if (a || b || c || d || e) && !(d && e)]' as a dependency for the chosen choice in category 6.

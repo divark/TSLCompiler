@@ -129,15 +129,14 @@ int TSLCollector::recordUnaryExpression(ExpType unaryType) {
 /**
 * Returns the index of the recently created Binary Expression for the
 * current choice.
-* Preconditions: The most recent Choice has exactly two Expressions.
+* Preconditions: The most recent Choice has at least two Expressions.
 */
 int TSLCollector::recordBinaryExpression(ExpType binaryType) {
-    auto firstExpression = choiceExpressions.front();
     auto lastExpression = choiceExpressions.back();
+    choiceExpressions.pop_back();
+    auto firstExpression = choiceExpressions.back();
+    choiceExpressions.pop_back();
 
-    for (int i = 0; i < 2; i++) {
-        choiceExpressions.pop_back();
-    }
     auto binaryExpression = std::make_shared<Expression>(binaryType, firstExpression, lastExpression);
 
     return recordExpression(binaryExpression);

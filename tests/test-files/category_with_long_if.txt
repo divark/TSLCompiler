@@ -1,0 +1,22 @@
+A:
+    a.  [property a]
+    no a.
+
+B:
+    b.  [property b]
+    no b.
+
+C:
+    c.  [property c]
+    no c.
+
+D:
+    d.  [property d]
+    no d.
+
+E:
+    e.  [property e]
+    no e.
+
+Presence of some choice:
+    One.    [if (a || b || c || d || e) && !(d && e)]
