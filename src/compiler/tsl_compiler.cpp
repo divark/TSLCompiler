@@ -122,7 +122,7 @@ std::string convertToIdealErrorMsg(const std::string& argsErrorMsg) {
 std::vector<TSLCompilerArgument> parseArguments(const std::vector<std::string> &argumentsFromArgv) {
     std::vector<TSLCompilerArgument> argumentsParsed;
 
-    args::ArgumentParser argumentParser("A tool that generates test cases used as reference when writing test code.");
+    args::ArgumentParser argumentParser("A tool that generates test cases used as reference when writing test code.", "For more information on how this program works, consult USER_MANUAL.md in the docs directory.");
 
     args::HelpFlag help(argumentParser, "help", "Displays this help menu", {'h', "help"});
 

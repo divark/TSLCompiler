@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
         printTestCases(testCases, outputLocation);
     } catch (const ArgumentException& argumentError) {
         std::cerr << argumentError.what() << std::endl;
-        std::cerr << "For info on how to run the program, run: " << argv[0] << " -h" << std::endl;
+        std::cerr << "For information on how to run the program, run: " << argv[0] << " -h" << std::endl;
         return 1;
     } catch (const TSLException& compilerError) {
         std::cerr << compilerError.getErrorMessage() << std::endl;
