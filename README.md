@@ -41,19 +41,26 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 ### macOS
 2. Install the latest versions of meson, flex and bison.
     - With brew: `brew install meson bison flex`
-3. (Recommended) Install the fmt library with `meson wrap install fmt`
+3. Install the fmt library with `meson wrap install fmt`
 4. Run `meson setup --native-file macos-build.ini build`, where `build` is the name of the build directory.
 
-### Ubuntu
+### Linux
 2. Install the latest versions of cmake, flex and bison.
-    - With apt: `sudo apt install libbison-dev bison flex cmake libfl-dev` 
+    - With apt (Ubuntu, Debian and similar): `sudo apt install libbison-dev bison flex cmake libfl-dev` 
+    - With dnf (Fedora and similar): `sudo dnf install bison bison-devel flex libfl-devel cmake`
+    - With pacman (Arch Linux and similar): `sudo pacman -S flex bison cmake`
 3. Install the latest version of clang++
-    - With apt: `sudo apt install clang`
-    - NOTE: `linux-build.ini` expects clang++-19 for the CI/CD. On your own, so as long as clang supports C++20, you can remove the -19. If your version of clang is too old, use LLVM's [Automatic installation script](https://apt.llvm.org/) and specify version 19.
-4. Install the latest version of meson with `sudo apt install meson`
+    - With apt (Ubuntu, Debian and similar): `sudo apt install clang`
+    - With dnf (Fedora and similar): `sudo dnf install clang`
+    - With pacman(Arch Linux and similar): `sudo pacman -S clang`
+4. Install the latest version of meson
+    - With apt (Ubuntu, Debian and similar): `sudo apt install meson`
+    - With dnf (Fedora and similar): `sudo dnf install meson`
+    - With pacman(Arch Linux and similar): `sudo pacman -S meson`
     - NOTE: If the version of meson is too old for the project, install it with `pipx install meson`
-5. (Recommended) Install the fmt library with `meson wrap install fmt`
+5. Install the fmt library with `meson wrap install fmt`
 6. Run `meson setup --native-file linux-build.ini build`, where `build` is the name of the build directory.
+    - NOTE: `linux-build.ini` expects clang++-19 for the CI/CD. On your own, so as long as clang supports C++20, you can remove the -19.
 
 ## Verifying
 1. Open the `build` directory from the `Building` step.
