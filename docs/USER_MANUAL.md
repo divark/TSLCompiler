@@ -59,7 +59,15 @@ Value:
 
 ## Choices
 ### Definition
-A Choice represents some item in a Category under consideration. A test case is formed by the combination of one selected choice in each Category.
+A Choice represents some item in a Category under consideration. A string ending with the '.' (period) character is interpreted as a choice.
+e.g.
+```
+Some Category:
+    this is another choice.
+                          ^
+```
+
+A test case is formed by the combination of one selected choice in each Category.
 e.g.
 ```
 Sample Category 1:
@@ -89,14 +97,6 @@ Sample Category 2:
 # Test Case 4
 # 	Simple Category 1  : Simple Choice 2 
 # 	Simple Category 2  : Simple Choice 4 
-```
-
-A string ending with the '.' (period) character is interpreted as a choice.
-e.g.
-```
-Some Category:
-    this is another choice.
-                          ^
 ```
 
 ## Markers
