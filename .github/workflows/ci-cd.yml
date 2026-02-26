@@ -94,35 +94,37 @@ jobs:
           strip build/tslcompiler
 
       - name: Upload TSLChecker binary if this is not a release.
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: github.ref_type != 'tag'
         with:
           path: build/tslchecker
+          compression-level: 9
           name: tslchecker-${{ matrix.os }}
 
       - name: Upload TSLCompiler binary if this is not a release.
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: github.ref_type != 'tag'
         with:
           path: build/tslcompiler
+          compression-level: 9
           name: tslcompiler-${{ matrix.os }}
 
       - name: Prepare artifacts for release if it exists.
         if: github.ref_type == 'tag'
         run: |
           cp build/tslchecker tslchecker
-          tar -cvzf tslchecker-${{ matrix.os }}.tar.gz tslchecker
+          tar -c -v --xz -f tslchecker-${{ matrix.os }}.tar.xz tslchecker
           cp build/tslcompiler tslcompiler
-          tar -cvzf tslcompiler-${{ matrix.os }}.tar.gz tslcompiler
+          tar -c -v --xz -f tslcompiler-${{ matrix.os }}.tar.xz tslcompiler
 
       - name: Upload TSLChecker binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslchecker-${{ matrix.os }}.tar.gz
+          files: tslchecker-${{ matrix.os }}.tar.xz
 
       - name: Upload TSLCompiler binary to release if it exists.
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: tslcompiler-${{ matrix.os }}.tar.gz
+          files: tslcompiler-${{ matrix.os }}.tar.xz
