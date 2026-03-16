@@ -178,7 +178,8 @@ e.g.
 ```
 Simple Category 1:
     Simple Choice 1.    [property test1]
-    # This yields an error because only one Choice is picked at a time. Property `test1` will never be defined for this if statement to come true.
+    # This yields an error because only one Choice is picked per Category.
+    # Property `test1` will never be defined for this if statement to come true.
     Simple Choice 2.    [if test1]
 ```
 

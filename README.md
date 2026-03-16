@@ -52,11 +52,11 @@ If they do not work, go to the [Building](#Building) section for compilation ins
 3. Install the latest version of clang++
     - With apt (Ubuntu, Debian and similar): `sudo apt install clang`
     - With dnf (Fedora and similar): `sudo dnf install clang`
-    - With pacman(Arch Linux and similar): `sudo pacman -S clang`
+    - With pacman (Arch Linux and similar): `sudo pacman -S clang`
 4. Install the latest version of meson
     - With apt (Ubuntu, Debian and similar): `sudo apt install meson`
     - With dnf (Fedora and similar): `sudo dnf install meson`
-    - With pacman(Arch Linux and similar): `sudo pacman -S meson`
+    - With pacman (Arch Linux and similar): `sudo pacman -S meson`
     - NOTE: If the version of meson is too old for the project, install it with `pipx install meson`
 5. Install the fmt library with `meson wrap install fmt`
 6. Run `meson setup --native-file linux-build.ini build`, where `build` is the name of the build directory.
