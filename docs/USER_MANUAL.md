@@ -121,7 +121,22 @@ Output:
 Both markings signal that only one test frame should be generated. The one test frame will be appropriately marked as an error or single.
 
 ### Common Errors
-1. A Choice cannot have multiple markers, only one.
+1. Nothing can come after a marker.
+e.g.
+```
+Input:
+  # In the TSLgenerator, anything after [single] or [error]
+  # would be ignored. For this example, this means that
+  # this choice would be read as
+  #     Text File.  [single]
+  # where the property defaultFile would never be defined.
+  Text File.  [single][property defaultFile]
+
+Output:
+  Text.
+  Image.
+```
+2. A Choice cannot have multiple markers, only one.
 e.g.
 ```
 Input:
