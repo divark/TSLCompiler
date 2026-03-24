@@ -40,11 +40,15 @@
 
 %token LOGICAL_GROUP_START
 %token LOGICAL_GROUP_END
-/* Since all Grammar rules are written in a left-associative style,
-all Binary-based operations should have left-precedence. */
-%right LOGICAL_NOT
 %left LOGICAL_AND
 %left LOGICAL_OR
+/* Since all Grammar rules are written in a left-associative style,
+all Binary-based operations should have left-precedence.
+
+Token precedence increases the lower it is. Negation takes higher
+precedence over && and ||.
+*/
+%right LOGICAL_NOT
 
 %token MARKING_SINGLE
 %token MARKING_ERROR
@@ -79,10 +83,10 @@ if_statement: CONSTRAINT_START IF expression CONSTRAINT_END label { $$ = collect
 else_statement: ELSE label { $$ = collector.convertPropertiesToElseProperties(); }
               | ELSE       { $$ = collector.markChoiceHasElse(); }
               ;
-expression: LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
-          | LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
+expression: LOGICAL_NOT expression { $$ = collector.recordUnaryExpression(ExpType::Negated); }
           | expression LOGICAL_AND expression { $$ = collector.recordBinaryExpression(ExpType::And); }
           | expression LOGICAL_OR expression  { $$ = collector.recordBinaryExpression(ExpType::Or);  }
+          | LOGICAL_GROUP_START expression LOGICAL_GROUP_END { $$ = collector.recordUnaryExpression(ExpType::Grouped); }
           | PROPERTY_ELEMENT { checkIfCurrentPropertyUndefined(lexer.getCurrentTokenContents(), collector, @$); $$ = collector.recordSimpleExpression(lexer.getCurrentTokenContents()); }
           ;
 label:  marking

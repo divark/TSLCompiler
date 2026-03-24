@@ -1,0 +1,10 @@
+Sample Category 1:
+    a.  [property a]
+    not a.
+
+Sample Category 2:
+    b.  [property b]
+    not b.
+
+Sample Category 3:
+    not a and not b.  [if !a && !b]
