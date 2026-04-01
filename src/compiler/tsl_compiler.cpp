@@ -47,7 +47,7 @@ int TSLCompiler::compile() {
         tslGraph.visitDFS(categoryNode);
     }
 
-    auto firstCategory = parser->getCollector().getCategory(0);
+    auto& firstCategory = parser->getCollector().getCategory(0);
     auto firstCategoryNodes = filterToNodesWithCategory(tslGraph.getNodes(), firstCategory);
     firstCategoryNodes = filterToNodesWithoutMarkers(firstCategoryNodes);
     for (auto categoryNode : firstCategoryNodes) {

@@ -114,7 +114,7 @@ void printTestCase(TSLTestCase &testCase, std::ostream& outputStream) {
     }
     formattedTestCase << std::endl;
 
-    auto categories = testCase.getCategories();
+    auto& categories = testCase.getCategories();
     // This is used for left-aligning the output, since it's easier to the eyes.
     size_t longestCategoryCount = getLongestLength(categories);
 

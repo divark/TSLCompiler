@@ -30,11 +30,11 @@ std::vector<std::shared_ptr<Node>> getNodesFromCollector(TSLCollector& recordedV
 
     auto numCategories = recordedVariables.getNumCategories();
     for (auto categoryIdx = 0; categoryIdx < numCategories; categoryIdx++) {
-        auto currentCategory = recordedVariables.getCategory(categoryIdx);
+        auto& currentCategory = recordedVariables.getCategory(categoryIdx);
         auto numChoices = currentCategory.getNumChoices();
         for (auto choiceIdx = 0; choiceIdx < numChoices; choiceIdx++) {
             auto categoryLabel = currentCategory.getLabel();
-            auto categoryChoice = currentCategory.getChoice(choiceIdx);
+            auto& categoryChoice = currentCategory.getChoice(choiceIdx);
             auto nodeData = TSLNode(categoryLabel, categoryChoice);
 
             auto node = std::make_shared<Node>(nodeData);
@@ -59,8 +59,8 @@ Edges getEdgesFromTSLNodes(std::vector<std::shared_ptr<Node>>& nodes, TSLCollect
 
     auto numCategories = recordedVariables.getNumCategories();
     for (auto categoryIdx = 0; categoryIdx < numCategories - 1; categoryIdx++) {
-        auto firstCategory = recordedVariables.getCategory(categoryIdx);
-        auto nextCategory = recordedVariables.getCategory(categoryIdx + 1);
+        auto& firstCategory = recordedVariables.getCategory(categoryIdx);
+        auto& nextCategory = recordedVariables.getCategory(categoryIdx + 1);
 
         auto firstCategoryNodes = filterToNodesWithCategory(nodes, firstCategory);
         firstCategoryNodes = filterToNodesWithoutMarkers(firstCategoryNodes);
@@ -84,8 +84,8 @@ std::vector<std::shared_ptr<Node>> filterToNodesWithMarkers(const std::vector<st
     std::vector<std::shared_ptr<Node>> foundNodes;
 
     for (auto node : nodes) {
-        auto nodeData = node->getData();
-        auto nodeChoice = nodeData.getChoice();
+        auto& nodeData = node->getData();
+        auto& nodeChoice = nodeData.getChoice();
 
         bool hasMarkers = nodeChoice.hasNormalMarker();
         if (!hasMarkers) {
@@ -105,8 +105,8 @@ std::vector<std::shared_ptr<Node>> filterToNodesWithoutMarkers(const std::vector
     std::vector<std::shared_ptr<Node>> foundNodes;
 
     for (auto node : nodes) {
-        auto nodeData = node->getData();
-        auto nodeChoice = nodeData.getChoice();
+        auto& nodeData = node->getData();
+        auto& nodeChoice = nodeData.getChoice();
 
         bool hasMarkers = nodeChoice.hasNormalMarker();
         if (hasMarkers) {
@@ -127,7 +127,7 @@ std::vector<std::shared_ptr<Node>> filterToNodesWithCategory(const std::vector<s
 
     auto desiredCategoryLabel = desiredCategory.getLabel();
     for (auto node : nodes) {
-        auto nodeData = node->getData();
+        auto& nodeData = node->getData();
         auto nodeCategoryLabel = nodeData.getCategoryLabel();
 
         if (nodeCategoryLabel != desiredCategoryLabel) {
@@ -203,7 +203,7 @@ std::vector<std::shared_ptr<Node>>& TSLGraph::getNodes() {
 const std::vector<std::shared_ptr<Node>> TSLGraph::getEdges(const std::shared_ptr<Node> currentNode) const {
     std::vector<std::shared_ptr<Node>> foundEdges;
 
-    auto edgesFound = this->edges.getNodeEdges(currentNode);
+    auto& edgesFound = this->edges.getNodeEdges(currentNode);
     for (auto nodeEdgeID : edgesFound) {
         foundEdges.push_back(this->nodes[nodeEdgeID]);
     }
