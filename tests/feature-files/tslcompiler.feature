@@ -279,3 +279,58 @@ Feature: The TSLCompiler should generate test frames.
         Then test case 4 should have 'not b.' chosen in category 2.
         Then test case 4 should have 'Sample Category 3:' as category 3.
         Then test case 4 should have 'not a or b.' chosen in category 3.
+
+    Scenario: A TSL file with conditional markers at the end are not visited twice.
+        Given a TSL file called conditional_marker_deadend.txt,
+        When the input is consumed by the TSLCompiler,
+        Then the TSLCompiler's result should contain 6 test cases.
+
+        Then test case 1 should have 'Category 4:' as category 1.
+        Then test case 1 should have 'Choice 1.' chosen in category 1.
+
+        Then test case 2 should have 'Category 5:' as category 1.
+        Then test case 2 should have 'Choice 1.' chosen in category 1.
+
+        Then test case 3 should have 'Category 1:' as category 1.
+        Then test case 3 should have 'Yes.' chosen in category 1.
+        Then test case 3 should have 'Category 2:' as category 2.
+        Then test case 3 should have 'No.' chosen in category 2.
+        Then test case 3 should have 'Category 3:' as category 3.
+        Then test case 3 should have 'No.' chosen in category 3.
+        Then test case 3 should have 'Category 4:' as category 4.
+        Then test case 3 should have 'N/A' chosen in category 4.
+        Then test case 3 should have 'Category 5:' as category 5.
+        Then test case 3 should have 'N/A' chosen in category 5.
+
+        Then test case 4 should have 'Category 1:' as category 1.
+        Then test case 4 should have 'No.' chosen in category 1.
+        Then test case 4 should have 'Category 2:' as category 2.
+        Then test case 4 should have 'Yes.' chosen in category 2.
+        Then test case 4 should have 'Category 3:' as category 3.
+        Then test case 4 should have 'Yes.' chosen in category 3.
+        Then test case 4 should have 'Category 4:' as category 4.
+        Then test case 4 should have 'N/A' chosen in category 4.
+        Then test case 4 should have 'Category 5:' as category 5.
+        Then test case 4 should have 'N/A' chosen in category 5.
+
+        Then test case 5 should have 'Category 1:' as category 1.
+        Then test case 5 should have 'No.' chosen in category 1.
+        Then test case 5 should have 'Category 2:' as category 2.
+        Then test case 5 should have 'Yes.' chosen in category 2.
+        Then test case 5 should have 'Category 3:' as category 3.
+        Then test case 5 should have 'No.' chosen in category 3.
+        Then test case 5 should have 'Category 4:' as category 4.
+        Then test case 5 should have 'N/A' chosen in category 4.
+        Then test case 5 should have 'Category 5:' as category 5.
+        Then test case 5 should have 'N/A' chosen in category 5.
+
+        Then test case 6 should have 'Category 1:' as category 1.
+        Then test case 6 should have 'No.' chosen in category 1.
+        Then test case 6 should have 'Category 2:' as category 2.
+        Then test case 6 should have 'No.' chosen in category 2.
+        Then test case 6 should have 'Category 3:' as category 3.
+        Then test case 6 should have 'No.' chosen in category 3.
+        Then test case 6 should have 'Category 4:' as category 4.
+        Then test case 6 should have 'N/A' chosen in category 4.
+        Then test case 6 should have 'Category 5:' as category 5.
+        Then test case 6 should have 'N/A' chosen in category 5.

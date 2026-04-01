@@ -1,0 +1,17 @@
+	Category 1:
+		Yes.					[property prop1]
+		No.
+
+	Category 2:
+		Yes.					[property prop2]
+		No.
+
+	Category 3:
+		Yes.					[property prop3]
+		No.
+
+	Category 4:
+		Choice 1.			[if prop1 && prop2][error]
+
+	Category 5:
+		Choice 1.				[if prop3 && !prop2][error]

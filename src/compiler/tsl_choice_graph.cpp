@@ -236,6 +236,55 @@ std::vector<std::reference_wrapper<TSLTestCase>> TSLGraph::getGeneratedTestCases
 }
 
 /**
+ * Returns a list of properties found for some Choice, or
+ * None if the expression was not evaluated.
+ */
+std::optional<std::vector<Property>> TSLGraph::getApplicableProperties(Choice& currentChoice) {
+    std::vector<Property> choiceProperties;
+    if (!currentChoice.getExpression()) {
+        choiceProperties = currentChoice.getProperties();
+
+        return std::make_optional(choiceProperties);
+    }
+
+    auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
+    // No properties returning means that the expression was not satisfied, indicating that
+    // there was not an else statement either.
+    if (!evaluatedChoiceProperties) {
+        return {};
+    }
+
+    choiceProperties = evaluatedChoiceProperties.value().getProperties();
+
+    return std::make_optional(choiceProperties);
+}
+
+/**
+ * Returns whether the current node has a marker if the expression is
+ * satisfied.
+ */
+bool TSLGraph::hasSatisfiedConditionalMarker(std::shared_ptr<Node> currentNode) {
+    auto& currentChoice = currentNode->getData().getChoice();
+
+    if (!currentChoice.getExpression()) {
+        return false;
+    }
+
+    auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
+    if (!evaluatedChoiceProperties) {
+        return false;
+    }
+
+    auto foundProperty = evaluatedChoiceProperties.value().getProperties()[0];
+    auto foundMarker = foundProperty.asMarker();
+    if (!foundMarker) {
+        return false;
+    }
+
+    return checkIfMarkerAlreadyVisited(currentNode, foundMarker.value());
+}
+
+/**
 * Checks in with listeners subscribed to preorder events.
 */
 bool TSLGraph::preorderCheckin(std::shared_ptr<Node> currentNode) {
@@ -243,19 +292,22 @@ bool TSLGraph::preorderCheckin(std::shared_ptr<Node> currentNode) {
 
     bool currentNodeNonApplicable = isNonApplicable(currentNode);
 
-    auto currentChoice = currentNode->getData().getChoice();
+    // We don't want to visit a N/A Choice if it still results
+    // in seeing a Marker again.
+    bool nonApplicableNodeHasSeenMarker = currentNodeNonApplicable && hasSatisfiedConditionalMarker(currentNode);
+    if (nonApplicableNodeHasSeenMarker) {
+        return false;
+    }
+
+    auto& currentChoice = currentNode->getData().getChoice();
     std::vector<Property> choiceProperties;
-    if (currentChoice.getExpression() && !currentNodeNonApplicable) {
-        auto evaluatedChoiceProperties = currentChoice.getEvaluatedProperties(seenPropertiesOverall);
-        // No properties returning means that the expression was not satisfied, indicating that
-        // there was not an else statement either.
-        if (!evaluatedChoiceProperties) {
+    if (!currentNodeNonApplicable) {
+        auto foundChoiceProperties = getApplicableProperties(currentChoice);
+        if (!foundChoiceProperties) {
             return false;
-        } else {
-            choiceProperties = evaluatedChoiceProperties.value().getProperties();
         }
-    } else if (!currentNodeNonApplicable) {
-        choiceProperties = currentChoice.getProperties();
+
+        choiceProperties = foundChoiceProperties.value();
     }
 
     for (auto property : choiceProperties) {

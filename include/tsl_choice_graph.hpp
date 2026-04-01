@@ -72,8 +72,10 @@ class TSLGraph {
         void removeNonApplicable(std::shared_ptr<Node>);
 
         bool isNonApplicable(std::shared_ptr<Node>);
+        std::optional<std::vector<Property>> getApplicableProperties(Choice&);
         bool checkIfNextCategoryNotApplicable(std::shared_ptr<Node>);
 
+        bool hasSatisfiedConditionalMarker(std::shared_ptr<Node>);
         bool checkIfMarkerAlreadyVisited(std::shared_ptr<Node>, Marker&);
         void markChoiceWithMarkerAsVisited(std::shared_ptr<Node>, Marker&);
 
