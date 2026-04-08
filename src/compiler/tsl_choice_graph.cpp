@@ -3,6 +3,7 @@
 #include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
 #include <functional>
+#include <sstream>
 
 TSLNode::TSLNode() {
     categoryLabel = "";
@@ -428,19 +429,24 @@ TSLTestCase TSLGraph::makeTestCase(std::vector<std::shared_ptr<Node>>& choiceNod
  * together.
  */
 std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes) {
-    std::string nodesKey = "";
-    for (auto& node : nodes) {
-        auto foundNodeID = node->getID();
+    std::ostringstream nodeKeyGenerator;
+    for (size_t i = 0; i < nodes.size(); i++) {
+        if (i != 0) {
+            nodeKeyGenerator << ",";
+        }
+
+        auto& currentNode = nodes[i];
+        auto foundNodeID = currentNode->getID();
         // Even if a N/A was found on different Choices in the same Category,
         // we want to exclude a test case that looks the same.
-        if (isNonApplicable(node)) {
+        if (isNonApplicable(currentNode)) {
             foundNodeID = -1;
         }
 
-        nodesKey.push_back(foundNodeID);
+        nodeKeyGenerator << foundNodeID;
     }
 
-    return nodesKey;
+    return nodeKeyGenerator.str();
 }
 
 /**
