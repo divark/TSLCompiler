@@ -25,14 +25,14 @@ class TSLNode {
 
 class Node {
     private:
-        size_t id;
+        ssize_t id;
         TSLNode data;
     public:
         Node(TSLNode);
 
         TSLNode& getData();
-        size_t getID() const;
-        void setID(size_t);
+        ssize_t getID() const;
+        void setID(ssize_t);
 };
 
 class Edges {
@@ -79,7 +79,8 @@ class TSLGraph {
         bool checkIfMarkerAlreadyVisited(std::shared_ptr<Node>, Marker&);
         void markChoiceWithMarkerAsVisited(std::shared_ptr<Node>, Marker&);
 
-        std::unordered_set<std::string> testCaseKeys;
+        std::unordered_set<size_t> testCaseKeys;
+        size_t generateNodesHash(std::vector<std::shared_ptr<Node>>&);
         std::string generateNodesKey(std::vector<std::shared_ptr<Node>>&);
         bool checkIfNodesAlreadyTestCase(std::vector<std::shared_ptr<Node>>&);
     public:

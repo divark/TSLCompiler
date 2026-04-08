@@ -149,14 +149,14 @@ Node::Node(TSLNode nodeData) {
 /**
  * Returns the ID assigned to the current Node.
  */
-size_t Node::getID() const {
+ssize_t Node::getID() const {
     return id;
 }
 
 /**
  * Sets the ID for the current Node.
  */
-void Node::setID(size_t newID) {
+void Node::setID(ssize_t newID) {
     id = newID;
 }
 
@@ -425,6 +425,26 @@ TSLTestCase TSLGraph::makeTestCase(std::vector<std::shared_ptr<Node>>& choiceNod
 }
 
 /**
+ * Returns a combined hash value from all nodes given.
+ */
+size_t TSLGraph::generateNodesHash(std::vector<std::shared_ptr<Node>>& nodes) {
+    size_t seed = 0;
+
+    for (auto& node : nodes) {
+        ssize_t nodeID = node->getID();
+        // Even if a N/A was found on different Choices in the same Category,
+        // we want to exclude a test case that looks the same.
+        if (isNonApplicable(node)) {
+            nodeID = -1;
+        }
+
+        seed ^= std::hash<ssize_t>()(nodeID) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+
+    return seed;
+}
+
+/**
  * Returns a key represented as a string of node IDs concatenated
  * together.
  */
@@ -436,7 +456,7 @@ std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes
         }
 
         auto& currentNode = nodes[i];
-        auto foundNodeID = currentNode->getID();
+        ssize_t foundNodeID = currentNode->getID();
         // Even if a N/A was found on different Choices in the same Category,
         // we want to exclude a test case that looks the same.
         if (isNonApplicable(currentNode)) {
@@ -454,8 +474,8 @@ std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes
  * were already used to make a test case.
  */
 bool TSLGraph::checkIfNodesAlreadyTestCase(std::vector<std::shared_ptr<Node>>& nodes) {
-    std::string nodesKey = generateNodesKey(nodes);
-    return testCaseKeys.contains(nodesKey);
+    size_t nodesHash = generateNodesHash(nodes);
+    return testCaseKeys.contains(nodesHash);
 }
 
 /**
@@ -471,7 +491,8 @@ void TSLGraph::generateNormalTestCase() {
     generatedTestCases.push_back(testCase);
 
     std::string visitedNodesKey = generateNodesKey(visitedNodes);
-    testCaseKeys.insert(visitedNodesKey);
+    size_t visitedNodesHash = generateNodesHash(visitedNodes);
+    testCaseKeys.insert(visitedNodesHash);
 }
 
 /**
@@ -490,7 +511,8 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
     markerTestCases.push_back(testCase);
 
     std::string visitedNodesKey = generateNodesKey(markerNode);
-    testCaseKeys.insert(visitedNodesKey);
+    size_t visitedNodesHash = generateNodesHash(visitedNodes);
+    testCaseKeys.insert(visitedNodesHash);
 }
 
 /**
