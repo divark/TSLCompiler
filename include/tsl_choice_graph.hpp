@@ -80,8 +80,8 @@ class TSLGraph {
         void markChoiceWithMarkerAsVisited(std::shared_ptr<Node>, Marker&);
 
         std::unordered_set<size_t> testCaseKeys;
-        size_t generateNodesHash(std::vector<std::shared_ptr<Node>>&);
-        std::string generateNodesKey(std::vector<std::shared_ptr<Node>>&);
+        ssize_t generateNodesHash(std::vector<std::shared_ptr<Node>>&);
+        //std::string generateNodesKey(std::vector<std::shared_ptr<Node>>&);
         bool checkIfNodesAlreadyTestCase(std::vector<std::shared_ptr<Node>>&);
     public:
         TSLGraph();

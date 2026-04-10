@@ -3,7 +3,6 @@
 #include "tsl_grammar.hpp"
 #include "tsl_testcase.hpp"
 #include <functional>
-#include <sstream>
 
 TSLNode::TSLNode() {
     categoryLabel = "";
@@ -427,8 +426,8 @@ TSLTestCase TSLGraph::makeTestCase(std::vector<std::shared_ptr<Node>>& choiceNod
 /**
  * Returns a combined hash value from all nodes given.
  */
-size_t TSLGraph::generateNodesHash(std::vector<std::shared_ptr<Node>>& nodes) {
-    size_t seed = 0;
+ssize_t TSLGraph::generateNodesHash(std::vector<std::shared_ptr<Node>>& nodes) {
+    ssize_t seed = 0;
 
     for (auto& node : nodes) {
         ssize_t nodeID = node->getID();
@@ -444,30 +443,30 @@ size_t TSLGraph::generateNodesHash(std::vector<std::shared_ptr<Node>>& nodes) {
     return seed;
 }
 
-/**
- * Returns a key represented as a string of node IDs concatenated
- * together.
- */
-std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes) {
-    std::ostringstream nodeKeyGenerator;
-    for (size_t i = 0; i < nodes.size(); i++) {
-        if (i != 0) {
-            nodeKeyGenerator << ",";
-        }
-
-        auto& currentNode = nodes[i];
-        ssize_t foundNodeID = currentNode->getID();
-        // Even if a N/A was found on different Choices in the same Category,
-        // we want to exclude a test case that looks the same.
-        if (isNonApplicable(currentNode)) {
-            foundNodeID = -1;
-        }
-
-        nodeKeyGenerator << foundNodeID;
-    }
-
-    return nodeKeyGenerator.str();
-}
+///**
+// * Returns a key represented as a string of node IDs concatenated
+// * together.
+// */
+//std::string TSLGraph::generateNodesKey(std::vector<std::shared_ptr<Node>>& nodes) {
+//    std::ostringstream nodeKeyGenerator;
+//    for (size_t i = 0; i < nodes.size(); i++) {
+//        if (i != 0) {
+//            nodeKeyGenerator << ",";
+//        }
+//
+//        auto& currentNode = nodes[i];
+//        ssize_t foundNodeID = currentNode->getID();
+//        // Even if a N/A was found on different Choices in the same Category,
+//        // we want to exclude a test case that looks the same.
+//        if (isNonApplicable(currentNode)) {
+//            foundNodeID = -1;
+//        }
+//
+//        nodeKeyGenerator << foundNodeID;
+//    }
+//
+//    return nodeKeyGenerator.str();
+//}
 
 /**
  * Returns a boolean indicating whether the given nodes
@@ -490,7 +489,6 @@ void TSLGraph::generateNormalTestCase() {
     auto testCase = makeTestCase(visitedNodes);
     generatedTestCases.push_back(testCase);
 
-    std::string visitedNodesKey = generateNodesKey(visitedNodes);
     size_t visitedNodesHash = generateNodesHash(visitedNodes);
     testCaseKeys.insert(visitedNodesHash);
 }
@@ -510,7 +508,6 @@ void TSLGraph::generateMarkerTestCase(Marker& markerFound) {
     testCase.setMarker(markerFound);
     markerTestCases.push_back(testCase);
 
-    std::string visitedNodesKey = generateNodesKey(markerNode);
     size_t visitedNodesHash = generateNodesHash(visitedNodes);
     testCaseKeys.insert(visitedNodesHash);
 }
